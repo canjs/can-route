@@ -1,11 +1,11 @@
-/* jshint asi:true*/
+/* jshint asi:true */
+/* jshint -W079 */
 var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
 var Map = require('can-map');
-var ObserveInfo = require('can-observe-info');
-
 var makeArray = require('can-util/js/make-array/make-array');
 
+require('can-observe-info');
 
 QUnit.module("can/route", {
 	setup: function () {

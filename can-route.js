@@ -1,5 +1,5 @@
+/*jshint -W079 */
 var Map = require('can-map');
-var List = require('can-list');
 var canBatch = require('can-event/batch/batch');
 var canEvent = require('can-event');
 var ObserveInfo = require('can-observe-info');
@@ -17,142 +17,104 @@ var makeArray = require('can-util/js/make-array/make-array');
 var assign = require("can-util/js/assign/assign");
 var types = require('can-util/js/types/types');
 
+require('can-list');
+
 // ## route.js
 // `canRoute`
 // _Helps manage browser history (and client state) by synchronizing the
 // `window.location.hash` with a `Map`._
 //
 // Helper methods used for matching routes.
-var
 // `RegExp` used to match route variables of the type ':name'.
 // Any word character or a period is matched.
-matcher = /\:([\w\.]+)/g,
-	// Regular expression for identifying &amp;key=value lists.
-	paramsMatcher = /^(?:&[^=]+=[^&]*)+/,
-	// Converts a JS Object into a list of parameters that can be
-	// inserted into an html element tag.
-	makeProps = function (props) {
-		var tags = [];
-		each(props, function (val, name) {
-			tags.push((name === 'className' ? 'class' : name) + '="' +
-				(name === "href" ? val : string.esc(val)) + '"');
+var matcher = /\:([\w\.]+)/g;
+// Regular expression for identifying &amp;key=value lists.
+var paramsMatcher = /^(?:&[^=]+=[^&]*)+/;
+// Converts a JS Object into a list of parameters that can be
+// inserted into an html element tag.
+var makeProps = function (props) {
+	var tags = [];
+	each(props, function (val, name) {
+		tags.push((name === 'className' ? 'class' : name) + '="' +
+			(name === "href" ? val : string.esc(val)) + '"');
+	});
+	return tags.join(" ");
+};
+// Checks if a route matches the data provided. If any route variable
+// is not present in the data, the route does not match. If all route
+// variables are present in the data, the number of matches is returned
+// to allow discerning between general and more specific routes.
+var matchesData = function (route, data) {
+	var count = 0,
+		i = 0,
+		defaults = {};
+	// look at default values, if they match ...
+	for (var name in route.defaults) {
+		if (route.defaults[name] === data[name]) {
+			// mark as matched
+			defaults[name] = 1;
+			count++;
+		}
+	}
+	for (; i < route.names.length; i++) {
+		if (!data.hasOwnProperty(route.names[i])) {
+			return -1;
+		}
+		if (!defaults[route.names[i]]) {
+			count++;
+		}
+
+	}
+
+	return count;
+};
+var location = typeof window !== 'undefined' ? window.location : {};
+var wrapQuote = function (str) {
+	return (str + '')
+		.replace(/([.?*+\^$\[\]\\(){}|\-])/g, "\\$1");
+};
+
+// Helper for convert any object (or value) to stringified object (or value)
+var stringify = function (obj) {
+	// Object is array, plain object, Map or List
+	if (obj && typeof obj === "object") {
+		if (obj instanceof Map) {
+			obj = obj;
+		} else {
+			// Get array from array-like or shallow-copy object
+			obj = isFunction(obj.slice) ? obj.slice() : assign({}, obj);
+		}
+		// Convert each object property or array item into stringified new
+		each(obj, function (val, prop) {
+			obj[prop] = stringify(val);
 		});
-		return tags.join(" ");
-	},
-	// Checks if a route matches the data provided. If any route variable
-	// is not present in the data, the route does not match. If all route
-	// variables are present in the data, the number of matches is returned
-	// to allow discerning between general and more specific routes.
-	matchesData = function (route, data) {
-		var count = 0,
-			i = 0,
-			defaults = {};
-		// look at default values, if they match ...
-		for (var name in route.defaults) {
-			if (route.defaults[name] === data[name]) {
-				// mark as matched
-				defaults[name] = 1;
-				count++;
-			}
-		}
-		for (; i < route.names.length; i++) {
-			if (!data.hasOwnProperty(route.names[i])) {
-				return -1;
-			}
-			if (!defaults[route.names[i]]) {
-				count++;
-			}
+		// Object supports toString function
+	} else if (obj !== undefined && obj !== null && isFunction(obj.toString)) {
+		obj = obj.toString();
+	}
 
-		}
+	return obj;
+};
 
-		return count;
-	},
-	location = typeof window !== 'undefined' ? window.location : {}, // jshint ignore:line
-	wrapQuote = function (str) {
-		return (str + '')
-			.replace(/([.?*+\^$\[\]\\(){}|\-])/g, "\\$1");
-	},
-	// Helper for convert any object (or value) to stringified object (or value)
-	stringify = function (obj) {
-		// Object is array, plain object, Map or List
-		if (obj && typeof obj === "object") {
-			if (obj instanceof Map) {
-				obj = obj;
-			} else {
-				// Get array from array-like or shallow-copy object
-				obj = isFunction(obj.slice) ? obj.slice() : assign({}, obj);
-			}
-			// Convert each object property or array item into stringified new
-			each(obj, function (val, prop) {
-				obj[prop] = stringify(val);
-			});
-			// Object supports toString function
-		} else if (obj !== undefined && obj !== null && isFunction(obj.toString)) {
-			obj = obj.toString();
-		}
+var removeBackslash = function (str) {
+	return str.replace(/\\/g, "");
+};
 
-		return obj;
-	},
-	removeBackslash = function (str) {
-		return str.replace(/\\/g, "");
-	},
-	// A ~~throttled~~ debounced function called multiple times will only fire once the
-	// timer runs down. Each call resets the timer.
-	timer,
-	// Intermediate storage for `canRoute.data`.
-	curParams,
-	// The last hash caused by a data change
-	lastHash,
-	// Are data changes pending that haven't yet updated the hash
-	changingData,
-	// List of attributes that have changed since last update
-	changedAttrs = [],
-	// If the `canRoute.data` changes, update the hash.
-	// Using `.serialize()` retrieves the raw data contained in the `observable`.
-	// This function is ~~throttled~~ debounced so it only updates once even if multiple values changed.
-	// This might be able to use batchNum and avoid this.
-	onRouteDataChange = function (ev, attr, how, newval) {
-		// indicate that data is changing
-		changingData = 1;
-		// collect attributes that are changing
-		changedAttrs.push(attr);
-		clearTimeout(timer);
-		timer = setTimeout(function () {
-			// indicate that the hash is set to look like the data
-			changingData = 0;
-			var serialized =canRoute.data.serialize(),
-				path =canRoute.param(serialized, true);
-			canRoute._call("setURL", path, changedAttrs);
-			// trigger a url change so its possible to live-bind on url-based changes
-			canBatch.trigger(eventsObject,"__url",[path, lastHash]);
-			lastHash = path;
-			changedAttrs = [];
-		}, 10);
-	},
-	// A dummy events object used to dispatch url change events on.
-	eventsObject = assign({}, canEvent),
-	// everything in the backing Map is a string
-	// add type coercion during Map setter to coerce all values to strings
-	stringCoercingMapDecorator = function(map) {
-		var attrSuper = map.attr;
+// A ~~throttled~~ debounced function called multiple times will only fire once the
+// timer runs down. Each call resets the timer.
+var timer;
+// Intermediate storage for `canRoute.data`.
+var curParams;
+// The last hash caused by a data change
+var lastHash;
+// Are data changes pending that haven't yet updated the hash
+var changingData;
+// List of attributes that have changed since last update
+var changedAttrs = [];
+// A dummy events object used to dispatch url change events on.
+var eventsObject = assign({}, canEvent);
 
-		map.attr = function(prop, val) {
-			var serializable = this.define === undefined || this.define[prop] === undefined || !!this.define[prop].serialize,
-				args;
-
-			if (serializable) { // if setting non-str non-num attr
-				args = stringify(Array.apply(null, arguments));
-			} else {
-				args = arguments;
-			}
-
-			return attrSuper.apply(this, args);
-		};
-
-		return map;
-	};
-
-canRoute = function (url, defaults) {
+var canRoute = function (url, defaults) {
 	// if route ends with a / and url starts with a /, remove the leading / of the url
 	var root =canRoute._call("root");
 
@@ -203,6 +165,85 @@ canRoute = function (url, defaults) {
 			.length
 	};
 	return canRoute;
+};
+
+// If the `canRoute.data` changes, update the hash.
+// Using `.serialize()` retrieves the raw data contained in the `observable`.
+// This function is ~~throttled~~ debounced so it only updates once even if multiple values changed.
+// This might be able to use batchNum and avoid this.
+var onRouteDataChange = function (ev, attr, how, newval) {
+	// indicate that data is changing
+	changingData = 1;
+	// collect attributes that are changing
+	changedAttrs.push(attr);
+	clearTimeout(timer);
+	timer = setTimeout(function () {
+		// indicate that the hash is set to look like the data
+		changingData = 0;
+		var serialized =canRoute.data.serialize(),
+			path =canRoute.param(serialized, true);
+		canRoute._call("setURL", path, changedAttrs);
+		// trigger a url change so its possible to live-bind on url-based changes
+		canBatch.trigger(eventsObject,"__url",[path, lastHash]);
+		lastHash = path;
+		changedAttrs = [];
+	}, 10);
+};
+
+// everything in the backing Map is a string
+// add type coercion during Map setter to coerce all values to strings
+var stringCoercingMapDecorator = function(map) {
+	var attrSuper = map.attr;
+
+	map.attr = function(prop, val) {
+		var serializable = this.define === undefined || this.define[prop] === undefined || !!this.define[prop].serialize,
+			args;
+
+		if (serializable) { // if setting non-str non-num attr
+			args = stringify(Array.apply(null, arguments));
+		} else {
+			args = arguments;
+		}
+
+		return attrSuper.apply(this, args);
+	};
+
+	return map;
+};
+
+var recursiveClean = function(old, cur, data){
+	for(var attr in old){
+		if(cur[attr] === undefined){
+			data.removeAttr(attr);
+		}
+		else if(Object.prototype.toString.call(old[attr]) === "[object Object]") {
+			recursiveClean( old[attr], cur[attr], data.attr(attr) );
+		}
+	}
+};
+
+var // Deparameterizes the portion of the hash of interest and assign the
+// values to the `canRoute.data` removing existing values no longer in the hash.
+// setState is called typically by hashchange which fires asynchronously
+// So it's possible that someone started changing the data before the
+// hashchange event fired.  For this reason, it will not set the route data
+// if the data is changing or the hash already matches the hash that was set.
+setState =canRoute.setState = function () {
+	var hash =canRoute._call("matchingPartOfURL");
+	var oldParams = curParams;
+	curParams =canRoute.deparam(hash);
+
+	// if the hash data is currently changing, or
+	// the hash is what we set it to anyway, do NOT change the hash
+	if (!changingData || hash !== lastHash) {
+		canRoute.batch.start();
+		recursiveClean(oldParams, curParams,canRoute.data);
+
+		canRoute.attr(curParams);
+		// trigger a url change so its possible to live-bind on url-based changes
+		canRoute.batch.trigger.call(eventsObject,"__url",[hash, lastHash]);
+		canRoute.batch.stop();
+	}
 };
 
 /**
@@ -663,41 +704,6 @@ canRoute.attr = function () {
 
 //Allow for overriding of route batching by can.transaction
 canRoute.batch = canBatch;
-
-var // Deparameterizes the portion of the hash of interest and assign the
-// values to the `canRoute.data` removing existing values no longer in the hash.
-// setState is called typically by hashchange which fires asynchronously
-// So it's possible that someone started changing the data before the
-// hashchange event fired.  For this reason, it will not set the route data
-// if the data is changing or the hash already matches the hash that was set.
-setState =canRoute.setState = function () {
-	var hash =canRoute._call("matchingPartOfURL");
-	var oldParams = curParams;
-	curParams =canRoute.deparam(hash);
-
-	// if the hash data is currently changing, or
-	// the hash is what we set it to anyway, do NOT change the hash
-	if (!changingData || hash !== lastHash) {
-		canRoute.batch.start();
-		recursiveClean(oldParams, curParams,canRoute.data);
-
-		canRoute.attr(curParams);
-		// trigger a url change so its possible to live-bind on url-based changes
-		canRoute.batch.trigger.call(eventsObject,"__url",[hash, lastHash]);
-		canRoute.batch.stop();
-	}
-};
-
-var recursiveClean = function(old, cur, data){
-	for(var attr in old){
-		if(cur[attr] === undefined){
-			data.removeAttr(attr);
-		}
-		else if(Object.prototype.toString.call(old[attr]) === "[object Object]") {
-			recursiveClean( old[attr], cur[attr], data.attr(attr) );
-		}
-	}
-};
 
 var oldIsCallableForValue = types.isCallableForValue;
 types.isCallableForValue = function(obj){
