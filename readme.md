@@ -1,6 +1,6 @@
 # can-route
 
-[![Build Status](https://travis-ci.org//can-route.png?branch=master)](https://travis-ci.org//can-route)
+[![Build Status](https://travis-ci.org/canjs/can-route.png?branch=master)](https://travis-ci.org/canjs/can-route)
 
 
 
