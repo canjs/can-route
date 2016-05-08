@@ -13,12 +13,12 @@
         System.import('can-route'),
         System.import('can-observe-info'),
         System.import('can-observe-info/reader/reader'),
-        System.import('can-map')
+        System.import('can-define/map/map')
     ]).then(function(modules){
         var route = modules[0];
         window.ObserveInfo = modules[1];
         window.observeReader = modules[2];
-        window.CanMap = modules[3];
+        window.DefineMap = modules[3];
 
         setTimeout(function () {
           window.parent.routeTestReady && window.parent.routeTestReady(route, window.location, window)

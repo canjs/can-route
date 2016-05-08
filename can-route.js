@@ -1,8 +1,8 @@
 /*jshint -W079 */
-var Map = require('can-map');
 var canBatch = require('can-event/batch/batch');
 var canEvent = require('can-event');
 var ObserveInfo = require('can-observe-info');
+var compute = require('can-compute');
 
 var deparam = require('can-util/js/deparam/deparam');
 var each = require('can-util/js/each/each');
@@ -17,7 +17,6 @@ var makeArray = require('can-util/js/make-array/make-array');
 var assign = require("can-util/js/assign/assign");
 var types = require('can-util/js/types/types');
 
-require('can-list');
 
 // ## route.js
 // `canRoute`
@@ -78,8 +77,8 @@ var wrapQuote = function (str) {
 var stringify = function (obj) {
 	// Object is array, plain object, Map or List
 	if (obj && typeof obj === "object") {
-		if (obj instanceof Map) {
-			obj = obj;
+		if (obj && typeof obj === "object" && ("serialize" in obj)) {
+			obj = obj.serialize();
 		} else {
 			// Get array from array-like or shallow-copy object
 			obj = isFunction(obj.slice) ? obj.slice() : assign({}, obj);
@@ -171,18 +170,23 @@ var canRoute = function (url, defaults) {
 // Using `.serialize()` retrieves the raw data contained in the `observable`.
 // This function is ~~throttled~~ debounced so it only updates once even if multiple values changed.
 // This might be able to use batchNum and avoid this.
-var onRouteDataChange = function (ev, attr, how, newval) {
+var oldProperties = null;
+var onRouteDataChange = function (ev, newProps, oldProps) {
 	// indicate that data is changing
 	changingData = 1;
 	// collect attributes that are changing
-	changedAttrs.push(attr);
+	if(!oldProperties) {
+		oldProperties = oldProps;
+	}
 	clearTimeout(timer);
 	timer = setTimeout(function () {
+		var old = oldProperties;
+		oldProperties = null;
 		// indicate that the hash is set to look like the data
 		changingData = 0;
 		var serialized =canRoute.data.serialize(),
 			path =canRoute.param(serialized, true);
-		canRoute._call("setURL", path, changedAttrs);
+		canRoute._call("setURL", path, newProps, old);
 		// trigger a url change so its possible to live-bind on url-based changes
 		canBatch.trigger(eventsObject,"__url",[path, lastHash]);
 		lastHash = path;
@@ -193,6 +197,7 @@ var onRouteDataChange = function (ev, attr, how, newval) {
 // everything in the backing Map is a string
 // add type coercion during Map setter to coerce all values to strings
 var stringCoercingMapDecorator = function(map) {
+
 	var attrSuper = map.attr;
 
 	map.attr = function(prop, val) {
@@ -214,7 +219,12 @@ var stringCoercingMapDecorator = function(map) {
 var recursiveClean = function(old, cur, data){
 	for(var attr in old){
 		if(cur[attr] === undefined){
-			data.removeAttr(attr);
+			if("removeAttr" in data) {
+				data.removeAttr(attr);
+			} else {
+				cur[attr] = undefined;
+			}
+
 		}
 		else if(Object.prototype.toString.call(old[attr]) === "[object Object]") {
 			recursiveClean( old[attr], cur[attr], data.attr(attr) );
@@ -426,23 +436,8 @@ assign(canRoute, {
 		}
 		return paramsMatcher.test(url) ? deparam(url.slice(1)) : {};
 	},
-	/**
-	 * @hide
-	 * A Map that represents the state of the history.
-	 */
-	data: stringCoercingMapDecorator(new Map({})),
 	map: function(data){
-		var appState;
-		// appState is a Map constructor function
-		if(data.prototype instanceof Map){
-			appState = new data();
-		}
-		// appState is an instance of Map
-		else {
-			appState = data;
-		}
-
-		canRoute.data = stringCoercingMapDecorator(appState);
+		canRoute.data = data;
 	},
 	/**
 	 * @property {Object} routes
@@ -657,14 +652,14 @@ assign(canRoute, {
 	_setup: function () {
 		if (!canRoute.currentBinding) {
 			canRoute._call("bind");
-			canRoute.bind("change", onRouteDataChange);
+			canRoute.serializedCompute.addEventListener("change", onRouteDataChange);
 			canRoute.currentBinding =canRoute.defaultBinding;
 		}
 	},
 	_teardown: function () {
 		if (canRoute.currentBinding) {
 			canRoute._call("unbind");
-			canRoute.unbind("change", onRouteDataChange);
+			canRoute.serializedCompute.removeEventListener("change", onRouteDataChange);
 			canRoute.currentBinding = null;
 		}
 		clearTimeout(timer);
@@ -698,8 +693,77 @@ each(['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off', 'd
 	};
 });
 
-canRoute.attr = function () {
-	return canRoute.data.attr.apply(canRoute.data, arguments);
+
+var routeData;
+var setRouteData = function(data){
+	routeData = data;
+	return routeData;
+}
+var serializedCompute;
+Object.defineProperty(canRoute,"serializedCompute", {
+	get: function(){
+		if(!serializedCompute) {
+			serializedCompute = compute(function(){
+				return canRoute.data.serialize();
+			});
+		}
+		return serializedCompute;
+	}
+})
+Object.defineProperty(canRoute,"data", {
+	get: function(){
+		if(routeData) {
+			return routeData;
+		} else if( types.DefaultMap ) {
+
+			if( types.DefaultMap.prototype.toObject ) {
+				var DefaultRouteMap = types.DefaultMap.extend({
+					seal: false
+				},{
+					"*": {
+						type: "string"
+					}
+				});
+				return setRouteData(new DefaultRouteMap());
+			} else {
+				return setRouteData( stringCoercingMapDecorator( new types.DefaultMap() ) );
+			}
+
+		} else {
+			throw new Error("can.route.data accessed without being set");
+		}
+	},
+	set: function(data) {
+		if( types.isConstructor( data ) ){
+			data = new data();
+		}
+		// if it's a map, we make it always set strings for backwards compat
+		if( "attr" in data ) {
+			setRouteData( stringCoercingMapDecorator(data) );
+		} else {
+			setRouteData(data);
+		}
+
+	}
+});
+
+canRoute.attr = function (prop, value) {
+	if("attr" in canRoute.data) {
+		return canRoute.data.attr.apply(canRoute.data, arguments);
+	} else {
+		if(arguments.length > 1) {
+			canRoute.data.set(prop, value);
+			return canRoute.data;
+		} else if(typeof prop === 'object') {
+			canRoute.data.set(prop);
+			return canRoute.data;
+		} else if(arguments.length === 1){
+			return canRoute.data.get(prop);;
+		} else {
+			return canRoute.data.toObject();
+		}
+	}
+
 };
 
 //Allow for overriding of route batching by can.transaction

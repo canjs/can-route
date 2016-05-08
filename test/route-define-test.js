@@ -2,12 +2,12 @@
 /* jshint -W079 */
 var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
-var Map = require('can-map');
+var DefineMap = require('can-define/map/map');
 var makeArray = require('can-util/js/make-array/make-array');
 
 require('can-observe-info');
 
-QUnit.module("can/route with can-map", {
+QUnit.module("can/route with can-define/map/map", {
 	setup: function () {
 		canRoute._teardown();
 		canRoute.defaultBinding = "hashchange";
@@ -467,7 +467,7 @@ var setupRouteTest = function(callback){
 		args.unshift(iframe);
 		callback.apply(null, args);
 	};
-	iframe.src = __dirname + "/testing.html?"+Math.random();
+	iframe.src = __dirname + "/define-testing.html?"+Math.random();
 	testarea.appendChild(iframe);
 	teardownRouteTest = function(){
 		setTimeout(function(){
@@ -485,13 +485,12 @@ if (typeof steal !== 'undefined') {
 
 		setupRouteTest(function (iframe, iCanRoute) {
 
-			ok(!iCanRoute.attr('bla'), 'Value not set yet');
+			ok(!iCanRoute.data.bla, 'Value not set yet');
 
-			iCanRoute.bind('change', function () {
-
-				equal(iCanRoute.attr('bla'), 'blu', 'Got route change event and value is as expected');
+			iCanRoute.bind('bla', function(){
+				equal(iCanRoute.data.bla, 'blu', 'Got route change event and value is as expected');
 				teardownRouteTest();
-			});
+			})
 
 			iCanRoute.ready();
 
@@ -508,14 +507,14 @@ if (typeof steal !== 'undefined') {
 		expect(1);
 		window.routeTestReady = function (iCanRoute, loc) {
 			iCanRoute("", {});
-			iCanRoute.bind('change', function(){
+			iCanRoute.serializedCompute.bind('change', function(){
 				ok(true, 'change triggered once')
 				start();
 			});
 			iCanRoute.ready();
 		}
 		var iframe = document.createElement('iframe');
-		iframe.src = __dirname+"/testing.html?5";
+		iframe.src = __dirname+"/define-testing.html?5";
 		this.fixture.appendChild(iframe);
 	});
 
@@ -523,11 +522,12 @@ if (typeof steal !== 'undefined') {
 
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
-			iCanRoute.bind('change', function () {
+			iCanRoute.serializedCompute.bind('change', function () {
 
-				equal(iCanRoute.attr('foo'), 'bar', 'expected value');
-				iCanRoute.unbind('change');
-				iCanRoute.bind('change', function(){
+				equal(iCanRoute.attr('foo'), 'bar', 'expected value for foo');
+
+				iCanRoute.serializedCompute.unbind('change');
+				iCanRoute.serializedCompute.bind('change', function(){
 
 					equal(iCanRoute.attr('personId'), '3', 'personId');
 					equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
@@ -552,7 +552,7 @@ if (typeof steal !== 'undefined') {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
 			iCanRoute(":type/:id");
-			var AppState = Map.extend();
+			var AppState = DefineMap.extend({seal: false},{});
 			var appState = new AppState({type: "dog", id: '4'});
 
 			iCanRoute.map(appState);
@@ -564,8 +564,8 @@ if (typeof steal !== 'undefined') {
 
 				var after = loc.href.substr(loc.href.indexOf("#"));
 				equal(after, "#!cat/5", "same URL");
-				equal(appState.attr("type"), "cat", "conflicts should be won by the URL");
-				equal(appState.attr("id"), "5", "conflicts should be won by the URL");
+				equal(appState.get("type"), "cat", "conflicts should be won by the URL");
+				equal(appState.get("id"), "5", "conflicts should be won by the URL");
 				teardownRouteTest();
 
 			}, 30);
@@ -574,10 +574,10 @@ if (typeof steal !== 'undefined') {
 	});
 
 	test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(){
-		setupRouteTest(function (iframe, iCanRoute, loc, win) {
+		setupRouteTest(function (iframe, iCanRoute, loc) {
 
 			iCanRoute(":type/:id");
-			var AppState = win.CanMap.extend();
+			var AppState = DefineMap.extend({seal: false},{});
 			var appState = new AppState({section: 'home'});
 
 			iCanRoute.map(appState);
@@ -588,9 +588,9 @@ if (typeof steal !== 'undefined') {
 
 				var after = loc.href.substr(loc.href.indexOf("#"));
 				equal(after, "#!cat/5&section=home", "same URL");
-				equal(appState.attr("type"), "cat", "hash populates the appState");
-				equal(appState.attr("id"), "5", "hash populates the appState");
-				equal(appState.attr("section"), "home", "appState keeps its properties");
+				equal(appState.get("type"), "cat", "hash populates the appState");
+				equal(appState.get("id"), "5", "hash populates the appState");
+				equal(appState.get("section"), "home", "appState keeps its properties");
 				ok(iCanRoute.data === appState, "canRoute.data is the same as appState");
 
 
@@ -753,11 +753,11 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("updating bound can.Map causes single update with a coerced string value", function() {
+	test("updating bound DefineMap causes single update with a coerced string value", function() {
 		expect(1);
 
 		setupRouteTest(function (iframe, route) {
-			var appVM = new Map();
+			var appVM = new DefineMap();
 
 			route.map(appVM);
 			route.ready();
@@ -775,11 +775,11 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("updating unserialized prop on bound can.Map causes single update without a coerced string value", function() {
+	test("updating unserialized prop on bound DefineMap causes single update without a coerced string value", function() {
 		expect(1);
 
 		setupRouteTest(function (iframe, route) {
-			var appVM = new (Map.extend({define: {
+			var appVM = new (DefineMap.extend({define: {
 				action: {serialize: false}
 			}}))();
 
@@ -832,7 +832,7 @@ if (typeof steal !== 'undefined') {
 			}, 100);
 		};
 		var iframe = document.createElement('iframe');
-		iframe.src = __dirname+"/testing.html?1";
+		iframe.src = __dirname+"/define-testing.html?1";
 		this.fixture.appendChild(iframe);
 	});
 
@@ -949,9 +949,9 @@ test("on/off binding", function () {
 	canRoute.attr('foo', 'bar');
 });
 
-test("two way binding canRoute.map with can.Map instance", function(){
+test("two way binding canRoute.map with DefineMap instance", function(){
 	expect(1);
-	var AppState = Map.extend();
+	var AppState = DefineMap.extend();
 	var appState = new AppState();
 
 	canRoute.map(appState);
