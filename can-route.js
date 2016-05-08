@@ -698,7 +698,7 @@ var routeData;
 var setRouteData = function(data){
 	routeData = data;
 	return routeData;
-}
+};
 var serializedCompute;
 Object.defineProperty(canRoute,"serializedCompute", {
 	get: function(){
@@ -709,7 +709,7 @@ Object.defineProperty(canRoute,"serializedCompute", {
 		}
 		return serializedCompute;
 	}
-})
+});
 Object.defineProperty(canRoute,"data", {
 	get: function(){
 		if(routeData) {
@@ -758,7 +758,7 @@ canRoute.attr = function (prop, value) {
 			canRoute.data.set(prop);
 			return canRoute.data;
 		} else if(arguments.length === 1){
-			return canRoute.data.get(prop);;
+			return canRoute.data.get(prop);
 		} else {
 			return canRoute.data.toObject();
 		}
