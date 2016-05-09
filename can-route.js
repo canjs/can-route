@@ -72,6 +72,24 @@ var wrapQuote = function (str) {
 	return (str + '')
 		.replace(/([.?*+\^$\[\]\\(){}|\-])/g, "\\$1");
 };
+var attrHelper = function (prop, value) {
+	if("attr" in this) {
+		return this.attr.apply(this, arguments);
+	} else {
+		if(arguments.length > 1) {
+			this.set(prop, value);
+			return this;
+		} else if(typeof prop === 'object') {
+			this.set(prop);
+			return this;
+		} else if(arguments.length === 1){
+			return this.get(prop);
+		} else {
+			return this.toObject();
+		}
+	}
+
+};
 
 // Helper for convert any object (or value) to stringified object (or value)
 var stringify = function (obj) {
@@ -227,7 +245,7 @@ var recursiveClean = function(old, cur, data){
 
 		}
 		else if(Object.prototype.toString.call(old[attr]) === "[object Object]") {
-			recursiveClean( old[attr], cur[attr], data.attr(attr) );
+			recursiveClean( old[attr], cur[attr], attrHelper.call(data,attr) );
 		}
 	}
 };
@@ -720,9 +738,7 @@ Object.defineProperty(canRoute,"data", {
 				var DefaultRouteMap = types.DefaultMap.extend({
 					seal: false
 				},{
-					"*": {
-						type: "string"
-					}
+					"*": "stringOrObservable"
 				});
 				return setRouteData(new DefaultRouteMap());
 			} else {
@@ -747,23 +763,10 @@ Object.defineProperty(canRoute,"data", {
 	}
 });
 
-canRoute.attr = function (prop, value) {
-	if("attr" in canRoute.data) {
-		return canRoute.data.attr.apply(canRoute.data, arguments);
-	} else {
-		if(arguments.length > 1) {
-			canRoute.data.set(prop, value);
-			return canRoute.data;
-		} else if(typeof prop === 'object') {
-			canRoute.data.set(prop);
-			return canRoute.data;
-		} else if(arguments.length === 1){
-			return canRoute.data.get(prop);
-		} else {
-			return canRoute.data.toObject();
-		}
-	}
 
+
+canRoute.attr = function(){
+	return attrHelper.apply(canRoute.data,arguments);
 };
 
 //Allow for overriding of route batching by can.transaction

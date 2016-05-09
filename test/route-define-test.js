@@ -4,6 +4,7 @@ var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
 var DefineMap = require('can-define/map/map');
 var makeArray = require('can-util/js/make-array/make-array');
+var mockRoute = require("./mock-route-binding");
 
 require('can-observe-info');
 
@@ -574,10 +575,10 @@ if (typeof steal !== 'undefined') {
 	});
 
 	test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(){
-		setupRouteTest(function (iframe, iCanRoute, loc) {
+		setupRouteTest(function (iframe, iCanRoute, loc, win) {
 
 			iCanRoute(":type/:id");
-			var AppState = DefineMap.extend({seal: false},{});
+			var AppState = win.DefineMap.extend({seal: false},{});
 			var appState = new AppState({section: 'home'});
 
 			iCanRoute.map(appState);
@@ -744,8 +745,8 @@ if (typeof steal !== 'undefined') {
 			loc.hash = hash2;
 
 			setTimeout(function() {
-				equal(iCanRoute.attr("panelA.id"), 20, "id should change");
-				equal(iCanRoute.attr("panelA.show"), undefined, "show should be removed");
+				equal(iCanRoute.data.panelA.id, 20, "id should change");
+				equal(iCanRoute.data.panelA.show, undefined, "show should be removed");
 
 				teardownRouteTest();
 			}, 30);
@@ -757,7 +758,7 @@ if (typeof steal !== 'undefined') {
 		expect(1);
 
 		setupRouteTest(function (iframe, route) {
-			var appVM = new DefineMap();
+			var appVM = new (DefineMap.extend({seal: false},{'*': "stringOrObservable"}));
 
 			route.map(appVM);
 			route.ready();
@@ -766,7 +767,7 @@ if (typeof steal !== 'undefined') {
 				strictEqual(newVal, '10');
 			});
 
-			appVM.attr('action', 10);
+			appVM.set('action', 10);
 
 			// check after 30ms to see that we only have a single call
 			setTimeout(function() {
@@ -779,9 +780,9 @@ if (typeof steal !== 'undefined') {
 		expect(1);
 
 		setupRouteTest(function (iframe, route) {
-			var appVM = new (DefineMap.extend({define: {
-				action: {serialize: false}
-			}}))();
+			var appVM = new (DefineMap.extend({
+				action: {serialize: false, type: "*"}
+			}))();
 
 			route.map(appVM);
 			route.ready();
@@ -790,7 +791,7 @@ if (typeof steal !== 'undefined') {
 				equal(typeof newVal, 'function');
 			});
 
-			appVM.attr('action', function() {});
+			appVM.set('action', function() {});
 
 			// check after 30ms to see that we only have a single call
 			setTimeout(function() {
@@ -816,7 +817,7 @@ if (typeof steal !== 'undefined') {
 					throw e;
 				}
 
-				iCanRoute.bind("change", function() {
+				iCanRoute.serializedCompute.bind("change", function() {
 					counter++;
 				});
 
@@ -950,18 +951,32 @@ test("on/off binding", function () {
 });
 
 test("two way binding canRoute.map with DefineMap instance", function(){
-	expect(1);
-	var AppState = DefineMap.extend();
+	expect(2);
+	stop();
+	mockRoute.start()
+
+	var AppState = DefineMap.extend({seal: false},{"*": "stringOrObservable"});
 	var appState = new AppState();
 
-	canRoute.map(appState);
 
-	canRoute.on('change', function(){
+
+	canRoute.map(appState);
+	canRoute.ready();
+
+	canRoute.serializedCompute.bind('change', function(){
+
 		equal(canRoute.attr('name'), 'Brian', 'appState is bound to canRoute');
-		canRoute.off('change');
-		appState.removeAttr('name');
+		canRoute.serializedCompute.unbind('change');
+		appState.name = undefined;
+
+		setTimeout(function(){
+			equal( mockRoute.hash(), "#");
+			mockRoute.stop();
+			start();
+		},20);
 	});
-	appState.attr('name', 'Brian');
+
+	appState.set('name', 'Brian');
 });
 
 }
