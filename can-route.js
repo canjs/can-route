@@ -4,6 +4,7 @@ var canEvent = require('can-event');
 var ObserveInfo = require('can-observe-info');
 var compute = require('can-compute');
 
+var namespace = require('can-util/namespace');
 var deparam = require('can-util/js/deparam/deparam');
 var each = require('can-util/js/each/each');
 var string = require('can-util/js/string/string');
@@ -781,4 +782,4 @@ types.isCallableForValue = function(obj){
     }
 };
 
-module.exports = canRoute;
+module.exports = namespace.route = canRoute;
