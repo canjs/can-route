@@ -27,7 +27,7 @@
     "document": "documentjs",
     "develop": "done-serve --static --develop --port 8080"
   },
-  "main": "dist/cjs/can-route",
+  "main": "can-route",
   "browser": {
     "transform": [
       "cssify"
@@ -38,25 +38,21 @@
       "cssify"
     ]
   },
-  "keywords": [],
+  "keywords": [
+    "canjs",
+    "canjs-plugin",
+    "donejs"
+  ],
   "system": {
-    "main": "can-route",
     "configDependencies": [
       "live-reload"
-    ],
-    "npmIgnore": [
-      "documentjs",
-      "testee",
-      "generator-donejs",
-      "donejs-cli",
-      "steal-tools"
     ],
     "npmAlgorithm": "flat"
   },
   "dependencies": {
     "can-event": "^3.0.0-pre.2",
     "can-observe-info": "^3.0.0-pre.1",
-    "can-util": "^3.0.0-pre.15",
+    "can-util": "^3.0.0-pre.21",
     "can-simple-map": "^3.0.0-pre.1",
     "can-compute": "3.0.0-pre.2"
   },
