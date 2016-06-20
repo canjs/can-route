@@ -29,3 +29,5 @@ node_modules
 
 docs/
 dist/
+doc/GREADME.md
+doc/docMap.json

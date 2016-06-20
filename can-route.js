@@ -20,7 +20,7 @@ var types = require('can-util/js/types/types');
 
 
 // ## route.js
-// `canRoute`
+// `can-route`
 // _Helps manage browser history (and client state) by synchronizing the
 // `window.location.hash` with a `Map`._
 //
@@ -281,10 +281,10 @@ setState =canRoute.setState = function () {
 assign(canRoute, {
 
 	/**
-	 * @functioncanRoute.param param
-	 * @parentcanRoute.static
+	 * @function can-route.param param
+	 * @parent canRoute.static
 	 * @description Get a route path from given data.
-	 * @signature `canRoute.param( data )`
+	 * @signature `route.param(data)`
 	 * @param {data} object The data to populate the route with.
 	 * @return {String} The route, with the data populated in it.
 	 *
@@ -369,10 +369,20 @@ assign(canRoute, {
 		return isEmptyObject(data) ? "" :canRoute._call("querySeparator") + param(data);
 	},
 	/**
-	 * @functioncanRoute.deparam deparam
-	 * @parentcanRoute.static
+	 * @function can-route.deparam deparam
+	 * @parent can-route.static
 	 * @description Extract data from a route path.
-	 * @signature `canRoute.deparam( url )`
+	 * @signature `route.deparam(url)`
+	 *
+	 * Extract data from a url, creating an object representing its values.
+	 *
+	 * ```js
+	 * route(":page");
+	 *
+	 * var result = route.deparam("page=home");
+	 * console.log(result.page); // -> "home"
+	 * ```
+	 *
 	 * @param {String} url A route fragment to extract data from.
 	 * @return {Object} An object containing the extracted data.
 	 *
@@ -479,17 +489,24 @@ assign(canRoute, {
 	 */
 	routes: {},
 	/**
-	 * @functioncanRoute.ready ready
-	 * @parentcanRoute.static
+	 * @function can-route.ready ready
+	 * @parent can-route.static
 	 *
-	 * InitializecanRoute.
+	 * Initializes can-route.
 	 *
-	 * @signature `canRoute.ready()`
+	 * @signature `route.ready()`
 	 *
-	 * Sets up the two-way binding between the hash and thecanRoute observable map and
-	 * sets thecanRoute map to its initial values.
+	 * Sets up the two-way binding between the hash and the can-route observable
+	 * map and sets the route map to its initial values.
 	 *
-	 * @return {canRoute} The `canRoute` object.
+	 * ```js
+	 * route(":page", { page: "home" }));
+	 *
+	 * route.ready();
+	 * route.attr("page"); // -> "home"
+	 * ```
+	 *
+	 * @return {canRoute} The can-route object.
 	 *
 	 * @body
 	 *
@@ -511,12 +528,17 @@ assign(canRoute, {
 		return canRoute;
 	},
 	/**
-	 * @functioncanRoute.url url
-	 * @parentcanRoute.static
-	 * @signature `canRoute.url( data [, merge] )`
+	 * @function can-route.url url
+	 * @parent can-route.static
+	 * @signature `route.url(data [, merge])`
 	 *
-	 * Make a URL fragment that when set to window.location.hash will updatecanRoute's properties
+	 * Make a URL fragment that when set to window.location.hash will update can-route's properties
 	 * to match those in `data`.
+	 *
+	 * ```js
+	 * route.url({ page: "home" });
+	 * // -> "#!page=home"
+	 * ```
 	 *
 	 * @param {Object} data The data to populate the route with.
 	 * @param {Boolean} [merge] Whether the given options should be merged into the current state of the route.
@@ -547,9 +569,9 @@ assign(canRoute, {
 		return canRoute._call("root") +canRoute.param(options);
 	},
 	/**
-	 * @functioncanRoute.link link
-	 * @parentcanRoute.static
-	 * @signature `canRoute.link( innerText, data, props [, merge] )`
+	 * @function can-route.link link
+	 * @parent canRoute.static
+	 * @signature `route.link(innerText, data, props [, merge])`
 	 *
 	 * Make an anchor tag (`<A>`) that when clicked on will updatecanRoute's properties
 	 * to match those in `data`.
@@ -597,9 +619,9 @@ assign(canRoute, {
 			}, props)) + ">" + name + "</a>";
 	},
 	/**
-	 * @functioncanRoute.current current
-	 * @parentcanRoute.static
-	 * @signature `canRoute.current( data )`
+	 * @function can-route.current current
+	 * @parent canRoute.static
+	 * @signature `route.current(data)`
 	 *
 	 * Check if data represents the current route.
 	 *
