@@ -24,7 +24,7 @@
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
     "build": "node build.js",
-    "document": "documentjs",
+    "document": "bit-docs",
     "develop": "done-serve --static --develop --port 8080"
   },
   "main": "can-route",
@@ -60,7 +60,7 @@
     "can-map": "^3.0.0-pre.3",
     "can-list": "^3.0.0-pre.2",
     "can-define": "^0.7.3",
-    "documentjs": "^0.4.2",
+    "bit-docs": "0.0.6",
     "jshint": "^2.9.1",
     "cssify": "^0.6.0",
     "steal": "^0.16.0",
@@ -70,5 +70,21 @@
     "generator-donejs": "^0.9.0",
     "donejs-cli": "^0.8.0",
     "done-serve": "^0.2.0"
+  },
+  "bit-docs": {
+    "dependencies": {
+      "bit-docs-glob-finder": "^0.0.5",
+      "bit-docs-dev": "^0.0.3",
+      "bit-docs-js": "^0.0.3",
+      "bit-docs-generate-readme": "^0.0.8"
+    },
+    "glob": {
+      "pattern": "**\/*.{js,md}",
+      "ignore": "node_modules\/**\/*"
+    },
+		"readme": {
+			"apis": "./doc/apis.json"
+		},
+    "parent": "can-route"
   }
 }
