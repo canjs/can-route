@@ -60,7 +60,7 @@
     "can-map": "^3.0.0-pre.3",
     "can-list": "^3.0.0-pre.2",
     "can-define": "^0.7.3",
-    "bit-docs": "0.0.6",
+    "bit-docs": "0.0.7",
     "jshint": "^2.9.1",
     "cssify": "^1.0.2",
     "steal": "^0.16.0",
@@ -79,12 +79,12 @@
       "bit-docs-generate-readme": "^0.0.8"
     },
     "glob": {
-      "pattern": "**\/*.{js,md}",
-      "ignore": "node_modules\/**\/*"
+      "pattern": "**/*.{js,md}",
+      "ignore": "node_modules/**/*"
     },
-		"readme": {
-			"apis": "./doc/apis.json"
-		},
+    "readme": {
+      "apis": "./doc/apis.json"
+    },
     "parent": "can-route"
   }
 }
