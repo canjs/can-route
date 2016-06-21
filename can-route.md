@@ -1,9 +1,9 @@
 @function can-route can-route
-@group can.route.static static
+@group can-route.static static
 @inherits can-map
 @download can/route
 @test can-route/test.html
-@parent canjs
+@parent can-core
 @group can-route.plugins plugins
 @link ../docco/route/route.html docco
 

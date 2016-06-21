@@ -83,7 +83,7 @@
       "ignore": "node_modules\/**\/*"
     },
 		"readme": {
-			"apis": "./doc/apis.json"
+			"apis": "./docs/apis.json"
 		},
     "parent": "can-route"
   }
