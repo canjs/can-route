@@ -11,8 +11,8 @@
     // System.config(configuration);
     Promise.all([
         System.import('can-route'),
-        System.import('can-observe-info'),
-        System.import('can-observe-info/reader/reader'),
+        System.import('can-observation'),
+        System.import('can-observation/reader/reader'),
         System.import('can-define/map/map')
     ]).then(function(modules){
         var route = modules[0];

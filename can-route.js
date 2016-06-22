@@ -1,7 +1,7 @@
 /*jshint -W079 */
 var canBatch = require('can-event/batch/batch');
 var canEvent = require('can-event');
-var ObserveInfo = require('can-observe-info');
+var Observation = require('can-observation');
 var compute = require('can-compute');
 
 var namespace = require('can-util/namespace');
@@ -11,7 +11,7 @@ var string = require('can-util/js/string/string');
 var isFunction = require('can-util/js/is-function/is-function');
 var param = require('can-util/js/param/param');
 var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
-var deepAssign = require('can-util/js/deep-extend/deep-extend');
+var deepAssign = require('can-util/js/deep-assign/deep-assign');
 var isWebWorker =  require('can-util/js/is-web-worker/is-web-worker');
 var isBrowserWindow =  require('can-util/js/is-browser-window/is-browser-window');
 var makeArray = require('can-util/js/make-array/make-array');
@@ -563,7 +563,7 @@ assign(canRoute, {
 	url: function (options, merge) {
 
 		if (merge) {
-			ObserveInfo.observe(eventsObject,"__url");
+			Observation.add(eventsObject,"__url");
 			options = assign({},canRoute.deparam(canRoute._call("matchingPartOfURL")), options);
 		}
 		return canRoute._call("root") +canRoute.param(options);
@@ -644,7 +644,7 @@ assign(canRoute, {
 	 */
 	current: function (options) {
 		// "reads" the url so the url is live-bindable.
-		ObserveInfo.observe(eventsObject,"__url");
+		Observation.add(eventsObject,"__url");
 		return this._call("matchingPartOfURL") ===canRoute.param(options);
 	},
 	bindings: {
