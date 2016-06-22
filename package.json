@@ -52,14 +52,14 @@
   "dependencies": {
     "can-event": "^3.0.0-pre.2",
     "can-observation": "^3.0.0-pre.0",
-    "can-util": "^3.0.0-pre.21",
-    "can-simple-map": "^3.0.0-pre.1",
-    "can-compute": "^3.0.0-pre.2"
+    "can-util": "^3.0.0-pre.28",
+    "can-simple-map": "^3.0.0-pre.3",
+    "can-compute": "^3.0.0-pre.5"
   },
   "devDependencies": {
-    "can-map": "^3.0.0-pre.3",
-    "can-list": "^3.0.0-pre.2",
-    "can-define": "^0.7.3",
+    "can-map": "^3.0.0-pre.7",
+    "can-list": "^3.0.0-pre.4",
+    "can-define": "^0.7.7",
     "bit-docs": "0.0.6",
     "jshint": "^2.9.1",
     "cssify": "^1.0.2",
