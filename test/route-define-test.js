@@ -6,7 +6,7 @@ var DefineMap = require('can-define/map/map');
 var makeArray = require('can-util/js/make-array/make-array');
 var mockRoute = require("./mock-route-binding");
 
-require('can-observe-info');
+require('can-observation');
 
 QUnit.module("can/route with can-define/map/map", {
 	setup: function () {

@@ -5,7 +5,7 @@ var QUnit = require('steal-qunit');
 var Map = require('can-map');
 var makeArray = require('can-util/js/make-array/make-array');
 
-require('can-observe-info');
+require('can-observation');
 
 QUnit.module("can/route with can-map", {
 	setup: function () {
