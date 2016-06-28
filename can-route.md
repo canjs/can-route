@@ -4,7 +4,6 @@
 @download can/route
 @test can-route/test.html
 @parent can-core
-@group can-route.plugins plugins
 @link ../docco/route/route.html docco
 
 @description Manage browser history and

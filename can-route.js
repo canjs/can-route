@@ -390,27 +390,33 @@ assign(canRoute, {
 	 * Creates a data object based on the query string passed into it. This is
 	 * useful to create an object based on the `location.hash`.
 	 *
-	 *    canRoute.deparam("id=5&type=videos")
-	 *          // -> { id: 5, type: "videos" }
+	 * ```js
+	 * canRoute.deparam("id=5&type=videos")
+	 *   // -> { id: 5, type: "videos" }
+	 * ```
 	 *
 	 *
 	 * It's important to make sure the hash or exclamantion point is not passed
 	 * to `canRoute.deparam` otherwise it will be included in the first property's
 	 * name.
 	 *
-	 *    canRoute.attr("id", 5) // location.hash -> #!id=5
-	 *    canRoute.attr("type", "videos")
-	 *          // location.hash -> #!id=5&type=videos
-	 *    canRoute.deparam(location.hash)
-	 *          // -> { #!id: 5, type: "videos" }
+	 * ```js
+	 * canRoute.attr("id", 5) // location.hash -> #!id=5
+	 * canRoute.attr("type", "videos")
+	 *   // location.hash -> #!id=5&type=videos
+	 * canRoute.deparam(location.hash)
+	 *   // -> { #!id: 5, type: "videos" }
+	 * ```
 	 *
 	 * `canRoute.deparam` will try and find a matching route and, if it does,
 	 * will deconstruct the URL and parse our the key/value parameters into the data object.
 	 *
-	 *    canRoute(":type/:id")
+	 * ```js
+	 * canRoute(":type/:id")
 	 *
-	 *    canRoute.deparam("videos/5");
-	 *          // -> { id: 5, route: ":type/:id", type: "videos" }
+	 * canRoute.deparam("videos/5");
+	 *   // -> { id: 5, route: ":type/:id", type: "videos" }
+	 * ```
 	 */
 	deparam: function (url) {
 
@@ -514,9 +520,11 @@ assign(canRoute, {
 	 *
 	 * After setting all your routes, callcanRoute.ready().
 	 *
-	 *    canRoute("overview/:dateStart-:dateEnd");
-	 *    canRoute(":type/:id")
-	 *    canRoute.ready()
+	 * ```js
+	 * canRoute("overview/:dateStart-:dateEnd");
+	 * canRoute(":type/:id")
+	 * canRoute.ready()
+	 * ```
 	 */
 	ready: function (val) {
 		if (val !== true) {
@@ -548,17 +556,21 @@ assign(canRoute, {
 	 * Similar to [canRoute.link], but instead of creating an anchor tag, `canRoute.url` creates
 	 * only the URL based on the route options passed into it.
 	 *
-	 *    canRoute.url( { type: "videos", id: 5 } )
-	 *          // -> "#!type=videos&id=5"
+	 * ```js
+	 * canRoute.url( { type: "videos", id: 5 } )
+	 *   // -> "#!type=videos&id=5"
+	 * ```
 	 *
 	 * If a route matching the provided data is found the URL is built from the data. Any remaining
 	 * data is added at the end of the URL as & separated key/value parameters.
 	 *
-	 *    canRoute(":type/:id")
+	 * ```js
+	 * canRoute(":type/:id")
 	 *
-	 *    canRoute.url( { type: "videos", id: 5 } ) // -> "#!videos/5"
-	 *    canRoute.url( { type: "video", id: 5, isNew: false } )
-	 *          // -> "#!video/5&isNew=false"
+	 * canRoute.url( { type: "videos", id: 5 } ) // -> "#!videos/5"
+	 * canRoute.url( { type: "video", id: 5, isNew: false } )
+	 *   // -> "#!video/5&isNew=false"
+	 * ```
 	 */
 	url: function (options, merge) {
 
