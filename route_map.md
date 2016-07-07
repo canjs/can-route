@@ -81,7 +81,7 @@ route.map(appState);
 
 The following shows creating an appState that loads data at page load, has a virtual property 'locationIds' which serializes an array, and synchronizes the appState to can-route:
 
-@demo can/route/docs/map.html
+@demo demos/can-route/map.html
 
 ## Using arrays and can.Lists
 
