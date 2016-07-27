@@ -2,11 +2,13 @@ var stealTools = require("steal-tools");
 
 stealTools.export({
 	system: {
+		main: ["can-route", "can-define/map/map"],
 		config: __dirname + "/package.json!npm"
 	},
 	outputs: {
 		"+amd": {},
 		"+standalone": {
+			modules: ["can-route", "can-define/map/map"],
 			exports: {
 				"can-util/namespace": "can"
 			}

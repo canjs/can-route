@@ -185,7 +185,7 @@ var canRoute = function (url, defaults) {
 	return canRoute;
 };
 
-// If the `canRoute.data` changes, update the hash.
+// If the `route.data` changes, update the hash.
 // Using `.serialize()` retrieves the raw data contained in the `observable`.
 // This function is ~~throttled~~ debounced so it only updates once even if multiple values changed.
 // This might be able to use batchNum and avoid this.
@@ -252,7 +252,7 @@ var recursiveClean = function(old, cur, data){
 };
 
 var // Deparameterizes the portion of the hash of interest and assign the
-// values to the `canRoute.data` removing existing values no longer in the hash.
+// values to the `route.data` removing existing values no longer in the hash.
 // setState is called typically by hashchange which fires asynchronously
 // So it's possible that someone started changing the data before the
 // hashchange event fired.  For this reason, it will not set the route data
@@ -282,7 +282,7 @@ assign(canRoute, {
 
 	/**
 	 * @function can-route.param param
-	 * @parent canRoute.static
+	 * @parent can-route.static
 	 * @description Get a route path from given data.
 	 * @signature `route.param(data)`
 	 * @param {data} object The data to populate the route with.
@@ -291,18 +291,22 @@ assign(canRoute, {
 	 * @body
 	 * Parameterizes the raw JS object representation provided in data.
 	 *
-	 *    canRoute.param( { type: "video", id: 5 } )
-	 *          // -> "type=video&id=5"
+	 * ```js
+	 * route.param({ type: "video", id: 5 });
+	 *   // -> "type=video&id=5"
+	 * ```
 	 *
 	 * If a route matching the provided data is found, that URL is built
 	 * from the data. Any remaining data is added at the end of the
 	 * URL as &amp; separated key/value parameters.
 	 *
-	 *    canRoute(":type/:id")
+	 * ```js
+	 * route(":type/:id");
 	 *
-	 *    canRoute.param( { type: "video", id: 5 } ) // -> "video/5"
-	 *    canRoute.param( { type: "video", id: 5, isNew: false } )
-	 *          // -> "video/5&isNew=false"
+	 * route.param({ type: "video", id: 5 }) // -> "video/5"
+	 * route.param({ type: "video", id: 5, isNew: false })
+	 *   // -> "video/5&isNew=false"
+	 * ```
 	 */
 	param: function (data, _setRoute) {
 		// Check if the provided data keys match the names in any routes;
@@ -387,34 +391,36 @@ assign(canRoute, {
 	 * @return {Object} An object containing the extracted data.
 	 *
 	 * @body
+	 *
 	 * Creates a data object based on the query string passed into it. This is
 	 * useful to create an object based on the `location.hash`.
 	 *
 	 * ```js
-	 * canRoute.deparam("id=5&type=videos")
+	 * route.deparam("id=5&type=videos");
 	 *   // -> { id: 5, type: "videos" }
 	 * ```
 	 *
 	 *
 	 * It's important to make sure the hash or exclamantion point is not passed
-	 * to `canRoute.deparam` otherwise it will be included in the first property's
+	 * to `route.deparam` otherwise it will be included in the first property's
 	 * name.
 	 *
 	 * ```js
-	 * canRoute.attr("id", 5) // location.hash -> #!id=5
-	 * canRoute.attr("type", "videos")
+	 * route.attr("id", 5) // location.hash -> #!id=5
+	 * route.attr("type", "videos");
 	 *   // location.hash -> #!id=5&type=videos
-	 * canRoute.deparam(location.hash)
+	 * route.deparam(location.hash);
 	 *   // -> { #!id: 5, type: "videos" }
 	 * ```
 	 *
-	 * `canRoute.deparam` will try and find a matching route and, if it does,
-	 * will deconstruct the URL and parse our the key/value parameters into the data object.
+	 * `route.deparam` will try and find a matching route and, if it does,
+	 * will deconstruct the URL and parse our the key/value parameters into the
+	 * data object.
 	 *
 	 * ```js
-	 * canRoute(":type/:id")
+	 * route(":type/:id");
 	 *
-	 * canRoute.deparam("videos/5");
+	 * route.deparam("videos/5");
 	 *   // -> { id: 5, route: ":type/:id", type: "videos" }
 	 * ```
 	 */
@@ -512,18 +518,18 @@ assign(canRoute, {
 	 * route.attr("page"); // -> "home"
 	 * ```
 	 *
-	 * @return {canRoute} The can-route object.
+	 * @return {can-route} The can-route object.
 	 *
 	 * @body
 	 *
 	 * ## Use
 	 *
-	 * After setting all your routes, callcanRoute.ready().
+	 * After setting all your routes, call `route.ready()`.
 	 *
 	 * ```js
-	 * canRoute("overview/:dateStart-:dateEnd");
-	 * canRoute(":type/:id")
-	 * canRoute.ready()
+	 * route("overview/:dateStart-:dateEnd");
+	 * route(":type/:id");
+	 * route.ready();
 	 * ```
 	 */
 	ready: function (val) {
@@ -549,26 +555,28 @@ assign(canRoute, {
 	 * ```
 	 *
 	 * @param {Object} data The data to populate the route with.
-	 * @param {Boolean} [merge] Whether the given options should be merged into the current state of the route.
+	 * @param {Boolean} [merge] Whether the given options should be merged into
+	 * the current state of the route.
 	 * @return {String} The route URL and query string.
 	 *
 	 * @body
-	 * Similar to [canRoute.link], but instead of creating an anchor tag, `canRoute.url` creates
-	 * only the URL based on the route options passed into it.
+	 * Similar to [can-route.link], but instead of creating an anchor tag,
+	 * `route.url` creates only the URL based on the route options passed into it.
 	 *
 	 * ```js
-	 * canRoute.url( { type: "videos", id: 5 } )
+	 * route.url( { type: "videos", id: 5 } );
 	 *   // -> "#!type=videos&id=5"
 	 * ```
 	 *
-	 * If a route matching the provided data is found the URL is built from the data. Any remaining
-	 * data is added at the end of the URL as & separated key/value parameters.
+	 * If a route matching the provided data is found the URL is built from the
+	 * data. Any remaining data is added at the end of the URL as & separated
+	 * key/value parameters.
 	 *
 	 * ```js
-	 * canRoute(":type/:id")
+	 * route(":type/:id");
 	 *
-	 * canRoute.url( { type: "videos", id: 5 } ) // -> "#!videos/5"
-	 * canRoute.url( { type: "video", id: 5, isNew: false } )
+	 * route.url( { type: "videos", id: 5 } ) // -> "#!videos/5"
+	 * route.url( { type: "video", id: 5, isNew: false } )
 	 *   // -> "#!video/5&isNew=false"
 	 * ```
 	 */
@@ -582,11 +590,11 @@ assign(canRoute, {
 	},
 	/**
 	 * @function can-route.link link
-	 * @parent canRoute.static
+	 * @parent can-route.static
 	 * @signature `route.link(innerText, data, props [, merge])`
 	 *
-	 * Make an anchor tag (`<A>`) that when clicked on will updatecanRoute's properties
-	 * to match those in `data`.
+	 * Make an anchor tag (`<A>`) that when clicked on will update can-route's
+	 * properties to match those in `data`.
 	 *
 	 * @param {Object} innerText The text inside the link.
 	 * @param {Object} data The data to populate the route with.
@@ -599,30 +607,34 @@ assign(canRoute, {
 	 * attributes passed into it, as well as any properties desired
 	 * for the tag.
 	 *
-	 *    canRoute.link( "My videos", { type: "videos" }, {}, false )
-	 *          // -> <a href="#!type=videos">My videos</a>
+	 * ```js
+	 * route.link( "My videos", { type: "videos" }, {}, false )
+	 *   // -> <a href="#!type=videos">My videos</a>
+	 * ```
 	 *
 	 * Other attributes besides href can be added to the anchor tag
 	 * by passing in a data object with the attributes desired.
 	 *
-	 *    canRoute.link( "My videos", { type: "videos" },
-	 *       { className: "new" }, false )
-	 *          // -> <a href="#!type=videos" class="new">My Videos</a>
+	 * ```js
+	 * route.link( "My videos", { type: "videos" },
+	 *   { className: "new" }, false )
+	 *     // -> <a href="#!type=videos" class="new">My Videos</a>
+	 * ```
 	 *
 	 * It is possible to utilize the current route options when making anchor
 	 * tags in order to make your code more reusable. If merge is set to true,
 	 * the route options passed into `canRoute.link` will be passed into the
 	 * current ones.
 	 *
-	 *     location.hash = "#!type=videos"
-	 *    canRoute.link( "The zoo", { id: 5 }, true )
-	 *          // -> <a href="#!type=videos&id=5">The zoo</true>
+	 * ```js
+	 * location.hash = "#!type=videos"
+	 * route.link( "The zoo", { id: 5 }, true )
+	 *   // -> <a href="#!type=videos&id=5">The zoo</true>
 	 *
-	 *     location.hash = "#!type=pictures"
-	 *    canRoute.link( "The zoo", { id: 5 }, true )
-	 *          // -> <a href="#!type=pictures&id=5">The zoo</true>
-	 *
-	 *
+	 * location.hash = "#!type=pictures"
+	 * route.link( "The zoo", { id: 5 }, true )
+	 *   // -> <a href="#!type=pictures&id=5">The zoo</true>
+	 * ```
 	 */
 	link: function (name, options, props, merge) {
 		return "<a " + makeProps(
@@ -632,7 +644,7 @@ assign(canRoute, {
 	},
 	/**
 	 * @function can-route.current current
-	 * @parent canRoute.static
+	 * @parent can-route.static
 	 * @signature `route.current(data)`
 	 *
 	 * Check if data represents the current route.
@@ -641,18 +653,20 @@ assign(canRoute, {
 	 * @return {Boolean} Whether the data matches the current URL.
 	 *
 	 * @body
-	 * Checks the page's current URL to see if the route represents the options passed
-	 * into the function.
+	 * Checks the page's current URL to see if the route represents the options
+	 * passed into the function.
 	 *
-	 * Returns true if the options respresent the current URL.
+	 * Returns true if the options represent the current URL.
 	 *
-	 *    canRoute.attr('id', 5) // location.hash -> "#!id=5"
-	 *    canRoute.current({ id: 5 }) // -> true
-	 *    canRoute.current({ id: 5, type: 'videos' }) // -> false
+	 * ```js
+	 * route.attr('id', 5) // location.hash -> "#!id=5"
+	 * route.current({ id: 5 }) // -> true
+	 * route.current({ id: 5, type: 'videos' }) // -> false
 	 *
-	 *    canRoute.attr('type', 'videos')
-	 *            // location.hash -> #!id=5&type=videos
-	 *    canRoute.current({ id: 5, type: 'videos' }) // -> true
+	 * route.attr('type', 'videos')
+	 *   // location.hash -> #!id=5&type=videos
+	 * route.current({ id: 5, type: 'videos' }) // -> true
+	 * ```
 	 */
 	current: function (options) {
 		// "reads" the url so the url is live-bindable.
