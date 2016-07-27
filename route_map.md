@@ -53,7 +53,7 @@ An elegant way to solve this problem is using the [Observer Pattern](http://en.w
 
 ## Use
 
-`route.map` provides an easy to way make your Application ViewModel object cross-bound to `route`, using an internal can-map instance, which is serialized into the hash (or pushstate URLs).
+`route.map` provides an easy to way make your Application ViewModel object cross-bound to `route`, using an internal map instance, which is serialized into the hash (or pushstate URLs).
 
 ```js
 var ViewModel = DefineMap.extend({
@@ -71,7 +71,7 @@ route.map(viewModel);
 
 ## When to call it
 
-Call `route.map` at the  start of the application lifecycle, before any calls to `route.addEventListener`. This is because `route.map` creates a new internal map, replacing the default map instance, so binding has to occur on this new object.
+Call `route.map` at the  start of the application lifecycle, before any calls to `route.addEventListener`. `route.map` creates a new internal map, replacing the default map instance, so binding has to occur on this new object.
 
 ```js
 var ViewModel = DefineMap.extend({

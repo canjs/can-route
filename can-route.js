@@ -401,7 +401,7 @@ assign(canRoute, {
 	 * ```
 	 *
 	 *
-	 * It's important to make sure the hash or exclamantion point is not passed
+	 * It's important to make sure the hash or exclamation point is not passed
 	 * to `route.deparam` otherwise it will be included in the first property's
 	 * name.
 	 *
@@ -414,7 +414,7 @@ assign(canRoute, {
 	 * ```
 	 *
 	 * `route.deparam` will try and find a matching route and, if it does,
-	 * will deconstruct the URL and parse our the key/value parameters into the
+	 * will deconstruct the URL and parse out the key/value parameters into the
 	 * data object.
 	 *
 	 * ```js
@@ -544,6 +544,7 @@ assign(canRoute, {
 	/**
 	 * @function can-route.url url
 	 * @parent can-route.static
+	 * @description Creates a URL fragment based on registered routes given a set of data.
 	 * @signature `route.url(data [, merge])`
 	 *
 	 * Make a URL fragment that when set to window.location.hash will update can-route's properties
@@ -591,6 +592,8 @@ assign(canRoute, {
 	/**
 	 * @function can-route.link link
 	 * @parent can-route.static
+	 * @description Creates a string representation of an anchor link using
+	 * data and the registered routes.
 	 * @signature `route.link(innerText, data, props [, merge])`
 	 *
 	 * Make an anchor tag (`<A>`) that when clicked on will update can-route's
@@ -645,9 +648,13 @@ assign(canRoute, {
 	/**
 	 * @function can-route.current current
 	 * @parent can-route.static
-	 * @signature `route.current(data)`
 	 *
 	 * Check if data represents the current route.
+	 *
+	 * @signature `route.current(data)`
+	 *
+	 * Compares `data` to the current route. Used to verify if an object is
+	 * representative of the current route.
 	 *
 	 * @param {Object} data Data to check agains the current route.
 	 * @return {Boolean} Whether the data matches the current URL.
