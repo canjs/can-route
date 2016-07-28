@@ -71,7 +71,7 @@ Underlying can-route is an observable map. Depending on what type of map your ap
 
 Understanding how maps work is essential to understanding can-route.
 
-You can listen to changes in a map with `addEventListener(eventName, handler(ev, args...))` and change can-route's properties with `route.attr()`.
+You can listen to changes in a map with `on(eventName, handler(ev, args...))` and change can-route's properties with `route.attr()`.
 
 ### Listening to changes in can-route
 
@@ -79,8 +79,8 @@ Listen to changes in history by [can-event.addEventListener listening] to
 changes in can-route like:
 
 ```js
-route.addEventListener('change', function(ev, attr, how, newVal, oldVal) {
-
+route.on('foo', function(ev, attr, how, newVal, oldVal) {
+	// Foo changed!
 })
 ```
 
