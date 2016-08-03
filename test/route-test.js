@@ -964,4 +964,6 @@ test("two way binding canRoute.map with can.Map instance", function(){
 	appState.attr('name', 'Brian');
 });
 
+
+
 }

@@ -758,7 +758,8 @@ if (typeof steal !== 'undefined') {
 		expect(1);
 
 		setupRouteTest(function (iframe, route) {
-			var appVM = new (DefineMap.extend({seal: false},{'*': "stringOrObservable"}));
+			var MyMap = DefineMap.extend({seal: false},{'*': "stringOrObservable"});
+			var appVM = new MyMap();
 
 			route.map(appVM);
 			route.ready();
@@ -977,6 +978,60 @@ test("two way binding canRoute.map with DefineMap instance", function(){
 	});
 
 	appState.set('name', 'Brian');
+});
+
+test(".url with merge=true", function(){
+	mockRoute.start()
+
+	var AppState = DefineMap.extend({seal: false},{"*": "stringOrObservable"});
+	var appState = new AppState({});
+
+
+	canRoute.map(appState);
+	canRoute.ready();
+
+	QUnit.stop();
+
+	appState.set('foo', 'bar');
+
+	// TODO: expose a way to know when the url has changed.
+	setTimeout(function(){
+		var result = canRoute.url({page: "recipe", id: 5}, true);
+		QUnit.equal(result, "#!&foo=bar&page=recipe&id=5");
+
+		mockRoute.stop();
+		QUnit.start();
+	},20);
+
+});
+
+test(".url with merge=true (#16)", function(){
+	mockRoute.start()
+
+	var AppState = DefineMap.extend({seal: false},{"*": "stringOrObservable"});
+	var appState = new AppState({});
+
+
+	canRoute.map(appState);
+	canRoute.ready();
+
+	QUnit.stop();
+
+	appState.set({'foo': 'bar',page: "recipe", id: 5});
+
+	// TODO: expose a way to know when the url has changed.
+	setTimeout(function(){
+
+		QUnit.ok(canRoute.url({}, true), "empty is true");
+		QUnit.ok(canRoute.url({page: "recipe"}, true), "page:recipe is true");
+
+		QUnit.ok(canRoute.url({page: "recipe", id: 5}, true), "number to string works");
+		QUnit.ok(canRoute.url({page: "recipe", id: 6}, true), "not all equal");
+		
+		mockRoute.stop();
+		QUnit.start();
+	},20);
+
 });
 
 }
