@@ -251,6 +251,22 @@ var recursiveClean = function(old, cur, data){
 	}
 };
 
+// makes sure source has every value in matcher
+var matchCheck = function(source, matcher){
+	/*jshint eqeqeq:false*/
+	for(var prop in source) {
+		var s = source[prop],
+			m = matcher[prop];
+		if(s && m && typeof s === "object" && typeof matcher === "object") {
+			return matchCheck(s, m);
+		}
+		if(s != m) {
+			return false;
+		}
+	}
+	return true;
+};
+
 var // Deparameterizes the portion of the hash of interest and assign the
 // values to the `route.data` removing existing values no longer in the hash.
 // setState is called typically by hashchange which fires asynchronously
@@ -585,7 +601,8 @@ assign(canRoute, {
 
 		if (merge) {
 			Observation.add(eventsObject,"__url");
-			options = assign({},canRoute.deparam(canRoute._call("matchingPartOfURL")), options);
+			var baseOptions = canRoute.deparam(canRoute._call("matchingPartOfURL"));
+			options = assign(assign({}, baseOptions), options);
 		}
 		return canRoute._call("root") +canRoute.param(options);
 	},
@@ -656,10 +673,23 @@ assign(canRoute, {
 	 * Compares `data` to the current route. Used to verify if an object is
 	 * representative of the current route.
 	 *
-	 * @param {Object} data Data to check agains the current route.
-	 * @return {Boolean} Whether the data matches the current URL.
+	 * ```
+	 * route.data.set({page: "recipes", id: '5'});
+	 *
+	 * route.current({page: "recipes"})       //-> false
+	 * route.current({page: "recipes"}, true) //-> true
+	 * ```
+	 *
+	 *   @param {Object} data Data to check agains the current route.
+	 *   @param {Boolean} [subsetMatch] If true, `route.current` will return true
+	 *   if every value in `data` matches the current route data, even if
+	 *   the route data has additional properties that are not matched.
+	 *   @return {Boolean} Whether the data matches the current URL.
 	 *
 	 * @body
+	 *
+	 * ## Use
+	 *
 	 * Checks the page's current URL to see if the route represents the options
 	 * passed into the function.
 	 *
@@ -675,10 +705,16 @@ assign(canRoute, {
 	 * route.current({ id: 5, type: 'videos' }) // -> true
 	 * ```
 	 */
-	current: function (options) {
+	current: function (options, subsetMatch) {
 		// "reads" the url so the url is live-bindable.
 		Observation.add(eventsObject,"__url");
-		return this._call("matchingPartOfURL") ===canRoute.param(options);
+		if(subsetMatch) {
+			// everything in options shouhld be in baseOptions
+			var baseOptions = canRoute.deparam(canRoute._call("matchingPartOfURL"));
+			return matchCheck(options, baseOptions);
+		} else {
+			return this._call("matchingPartOfURL") === canRoute.param(options);
+		}
 	},
 	bindings: {
 		hashchange: {
