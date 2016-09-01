@@ -668,7 +668,7 @@ assign(canRoute, {
 	 *
 	 * Check if data represents the current route.
 	 *
-	 * @signature `route.current(data)`
+	 * @signature `route.current(data [,subsetMatch] )`
 	 *
 	 * Compares `data` to the current route. Used to verify if an object is
 	 * representative of the current route.
@@ -683,7 +683,8 @@ assign(canRoute, {
 	 *   @param {Object} data Data to check agains the current route.
 	 *   @param {Boolean} [subsetMatch] If true, `route.current` will return true
 	 *   if every value in `data` matches the current route data, even if
-	 *   the route data has additional properties that are not matched.
+	 *   the route data has additional properties that are not matched.  Defaults to `false`
+	 *   where every property needs to be present.
 	 *   @return {Boolean} Whether the data matches the current URL.
 	 *
 	 * @body
