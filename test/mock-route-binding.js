@@ -47,6 +47,7 @@ module.exports = {
 	stop: function(){
 		canRoute._teardown();
 		canRoute.defaultBinding = oldDefault;
+		//canRoute.bindings.mock.unbind();
 		//canRoute._setup();
 	},
 	hash: routeCompute

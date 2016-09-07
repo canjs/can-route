@@ -118,6 +118,10 @@ var removeBackslash = function (str) {
 	return str.replace(/\\/g, "");
 };
 
+var isDefineMap = function(map) {
+	return types.isMapLike(map) && typeof map.get === "function";
+};
+
 // A ~~throttled~~ debounced function called multiple times will only fire once the
 // timer runs down. Each call resets the timer.
 var timer;
@@ -853,6 +857,16 @@ Object.defineProperty(canRoute,"data", {
 			setRouteData(data);
 		}
 
+		if(isDefineMap(data) && Object.isSealed(data)) {
+			var proto = data.constructor.prototype;
+			// Set a constructor definition so can-define knows this already exists.
+			var definitions = proto._define.definitions;
+
+			if(!definitions.route) {
+				var errMsg = "Cannot map a DefineMap without a 'route' property defined.";
+				throw new Error(errMsg);
+			}
+		}
 	}
 });
 

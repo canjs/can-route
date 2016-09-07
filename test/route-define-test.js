@@ -1030,8 +1030,37 @@ test(".url with merge=true (#16)", function(){
 		
 		mockRoute.stop();
 		QUnit.start();
-	},20);
+	},200);
 
+});
+
+test("Throws on DefineMap that's sealed and no 'route' defined", function(){
+	var AppState = DefineMap.extend({
+		page: "string"
+	});
+	var appState = new AppState();
+
+	try {
+		canRoute.map(appState);
+
+		QUnit.ok(false, "This should have thrown");
+	} catch(err) {
+		QUnit.ok(true, "Threw because no 'route' defined");
+	}
+});
+
+test("Throws on a DefineMap derived constructor with no 'route' defined", function(){
+	var AppState = DefineMap.extend({
+		page: "string"
+	});
+	
+	try {
+		canRoute.map(AppState);
+
+		QUnit.ok(false, "This should have thrown");
+	} catch(err) {
+		QUnit.ok(true, "Threw because no 'route' defined");
+	}
 });
 
 }
