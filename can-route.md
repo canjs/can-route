@@ -12,17 +12,16 @@
 Create a route matching rule. Optionally provide defaults that will be applied to the underlying map when the route matches.
 
 ```js
-route(":page", { page: "home" });
+route("{page}", { page: "home" });
 ```
 
 Will apply **cart** when the url is `#cart` and **home** when the url is `#`.
 
-@param {String} template the fragment identifier to match.  The fragment identifier
-should start with either a character (a-Z) or colon (:). Identifiers that include a colon are interpreted as being properties on can-route's map.  Examples:
+@param {String} template the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces ( { } ). Identifiers wrapped in braces are interpreted as being properties on can-route's map. Examples:
 
 ```js
-route(":foo")
-route("foo/:bar")
+route("{foo}")
+route("foo/{bar}")
 ```
 
 @param {Object} [defaults] An object of default values. These defaults are applied to can-route's map when the route is matched.
@@ -114,7 +113,7 @@ In order to map to a specific properties in the url,
 prepend a colon to the name of the property like:
 
 ```js
-route("#!content/:type");
+route("#!content/{type}");
 ```
 
 If no routes are added, or no route is matched, 
@@ -131,7 +130,7 @@ can-route looks for matching routes and uses them
 to update can-route's data.
 
 ```js
-route("#!content/:type");
+route("#!content/{type}");
 location.hash = "#!content/images";
 // route -> {type : "images"}
 route.attr("type", "songs")
@@ -141,7 +140,7 @@ route.attr("type", "songs")
 Default values can be added to a route:
 
 ```js
-route("content/:type",{type: "videos" });
+route("content/{type}",{type: "videos" });
 location.hash = "#!content/"
 // route -> {type : "videos"}
 // location.hash -> "#!content/"
