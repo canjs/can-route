@@ -25,9 +25,9 @@ var types = require('can-util/js/types/types');
 // `window.location.hash` with a `Map`._
 //
 // Helper methods used for matching routes.
-// `RegExp` used to match route variables of the type ':name'.
+// `RegExp` used to match route variables of the type '{name}'.
 // Any word character or a period is matched.
-var matcher = /\:([\w\.]+)/g;
+var matcher = /[\:|\{]([\w.]+)\}?/g;
 // Regular expression for identifying &amp;key=value lists.
 var paramsMatcher = /^(?:&[^=]+=[^&]*)+/;
 // Converts a JS Object into a list of parameters that can be
@@ -156,7 +156,7 @@ var canRoute = function (url, defaults) {
 		querySeparator =canRoute._call("querySeparator"),
 		matchSlashes =canRoute._call("matchSlashes");
 
-	// res will be something like [":foo","foo"]
+	// res will be something like ["{foo}","foo"]
 	while (res = matcher.exec(url)) {
 		names.push(res[1]);
 		test += removeBackslash(url.substring(lastIndex, matcher.lastIndex - res[0].length));
@@ -173,8 +173,8 @@ var canRoute = function (url, defaults) {
 	// Add route in a form that can be easily figured out.
 	canRoute.routes[url] = {
 		// A regular expression that will match the route when variable values
-		// are present; i.e. for `:page/:type` the `RegExp` is `/([\w\.]*)/([\w\.]*)/` which
-		// will match for any value of `:page` and `:type` (word chars or period).
+		// are present; i.e. for (`{page}/{type}`) the `RegExp` is `/([\w\.]*)/([\w\.]*)/` which
+		// will match for any value of `{page}` and `{type}` (word chars or period).
 		test: new RegExp("^" + test + "($|" + wrapQuote(querySeparator) + ")"),
 		// The original URL, same as the index for this entry in routes.
 		route: url,
@@ -321,7 +321,7 @@ assign(canRoute, {
 	 * URL as &amp; separated key/value parameters.
 	 *
 	 * ```js
-	 * route(":type/:id");
+	 * route("{type}/{id}");
 	 *
 	 * route.param({ type: "video", id: 5 }) // -> "video/5"
 	 * route.param({ type: "video", id: 5, isNew: false })
@@ -401,7 +401,7 @@ assign(canRoute, {
 	 * Extract data from a url, creating an object representing its values.
 	 *
 	 * ```js
-	 * route(":page");
+	 * route("{page}");
 	 *
 	 * var result = route.deparam("page=home");
 	 * console.log(result.page); // -> "home"
@@ -438,10 +438,10 @@ assign(canRoute, {
 	 * data object.
 	 *
 	 * ```js
-	 * route(":type/:id");
+	 * route("{type}/{id}");
 	 *
 	 * route.deparam("videos/5");
-	 *   // -> { id: 5, route: ":type/:id", type: "videos" }
+	 *   // -> { id: 5, route: "{type}/{id}", type: "videos" }
 	 * ```
 	 */
 	deparam: function (url) {
@@ -508,8 +508,8 @@ assign(canRoute, {
 	 * Each route is an object with these members:
 	 *
 	 *  - test - A regular expression that will match the route when variable values
-	 *    are present; i.e. for :page/:type the `RegExp` is /([\w\.]*)/([\w\.]*)/ which
-	 *    will match for any value of :page and :type (word chars or period).
+	 *    are present; i.e. for {page}/{type} the `RegExp` is /([\w\.]*)/([\w\.]*)/ which
+	 *    will match for any value of {page} and {type} (word chars or period).
 	 *
 	 *  - route - The original URL, same as the index for this entry in routes.
 	 *
@@ -532,7 +532,7 @@ assign(canRoute, {
 	 * map and sets the route map to its initial values.
 	 *
 	 * ```js
-	 * route(":page", { page: "home" }));
+	 * route("{page}", { page: "home" }));
 	 *
 	 * route.ready();
 	 * route.attr("page"); // -> "home"
@@ -547,8 +547,8 @@ assign(canRoute, {
 	 * After setting all your routes, call `route.ready()`.
 	 *
 	 * ```js
-	 * route("overview/:dateStart-:dateEnd");
-	 * route(":type/:id");
+	 * route("overview/{dateStart}-{dateEnd}");
+	 * route("{type}/{id}");
 	 * route.ready();
 	 * ```
 	 */
@@ -594,7 +594,7 @@ assign(canRoute, {
 	 * key/value parameters.
 	 *
 	 * ```js
-	 * route(":type/:id");
+	 * route("{type}/{id}");
 	 *
 	 * route.url( { type: "videos", id: 5 } ) // -> "#!videos/5"
 	 * route.url( { type: "video", id: 5, isNew: false } )
