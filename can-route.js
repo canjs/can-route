@@ -18,6 +18,7 @@ var makeArray = require('can-util/js/make-array/make-array');
 var assign = require("can-util/js/assign/assign");
 var types = require('can-util/js/types/types');
 var dev = require('can-util/js/dev/dev');
+var diff = require('can-util/js/diff/diff');
 
 
 // ## route.js
@@ -185,6 +186,22 @@ var canRoute = function (url, defaults) {
 	}
 	test += url.substr(lastIndex)
 		.replace("\\", "");
+
+	// warn if new route uses same map properties as an existing route
+	if (dev) {
+		each(canRoute.routes, function(r) {
+			var existingKeys = r.names.concat(Object.keys(r.defaults)).sort();
+			var keys = names.concat(Object.keys(defaults)).sort();
+
+			if (!diff(existingKeys, keys).length) {
+				dev.warn('two routes were registered with matching keys:\n' +
+					'\t(1) route("' + r.route + '", ' + JSON.stringify(r.defaults) + ')\n' +
+					'\t(2) route("' + url + '", ' + JSON.stringify(defaults) + ')\n' +
+					'(1) will always be chosen since it was registered first');
+			}
+		});
+	}
+
 	// Add route in a form that can be easily figured out.
 	canRoute.routes[url] = {
 		// A regular expression that will match the route when variable values
