@@ -17,6 +17,8 @@ var isBrowserWindow =  require('can-util/js/is-browser-window/is-browser-window'
 var makeArray = require('can-util/js/make-array/make-array');
 var assign = require("can-util/js/assign/assign");
 var types = require('can-util/js/types/types');
+var dev = require('can-util/js/dev/dev');
+var diff = require('can-util/js/diff/diff');
 
 
 // ## route.js
@@ -27,7 +29,8 @@ var types = require('can-util/js/types/types');
 // Helper methods used for matching routes.
 // `RegExp` used to match route variables of the type '{name}'.
 // Any word character or a period is matched.
-var matcher = /[\:|\{]([\w.]+)\}?/g;
+var curliesMatcher = /\{([\w.]+)\}/g;
+var colonMatcher = /\:([\w.]+)/g;
 // Regular expression for identifying &amp;key=value lists.
 var paramsMatcher = /^(?:&[^=]+=[^&]*)+/;
 // Converts a JS Object into a list of parameters that can be
@@ -138,7 +141,7 @@ var eventsObject = assign({}, canEvent);
 
 var canRoute = function (url, defaults) {
 	// if route ends with a / and url starts with a /, remove the leading / of the url
-	var root =canRoute._call("root");
+	var root = canRoute._call("root");
 
 	if (root.lastIndexOf("/") === root.length - 1 &&
 		url.indexOf("/") === 0) {
@@ -151,10 +154,23 @@ var canRoute = function (url, defaults) {
 	var names = [],
 		res,
 		test = "",
-		lastIndex = matcher.lastIndex = 0,
+		matcher,
+		lastIndex,
 		next,
-		querySeparator =canRoute._call("querySeparator"),
-		matchSlashes =canRoute._call("matchSlashes");
+		querySeparator = canRoute._call("querySeparator"),
+		matchSlashes = canRoute._call("matchSlashes");
+
+	// fall back to legacy `:foo` RegExp if necessary
+	if (colonMatcher.test(url)) {
+		matcher = colonMatcher;
+
+		dev.warn('update route "' + url + '" to "' + url.replace(colonMatcher, function(name, key) {
+			return '{' + key + '}';
+		}) + '"');
+	} else {
+		matcher = curliesMatcher;
+	}
+	lastIndex = matcher.lastIndex = 0;
 
 	// res will be something like ["{foo}","foo"]
 	while (res = matcher.exec(url)) {
@@ -170,6 +186,22 @@ var canRoute = function (url, defaults) {
 	}
 	test += url.substr(lastIndex)
 		.replace("\\", "");
+
+	// warn if new route uses same map properties as an existing route
+	if (dev) {
+		each(canRoute.routes, function(r) {
+			var existingKeys = r.names.concat(Object.keys(r.defaults)).sort();
+			var keys = names.concat(Object.keys(defaults)).sort();
+
+			if (!diff(existingKeys, keys).length) {
+				dev.warn('two routes were registered with matching keys:\n' +
+					'\t(1) route("' + r.route + '", ' + JSON.stringify(r.defaults) + ')\n' +
+					'\t(2) route("' + url + '", ' + JSON.stringify(defaults) + ')\n' +
+					'(1) will always be chosen since it was registered first');
+			}
+		});
+	}
+
 	// Add route in a form that can be easily figured out.
 	canRoute.routes[url] = {
 		// A regular expression that will match the route when variable values
@@ -336,7 +368,11 @@ assign(canRoute, {
 			matches = 0,
 			matchCount,
 			routeName = data.route,
-			propCount = 0;
+			propCount = 0,
+			cpy,
+			res,
+			after,
+			matcher;
 
 		delete data.route;
 
@@ -359,26 +395,26 @@ assign(canRoute, {
 		// If we have a route name in our `canRoute` data, and it's
 		// just as good as what currently matches, use that
 		if (canRoute.routes[routeName] && matchesData(canRoute.routes[routeName], data) === matches) {
-			route =canRoute.routes[routeName];
+			route = canRoute.routes[routeName];
 		}
 		// If this is match...
 		if (route) {
-			var cpy = assign({}, data),
-				// Create the url by replacing the var names with the provided data.
-				// If the default value is found an empty string is inserted.
-				res = route.route.replace(matcher, function (whole, name) {
-					delete cpy[name];
-					return data[name] === route.defaults[name] ? "" : encodeURIComponent(data[name]);
-				})
-					.replace("\\", ""),
-				after;
+			cpy = assign({}, data);
+			// fall back to legacy :foo RegExp if necessary
+			matcher = colonMatcher.test(route.route) ? colonMatcher : curliesMatcher;	
+			// Create the url by replacing the var names with the provided data.
+			// If the default value is found an empty string is inserted.
+			res = route.route.replace(matcher, function (whole, name) {
+				delete cpy[name];
+				return data[name] === route.defaults[name] ? "" : encodeURIComponent(data[name]);
+			})
+			.replace("\\", "");
 			// Remove matching default values
 			each(route.defaults, function (val, name) {
 				if (cpy[name] === val) {
 					delete cpy[name];
 				}
 			});
-
 			// The remaining elements of data are added as
 			// `&amp;` separated parameters to the url.
 			after = param(cpy);
@@ -387,7 +423,7 @@ assign(canRoute, {
 			if (_setRoute) {
 				canRoute.attr('route', route.route);
 			}
-			return res + (after ?canRoute._call("querySeparator") + after : "");
+			return res + (after ? canRoute._call("querySeparator") + after : "");
 		}
 		// If no route was found, there is no hash URL, only paramters.
 		return isEmptyObject(data) ? "" :canRoute._call("querySeparator") + param(data);

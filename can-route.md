@@ -32,7 +32,7 @@ route("foo/{bar}")
 
 ## Use
 
-## Background Information
+## Background information
 
 To support the browser's back button and bookmarking in a JavaScript
  application, most applications use
@@ -104,7 +104,7 @@ route.attr({type: 'pages', id: 5}, true);
 When you make changes to can-route, they will automatically
 change the <code>hash</code>.
 
-## Creating a Route
+## Creating a route
 
 Use `route(url, defaults)` to create a 
 route. A route is a mapping from a url to 
@@ -164,7 +164,7 @@ to set can-route's data to match the current hash:
 route.ready();
 ```
 
-## Changing the route.
+## Changing the route
 
 Typically, you don't set `location.hash`
 directly. Instead, you can change properties on can-route
@@ -183,4 +183,67 @@ easy:
 
 ```js
 route.link("Videos", {type: 'videos'});
+```
+
+## Finding the matched route
+
+The matched route is the one that will be used to set the `window.location.hash`. The process can-route uses to find the matched route is:
+  - Find all routes with all of their map properties set
+  - If multiple routes are matched, find the route with the highest number of set properties
+  - If multiple routes are still matched, use the route that was registered first
+
+### Find all routes with all of their map properties set
+
+In order for a route to be matched, all of the map properties it uses must be set. For example, in the following route, `page` and `section` must be set in order for this route to be matched:
+
+```js
+route('{page}/{section}');
+route.ready();
+
+route.data.page = 'contact';
+route.data.section = 'email';
+
+route.data.route; // "{page}/{section}"
+```
+
+If a route contains default values, these map properties must also be set to match the default value in order for the route to be matched:
+
+```js
+route('{page}', { section: 'email' });
+route.ready();
+
+route.data.page = 'contact';
+route.data.section = 'email';
+
+route.data.route; // "{page}"
+```
+
+### Find the route with the highest number of set properties
+
+If multiple routes have all of their properties set, the route with the highest number of set properties will be used:
+
+```js
+route('{page}');
+route('{page}/{section}');
+route.ready();
+
+route.data.page = 'two';
+route.data.section = 'a';
+
+route.data.route; // "{page}/{section}"
+```
+
+### Find the route that was registered first
+
+If multiple routes are still matched, the route that was registered first will be matched:
+
+```js
+route('', { page: 'home' });
+route('{section}');
+route.ready();
+
+route.data.page = 'home';
+route.data.section = 'a';
+
+route.data.route; // ""
 ```
