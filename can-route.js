@@ -462,8 +462,8 @@ assign(canRoute, {
 	 * name.
 	 *
 	 * ```js
-	 * route.attr("id", 5) // location.hash -> #!id=5
-	 * route.attr("type", "videos");
+	 * route.data.id = 5 // location.hash -> #!id=5
+	 * route.data.type = "videos"
 	 *   // location.hash -> #!id=5&type=videos
 	 * route.deparam(location.hash);
 	 *   // -> { #!id: 5, type: "videos" }
@@ -571,7 +571,7 @@ assign(canRoute, {
 	 * route("{page}", { page: "home" }));
 	 *
 	 * route.ready();
-	 * route.attr("page"); // -> "home"
+	 * route.data.page; // -> "home"
 	 * ```
 	 *
 	 * @return {can-route} The can-route object.
@@ -716,8 +716,8 @@ assign(canRoute, {
 	 * ```
 	 * route.data.set({page: "recipes", id: '5'});
 	 *
-	 * route.current({page: "recipes"})       //-> false
-	 * route.current({page: "recipes"}, true) //-> true
+	 * route.current({page: "recipes"});       //-> false
+	 * route.current({page: "recipes"}, true); //-> true
 	 * ```
 	 *
 	 *   @param {Object} data Data to check agains the current route.
@@ -737,13 +737,13 @@ assign(canRoute, {
 	 * Returns true if the options represent the current URL.
 	 *
 	 * ```js
-	 * route.attr('id', 5) // location.hash -> "#!id=5"
-	 * route.current({ id: 5 }) // -> true
-	 * route.current({ id: 5, type: 'videos' }) // -> false
+	 * route.data.id = 5; // location.hash -> "#!id=5"
+	 * route.current({ id: 5 }); // -> true
+	 * route.current({ id: 5, type: 'videos' }); // -> false
 	 *
-	 * route.attr('type', 'videos')
+	 * route.data.type = 'videos';
 	 *   // location.hash -> #!id=5&type=videos
-	 * route.current({ id: 5, type: 'videos' }) // -> true
+	 * route.current({ id: 5, type: 'videos' }); // -> true
 	 * ```
 	 */
 	current: function (options, subsetMatch) {

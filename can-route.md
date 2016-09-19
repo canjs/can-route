@@ -64,13 +64,13 @@ the data in can-route looks like:
 
 can-route keeps the state of the hash in-sync with the `data` contained within it.
 
-## map
+## data
 
-Underlying can-route is an observable map. Depending on what type of map your application uses this could be a [can-map], a [can-define/map/map], or maybe even a [can-simple-map].
+Underlying can-route is an observable map: `route.data`. Depending on what type of map your application uses this could be a [can-map], a [can-define/map/map], or maybe even a [can-simple-map].
 
 Understanding how maps work is essential to understanding can-route.
 
-You can listen to changes in a map with `on(eventName, handler(ev, args...))` and change can-route's properties with `route.attr()`.
+You can listen to changes in a map with `on(eventName, handler(ev, args...))` and change can-route's properties by modifying `route.data`.
 
 ### Listening to changes in can-route
 
@@ -89,20 +89,22 @@ route.on('foo', function(ev, attr, how, newVal, oldVal) {
 
 ### Updating can-route
 
-Create changes in the route data with [can.Map.prototype.attr attr] like:
+When using a [can-define/map/map DefineMap] to back can-route, create changes in the route data by modifying it directly:
 
 ```js
-route.attr('type','images');
+route.data.type = 'image';
 ```
 
 Or change multiple properties at once like:
 
 ```js
-route.attr({type: 'pages', id: 5}, true);
+route.data.set({type: 'page', id: 5}, true);
 ```
 
 When you make changes to can-route, they will automatically
 change the <code>hash</code>.
+
+If using [can-map] or [can-simple-map] to back your route, update `route.data` using `attr`.
 
 ## Creating a route
 
@@ -133,7 +135,7 @@ to update can-route's data.
 route("#!content/{type}");
 location.hash = "#!content/images";
 // route -> {type : "images"}
-route.attr("type", "songs")
+route.data.type = "songs";
 // location.hash -> "#!content/songs"
 ```
     
@@ -151,7 +153,7 @@ Defaults can also be set on the root page of your app:
 ```js
 route("", { page: "index" });
 location.hash = "#!";
-// route.attr() -> { page: "index" }
+// route -> {page : "index"}
 // location.hash -> "#!"
 ```
 
@@ -171,7 +173,7 @@ directly. Instead, you can change properties on can-route
 like:
 
 ```js
-route.attr('type', 'videos');
+route.data.type = 'videos';
 ```
     
 This will automatically look up the appropriate 
