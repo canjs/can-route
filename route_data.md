@@ -1,47 +1,7 @@
-@function can-route.map map
+@function can-route.data data
 @parent can-route.static
 
-Assign a map instance that acts as can-route's internal map.  The purpose for this is to cross-bind a top level state object (Application ViewModel) to the can-route.
-
-@signature `route.map(MapConstructor)`
-
-Binds can-route to an instance based on a constructor. A new instance will be created and bound to:
-
-```js
-var ViewModel = DefineMap.extend({
-	page: {
-		type: "string",
-		set: function(page){
-			if(page === "user") {
-				this.verifyLoggedIn();
-			}
-			return page;
-		}
-	}
-});
-
-route.map(ViewModel);
-```
-
-@param {Object} MapConstructor A map constructor function (a [can-map] or [can-define/map/map] most likely).  A new instance will be created and used as the map internal to can-route.
-
-@signature `route.map(mapInstance)`
-
-Bind can-route to an instance of a map.
-
-```js
-var ViewModel = DefineMap.extend({
-	page: "string"
-});
-var map = new ViewModel({ page: "home" });
-
-route.map(map);
-
-map.attr("page", "user");
-// location.hash -> "#user"
-```
-
-@param {Object} mapInstance An instance, used as the map internal to can-route.
+This is the internal map underlying can-route. It can be set in order to cross-bind a top level state object (Application ViewModel) to can-route.
 
 @body
 
@@ -53,7 +13,7 @@ An elegant way to solve this problem is using the [Observer Pattern](http://en.w
 
 ## Use
 
-`route.map` provides an easy to way make your Application ViewModel object cross-bound to `route`, using an internal map instance, which is serialized into the hash (or pushstate URLs).
+Setting `route.data` is an easy way to cross-bind your Application ViewModel object to `route`. This will serialize your Application ViewModel into the hash (or pushstate URLs).
 
 ```js
 var ViewModel = DefineMap.extend({
@@ -66,32 +26,36 @@ var viewModel = new ViewModel({
 	storeId: "number"
 });
 
-route.map(viewModel);
+route.data = viewModel;
 ```
 
-## When to call it
-
-Call `route.map` at the  start of the application lifecycle, before any calls to `route.addEventListener`. `route.map` creates a new internal map, replacing the default map instance, so binding has to occur on this new object.
+`route.data` can also be set to a constructor function. A new instance will be created and bound to:
 
 ```js
 var ViewModel = DefineMap.extend({
-	graphType: "string",
-	currentType: "string"
+    page: {
+        type: "string",
+        set: function(page){
+            if(page === "user") {
+                this.verifyLoggedIn();
+            }
+            return page;
+        }
+    }
 });
 
-var viewModel = new ViewModel({
-	graphType: "line",
-	currencyType: "USD"
-});
-
-route.map(viewModel);
+route.data = ViewModel;
 ```
+
+## When to set it
+
+Set `route.data` at the  start of the application lifecycle, before any calls to `route.addEventListener`. This will allow events to correctly bind on this new object.
 
 ## Demo
 
 The following shows creating an Application ViewModel that loads data at page load, has a virtual property 'locationIds' which serializes an array, and synchronizes the viewModel to can-route:
 
-@demo demos/can-route/map.html
+@demo demos/can-route/data.html
 
 ## Complete example
 
@@ -151,10 +115,10 @@ var AppViewModel = DefineMap.extend({
 	}
 });
 
-// initialize and call map first, so anything binding to can-route
+// initialize and set route.data first, so anything binding to can-route
 // will work correctly
 var viewModel = new AppViewModel();
-route.map(appViewModel);
+route.data = appViewModel;
 
 // GET /locations
 var locations = new Location.List({});
@@ -170,7 +134,7 @@ locations.done(function(){
 
 ## Why
 
-The Application ViewModel object, which is cross-bound to the can-route via `route.map` and represents the overall state of the application, has several obvious uses:
+The Application ViewModel object, which is cross-bound to the can-route via `route.data` and represents the overall state of the application, has several obvious uses:
 
 * It is passed into the various components and used to communicate their own internal state.
 * It provides deep linking and back button support. As the URL changes, Application ViewModel changes cause changes in application components.
