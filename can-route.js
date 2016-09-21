@@ -243,7 +243,7 @@ var onRouteDataChange = function (ev, newProps, oldProps) {
 			path =canRoute.param(serialized, true);
 		canRoute._call("setURL", path, newProps, old);
 		// trigger a url change so its possible to live-bind on url-based changes
-		canBatch.trigger(eventsObject,"__url",[path, lastHash]);
+		canEvent.dispatch.call(eventsObject,"__url",[path, lastHash]);
 		lastHash = path;
 		changedAttrs = [];
 	}, 10);
@@ -322,7 +322,7 @@ setState =canRoute.setState = function () {
 
 		canRoute.attr(curParams);
 		// trigger a url change so its possible to live-bind on url-based changes
-		canRoute.batch.trigger.call(eventsObject,"__url",[hash, lastHash]);
+		canEvent.dispatch.call(eventsObject,"__url",[hash, lastHash]);
 		canRoute.batch.stop();
 	}
 };
@@ -401,7 +401,7 @@ assign(canRoute, {
 		if (route) {
 			cpy = assign({}, data);
 			// fall back to legacy :foo RegExp if necessary
-			matcher = colonMatcher.test(route.route) ? colonMatcher : curliesMatcher;	
+			matcher = colonMatcher.test(route.route) ? colonMatcher : curliesMatcher;
 			// Create the url by replacing the var names with the provided data.
 			// If the default value is found an empty string is inserted.
 			res = route.route.replace(matcher, function (whole, name) {
