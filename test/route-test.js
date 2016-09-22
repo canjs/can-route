@@ -594,7 +594,7 @@ if (typeof steal !== 'undefined') {
 		expect(1);
 		window.routeTestReady = function (iCanRoute, loc) {
 			iCanRoute("", {});
-			iCanRoute.bind('change', function(){
+			iCanRoute.matched.bind('change', function(){
 				ok(true, 'change triggered once')
 				start();
 			});
@@ -1050,6 +1050,25 @@ test("two way binding canRoute.map with can.Map instance", function(){
 	appState.attr('name', 'Brian');
 });
 
+test("matched() compute", function() {
+	stop();
+	var AppState = Map.extend();
+	var appState = new AppState();
 
+	canRoute.data = appState;
+	canRoute("{type}", { type: "foo" });
+	canRoute("{type}/{subtype}");
+	canRoute.ready();
+
+	equal(appState.attr("route"), undefined, "should not set route on appState");
+	equal(canRoute.matched(), "{type}", "should set route.matched property");
+
+	appState.attr("subtype", "bar");
+
+	setTimeout(function() {
+		equal(canRoute.matched(), "{type}/{subtype}", "should update route.matched property");
+		start();
+	}, 200);
+});
 
 }

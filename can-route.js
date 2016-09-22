@@ -121,10 +121,6 @@ var removeBackslash = function (str) {
 	return str.replace(/\\/g, "");
 };
 
-var isDefineMap = function(map) {
-	return types.isMapLike(map) && typeof map.get === "function";
-};
-
 // A ~~throttled~~ debounced function called multiple times will only fire once the
 // timer runs down. Each call resets the timer.
 var timer;
@@ -313,6 +309,7 @@ setState =canRoute.setState = function () {
 	var hash =canRoute._call("matchingPartOfURL");
 	var oldParams = curParams;
 	curParams =canRoute.deparam(hash);
+	var matched;
 
 	// if the hash data is currently changing, or
 	// the hash is what we set it to anyway, do NOT change the hash
@@ -320,7 +317,11 @@ setState =canRoute.setState = function () {
 		canRoute.batch.start();
 		recursiveClean(oldParams, curParams,canRoute.data);
 
+		matched = curParams.route;
+		delete curParams.route;
+		canRoute.matched(matched);
 		canRoute.attr(curParams);
+		curParams.route = matched;
 		// trigger a url change so its possible to live-bind on url-based changes
 		canEvent.dispatch.call(eventsObject,"__url",[hash, lastHash]);
 		canRoute.batch.stop();
@@ -421,7 +422,7 @@ assign(canRoute, {
 			// if we are paraming for setting the hash
 			// we also want to make sure the route value is updated
 			if (_setRoute) {
-				canRoute.attr('route', route.route);
+				canRoute.matched(route.route);
 			}
 			return res + (after ? canRoute._call("querySeparator") + after : "");
 		}
@@ -827,7 +828,29 @@ assign(canRoute, {
 		} else {
 			return method;
 		}
-	}
+	},
+	/**
+	 * @function can-route.matched matched
+	 * @parent can-route.static
+	 * @description A compute representing the currently matched route.
+	 * @signature `route.matched()`
+	 * @return {String} The currently matched route.
+	 *
+	 * @body
+	 * Use `route.matched()` to find the currently matched route.
+	 *
+	 * ```js
+	 * route("{type}", { type: "foo" });
+	 * route("{type}/{subtype}");
+	 *
+	 * route.matched(); // "{type}"
+	 *
+	 * route.data.subtype = "foo";
+	 *
+	 * route.matched(); // "{type}/{subtype}"
+	 * ```
+	 */
+	matched: compute()
 });
 
 // The functions in the following list applied to `canRoute` (e.g. `canRoute.attr('...')`) will
@@ -891,17 +914,6 @@ Object.defineProperty(canRoute,"data", {
 			setRouteData( stringCoercingMapDecorator(data) );
 		} else {
 			setRouteData(data);
-		}
-
-		if(isDefineMap(data) && Object.isSealed(data)) {
-			var proto = data.constructor.prototype;
-			// Set a constructor definition so can-define knows this already exists.
-			var definitions = proto._define.definitions;
-
-			if(!definitions.route) {
-				var errMsg = "Cannot map a DefineMap without a 'route' property defined.";
-				throw new Error(errMsg);
-			}
 		}
 	}
 });
