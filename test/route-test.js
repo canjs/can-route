@@ -19,6 +19,46 @@ if (("onhashchange" in window)) {
 
 test("deparam", function () {
 	canRoute.routes = {};
+	canRoute("{page}", {
+		page: "index"
+	});
+
+	var obj = canRoute.deparam("can.Control");
+	deepEqual(obj, {
+		page: "can.Control",
+		route: "{page}"
+	});
+
+	obj = canRoute.deparam("");
+	deepEqual(obj, {
+		page: "index",
+		route: "{page}"
+	});
+
+	obj = canRoute.deparam("can.Control&where=there");
+	deepEqual(obj, {
+		page: "can.Control",
+		where: "there",
+		route: "{page}"
+	});
+
+	canRoute.routes = {};
+	canRoute("{page}/{index}", {
+		page: "index",
+		index: "foo"
+	});
+
+	obj = canRoute.deparam("can.Control/&where=there");
+	deepEqual(obj, {
+		page: "can.Control",
+		index: "foo",
+		where: "there",
+		route: "{page}/{index}"
+	}, "default value and queryparams");
+});
+
+test("deparam - `:page` syntax", function () {
+	canRoute.routes = {};
 	canRoute(":page", {
 		page: "index"
 	});
@@ -60,7 +100,7 @@ test("deparam", function () {
 test("deparam of invalid url", function () {
 	var obj;
 	canRoute.routes = {};
-	canRoute("pages/:var1/:var2/:var3", {
+	canRoute("pages/{var1}/{var2}/{var3}", {
 		var1: 'default1',
 		var2: 'default2',
 		var3: 'default3'
@@ -78,7 +118,7 @@ test("deparam of invalid url", function () {
 		var1: 'val1',
 		var2: 'val2',
 		var3: 'val3',
-		route: "pages/:var1/:var2/:var3"
+		route: "pages/{var1}/{var2}/{var3}"
 	});
 });
 
@@ -97,6 +137,52 @@ test("deparam of url with non-generated hash (manual override)", function () {
 });
 
 test("param", function () {
+	canRoute.routes = {};
+	canRoute("pages/{page}", {
+		page: "index"
+	})
+
+	var res = canRoute.param({
+		page: "foo"
+	});
+	equal(res, "pages/foo")
+
+	res = canRoute.param({
+		page: "foo",
+		index: "bar"
+	});
+	equal(res, "pages/foo&index=bar")
+
+	canRoute("pages/{page}/{foo}", {
+		page: "index",
+		foo: "bar"
+	})
+
+	res = canRoute.param({
+		page: "foo",
+		foo: "bar",
+		where: "there"
+	});
+	equal(res, "pages/foo/&where=there")
+
+	// There is no matching route so the hash should be empty.
+	res = canRoute.param({});
+	equal(res, "")
+
+	canRoute.routes = {};
+
+	res = canRoute.param({
+		page: "foo",
+		bar: "baz",
+		where: "there"
+	});
+	equal(res, "&page=foo&bar=baz&where=there")
+
+	res = canRoute.param({});
+	equal(res, "")
+});
+
+test("param - `:page` syntax", function () {
 	canRoute.routes = {};
 	canRoute("pages/:page", {
 		page: "index"
@@ -161,7 +247,7 @@ test("symmetry", function () {
 
 test("light param", function () {
 	canRoute.routes = {};
-	canRoute(":page", {
+	canRoute("{page}", {
 		page: "index"
 	})
 
@@ -170,7 +256,7 @@ test("light param", function () {
 	});
 	equal(res, "")
 
-	canRoute("pages/:p1/:p2/:p3", {
+	canRoute("pages/{p1}/{p2}/{p3}", {
 		p1: "index",
 		p2: "foo",
 		p3: "bar"
@@ -194,7 +280,7 @@ test("light param", function () {
 test('param doesnt add defaults to params', function () {
 	canRoute.routes = {};
 
-	canRoute("pages/:p1", {
+	canRoute("pages/{p1}", {
 		p2: "foo"
 	})
 	var res = canRoute.param({
@@ -206,7 +292,7 @@ test('param doesnt add defaults to params', function () {
 
 test("param-deparam", function () {
 
-	canRoute(":page/:type", {
+	canRoute("{page}/{type}", {
 		page: "index",
 		type: "foo"
 	})
@@ -266,7 +352,7 @@ test("param-deparam", function () {
 
 test("deparam-param", function () {
 	canRoute.routes = {};
-	canRoute(":foo/:bar", {
+	canRoute("{foo}/{bar}", {
 		foo: 1,
 		bar: 2
 	});
@@ -280,27 +366,27 @@ test("deparam-param", function () {
 	deepEqual(deparamed, {
 		foo: 1,
 		bar: 2,
-		route: ":foo/:bar"
+		route: "{foo}/{bar}"
 	})
 })
 
 test("precident", function () {
 	canRoute.routes = {};
-	canRoute(":who", {
+	canRoute("{who}", {
 		who: "index"
 	});
-	canRoute("search/:search");
+	canRoute("search/{search}");
 
 	var obj = canRoute.deparam("can.Control");
 	deepEqual(obj, {
 		who: "can.Control",
-		route: ":who"
+		route: "{who}"
 	});
 
 	obj = canRoute.deparam("search/can.Control");
 	deepEqual(obj, {
 		search: "can.Control",
-		route: "search/:search"
+		route: "search/{search}"
 	}, "bad deparam");
 
 	equal(canRoute.param({
@@ -316,10 +402,10 @@ test("precident", function () {
 
 test("better matching precident", function () {
 	canRoute.routes = {};
-	canRoute(":type", {
+	canRoute("{type}", {
 		who: "index"
 	});
-	canRoute(":type/:id");
+	canRoute("{type}/{id}");
 
 	equal(canRoute.param({
 			type: "foo",
@@ -330,7 +416,7 @@ test("better matching precident", function () {
 
 test("linkTo", function () {
 	canRoute.routes = {};
-	canRoute(":foo");
+	canRoute("{foo}");
 	var res = canRoute.link("Hello", {
 		foo: "bar",
 		baz: 'foo'
@@ -367,7 +453,7 @@ test("route endings", function () {
 
 test("strange characters", function () {
 	canRoute.routes = {};
-	canRoute(":type/:id");
+	canRoute("{type}/{id}");
 	var res = canRoute.deparam("foo/" + encodeURIComponent("\/"))
 	equal(res.id, "\/")
 	res = canRoute.param({
@@ -380,7 +466,7 @@ test("strange characters", function () {
 test("empty default is matched even if last", function () {
 
 	canRoute.routes = {};
-	canRoute(":who");
+	canRoute("{who}");
 	canRoute("", {
 		foo: "bar"
 	})
@@ -394,13 +480,13 @@ test("empty default is matched even if last", function () {
 
 test("order matched", function () {
 	canRoute.routes = {};
-	canRoute(":foo");
-	canRoute(":bar")
+	canRoute("{foo}");
+	canRoute("{bar}")
 
 	var obj = canRoute.deparam("abc");
 	deepEqual(obj, {
 		foo: "abc",
-		route: ":foo"
+		route: "{foo}"
 	});
 });
 
@@ -409,7 +495,7 @@ test("param order matching", function () {
 	canRoute("", {
 		bar: "foo"
 	});
-	canRoute("something/:bar");
+	canRoute("something/{bar}");
 	var res = canRoute.param({
 		bar: "foo"
 	});
@@ -418,12 +504,12 @@ test("param order matching", function () {
 	// picks the first that matches everything ...
 	canRoute.routes = {};
 
-	canRoute(":recipe", {
+	canRoute("{recipe}", {
 		recipe: "recipe1",
 		task: "task3"
 	});
 
-	canRoute(":recipe/:task", {
+	canRoute("{recipe}/{task}", {
 		recipe: "recipe1",
 		task: "task3"
 	});
@@ -444,13 +530,13 @@ test("param order matching", function () {
 
 test("dashes in routes", function () {
 	canRoute.routes = {};
-	canRoute(":foo-:bar");
+	canRoute("{foo}-{bar}");
 
 	var obj = canRoute.deparam("abc-def");
 	deepEqual(obj, {
 		foo: "abc",
 		bar: "def",
-		route: ":foo-:bar"
+		route: "{foo}-{bar}"
 	});
 
 	window.location.hash = "qunit-fixture";
@@ -551,7 +637,7 @@ if (typeof steal !== 'undefined') {
 	test("canRoute.map: conflicting route values, hash should win", function(){
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
-			iCanRoute(":type/:id");
+			iCanRoute("{type}/{id}");
 			var AppState = Map.extend();
 			var appState = new AppState({type: "dog", id: '4'});
 
@@ -576,7 +662,7 @@ if (typeof steal !== 'undefined') {
 	test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(){
 		setupRouteTest(function (iframe, iCanRoute, loc, win) {
 
-			iCanRoute(":type/:id");
+			iCanRoute("{type}/{id}");
 			var AppState = win.CanMap.extend();
 			var appState = new AppState({section: 'home'});
 
@@ -605,7 +691,7 @@ if (typeof steal !== 'undefined') {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
 			iCanRoute.ready();
-			iCanRoute(":type/:id");
+			iCanRoute("{type}/{id}");
 			iCanRoute.attr({
 				type: "bar",
 				id: "\/"
@@ -646,8 +732,8 @@ if (typeof steal !== 'undefined') {
 	test("unsticky routes", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 			iCanRoute.ready();
-			iCanRoute(":type");
-			iCanRoute(":type/:id");
+			iCanRoute("{type}");
+			iCanRoute("{type}/{id}");
 			iCanRoute.attr({
 				type: "bar"
 			});
@@ -804,7 +890,7 @@ if (typeof steal !== 'undefined') {
 		window.routeTestReady = function (iCanRoute, loc) {
 
 			iCanRoute.ready();
-			iCanRoute(":path");
+			iCanRoute("{path}");
 
 			iCanRoute.attr('path', 'foo');
 			setTimeout(function() {
@@ -842,14 +928,14 @@ if (typeof steal !== 'undefined') {
 test("escaping periods", function () {
 
 	canRoute.routes = {};
-	canRoute(":page\\.html", {
+	canRoute("{page}\\.html", {
 		page: "index"
 	});
 
 	var obj = canRoute.deparam("can.Control.html");
 	deepEqual(obj, {
 		page: "can.Control",
-		route: ":page\\.html"
+		route: "{page}\\.html"
 	});
 
 	equal(canRoute.param({
@@ -914,7 +1000,7 @@ if (typeof require === 'undefined') {
 			});
 
 			route.routes = {};
-			route(":type/:id");
+			route("{type}/{id}");
 
 			route.attr({
 				type: 'page',
