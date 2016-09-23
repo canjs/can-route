@@ -508,7 +508,7 @@ if (typeof steal !== 'undefined') {
 		expect(1);
 		window.routeTestReady = function (iCanRoute, loc) {
 			iCanRoute("", {});
-			iCanRoute.serializedCompute.bind('change', function(){
+			iCanRoute.matched.bind('change', function(){
 				ok(true, 'change triggered once')
 				start();
 			});
@@ -1027,40 +1027,37 @@ test(".url with merge=true (#16)", function(){
 
 		QUnit.ok(canRoute.url({page: "recipe", id: 5}, true), "number to string works");
 		QUnit.ok(canRoute.url({page: "recipe", id: 6}, true), "not all equal");
-		
+
 		mockRoute.stop();
 		QUnit.start();
 	},200);
 
 });
 
-test("Throws on DefineMap that's sealed and no 'route' defined", function(){
+test("matched() compute", function() {
+	stop();
 	var AppState = DefineMap.extend({
-		page: "string"
+		seal: false
+	}, {
+		type: "string",
+		subtype: "string"
 	});
 	var appState = new AppState();
 
-	try {
-		canRoute.map(appState);
+	canRoute.data = appState;
+	canRoute("{type}", { type: "foo" });
+	canRoute("{type}/{subtype}");
+	canRoute.ready();
 
-		QUnit.ok(false, "This should have thrown");
-	} catch(err) {
-		QUnit.ok(true, "Threw because no 'route' defined");
-	}
-});
+	equal(appState.route, undefined, "should not set route on appState");
+	equal(canRoute.matched(), "{type}", "should set route.matched property");
 
-test("Throws on a DefineMap derived constructor with no 'route' defined", function(){
-	var AppState = DefineMap.extend({
-		page: "string"
-	});
-	
-	try {
-		canRoute.map(AppState);
+	appState.subtype = "bar";
 
-		QUnit.ok(false, "This should have thrown");
-	} catch(err) {
-		QUnit.ok(true, "Threw because no 'route' defined");
-	}
+	setTimeout(function() {
+		equal(canRoute.matched(), "{type}/{subtype}", "should update route.matched property");
+		start();
+	}, 200);
 });
 
 }

@@ -189,7 +189,7 @@ route.link("Videos", {type: 'videos'});
 
 ## Finding the matched route
 
-The matched route is the one that will be used to set the `window.location.hash`. The process can-route uses to find the matched route is:
+The matched route is stored in the compute `route.matched` and is used to set the `window.location.hash`. The process can-route uses to find the matched route is:
   - Find all routes with all of their map properties set
   - If multiple routes are matched, find the route with the highest number of set properties
   - If multiple routes are still matched, use the route that was registered first
@@ -205,7 +205,7 @@ route.ready();
 route.data.page = 'contact';
 route.data.section = 'email';
 
-route.data.route; // "{page}/{section}"
+route.matched(); // "{page}/{section}"
 ```
 
 If a route contains default values, these map properties must also be set to match the default value in order for the route to be matched:
@@ -217,7 +217,7 @@ route.ready();
 route.data.page = 'contact';
 route.data.section = 'email';
 
-route.data.route; // "{page}"
+route.matched(); // "{page}"
 ```
 
 ### Find the route with the highest number of set properties
@@ -232,7 +232,7 @@ route.ready();
 route.data.page = 'two';
 route.data.section = 'a';
 
-route.data.route; // "{page}/{section}"
+route.matched(); // "{page}/{section}"
 ```
 
 ### Find the route that was registered first
@@ -247,5 +247,5 @@ route.ready();
 route.data.page = 'home';
 route.data.section = 'a';
 
-route.data.route; // ""
+route.matched(); // ""
 ```
