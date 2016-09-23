@@ -535,6 +535,7 @@ assign(canRoute, {
 		return paramsMatcher.test(url) ? deparam(url.slice(1)) : {};
 	},
 	map: function(data){
+		dev.warn('Set route.data directly instead of calling route.map');
 		canRoute.data = data;
 	},
 	/**
