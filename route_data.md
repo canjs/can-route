@@ -74,7 +74,6 @@ var LocationList = DefineList.extend({
 });
 
 var AppViewModel = DefineMap.extend({
-	route: "string",
 	locations: {
 		type: "any",
 		// don't serialize this property at all in the route
