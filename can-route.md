@@ -4,6 +4,7 @@
 @test can-route/test.html
 @parent can-core
 @link ../docco/route/route.html docco
+@package ./package.json
 
 @description Manage browser history and client state by synchronizing the `window.location.hash` with a map.
 
@@ -37,8 +38,8 @@ route("foo/{bar}")
 To support the browser's back button and bookmarking in a JavaScript
  application, most applications use
 the `window.location.hash`.  By
-changing the hash (via a link or JavaScript), 
-one is able to add to the browser's history 
+changing the hash (via a link or JavaScript),
+one is able to add to the browser's history
 without changing the page.
 
 This provides the basics needed to
@@ -53,11 +54,11 @@ create history enabled single-page apps.  However,
 ## How it works
 
 can-route is a map that represents the
-`window.location.hash` as an 
+`window.location.hash` as an
 object.  For example, if the hash looks like:
 
     #!type=videos&id=5
-    
+
 the data in can-route looks like:
 
     { type: 'videos', id: 5 }
@@ -108,9 +109,9 @@ If using [can-map] or [can-simple-map] to back your route, update `route.data` u
 
 ## Creating a route
 
-Use `route(url, defaults)` to create a 
-route. A route is a mapping from a url to 
-an object (that is the route's state). 
+Use `route(url, defaults)` to create a
+route. A route is a mapping from a url to
+an object (that is the route's state).
 In order to map to a specific properties in the url,
 prepend a colon to the name of the property like:
 
@@ -118,7 +119,7 @@ prepend a colon to the name of the property like:
 route("#!content/{type}");
 ```
 
-If no routes are added, or no route is matched, 
+If no routes are added, or no route is matched,
 can-route's data is updated with the [can-route.deparam deparamed]
 hash.
 
@@ -126,7 +127,7 @@ hash.
 location.hash = "#!type=videos";
 // route -> {type : "videos"}
 ```
-    
+
 Once routes are added and the hash changes,
 can-route looks for matching routes and uses them
 to update can-route's data.
@@ -138,7 +139,7 @@ location.hash = "#!content/images";
 route.data.type = "songs";
 // location.hash -> "#!content/songs"
 ```
-    
+
 Default values can be added to a route:
 
 ```js
@@ -175,12 +176,12 @@ like:
 ```js
 route.data.type = 'videos';
 ```
-    
-This will automatically look up the appropriate 
+
+This will automatically look up the appropriate
 route and update the hash.
 
 Often, you want to create links. can-route provides
-the [can-route.link] and [can-route.url] helpers to make this 
+the [can-route.link] and [can-route.url] helpers to make this
 easy:
 
 ```js
