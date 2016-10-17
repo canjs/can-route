@@ -50,11 +50,11 @@
     "npmAlgorithm": "flat"
   },
   "dependencies": {
-    "can-event": "^3.0.0-pre.2",
-    "can-observation": "^3.0.0-pre.0",
-    "can-util": "^3.0.0-pre.28",
-    "can-simple-map": "^3.0.0-pre.3",
-    "can-compute": "^3.0.0-pre.5"
+    "can-compute": "^3.0.0",
+    "can-event": "^3.0.1",
+    "can-observation": "^3.0.1",
+    "can-simple-map": "^3.0.0",
+    "can-util": "^3.0.1"
   },
   "devDependencies": {
     "can-map": "^3.0.0-pre.7",
