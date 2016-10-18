@@ -19,6 +19,7 @@ var assign = require("can-util/js/assign/assign");
 var types = require('can-util/js/types/types');
 var dev = require('can-util/js/dev/dev');
 var diff = require('can-util/js/diff/diff');
+var diffObject = require('can-util/js/diff-object/diff-object');
 
 
 // ## route.js
@@ -189,7 +190,10 @@ var canRoute = function (url, defaults) {
 			var existingKeys = r.names.concat(Object.keys(r.defaults)).sort();
 			var keys = names.concat(Object.keys(defaults)).sort();
 
-			if (!diff(existingKeys, keys).length) {
+			var sameMapKeys = !diff(existingKeys, keys).length;
+			var sameDefaultValues = !diffObject(r.defaults, defaults).length;
+
+			if (sameMapKeys && sameDefaultValues) {
 				dev.warn('two routes were registered with matching keys:\n' +
 					'\t(1) route("' + r.route + '", ' + JSON.stringify(r.defaults) + ')\n' +
 					'\t(2) route("' + url + '", ' + JSON.stringify(defaults) + ')\n' +

@@ -4,6 +4,7 @@ var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
 var Map = require('can-map');
 var makeArray = require('can-util/js/make-array/make-array');
+var dev = require('can-util/js/dev/dev');
 
 require('can-observation');
 
@@ -1070,5 +1071,49 @@ test("matched() compute", function() {
 		start();
 	}, 200);
 });
+
+//!steal-remove-start
+if (dev) {
+	test("should warn when two routes have same map properties", function () {
+		var oldlog = dev.warn;
+
+		dev.warn = function(text) {
+			equal(text.split(":")[0], "two routes were registered with matching keys");
+		};
+
+		canRoute("{page}/{subpage}");
+		canRoute("foo/{page}/{subpage}");
+
+		dev.warn = oldlog;
+	});
+
+	test("should warn when two routes have same map properties - including defaults", function () {
+		var oldlog = dev.warn;
+
+		dev.warn = function(text) {
+			equal(text.split(":")[0], "two routes were registered with matching keys");
+		};
+
+		canRoute("{page}", { subpage: "bar" });
+		canRoute("{page}/{subpage}");
+
+		dev.warn = oldlog;
+	});
+
+	test("should not warn when two routes have same map properties - but different defaults(#36)", function () {
+		expect(0);
+		var oldlog = dev.warn;
+
+		dev.warn = function(text) {
+			ok(false, text);
+		};
+
+		canRoute("login", { "page": "auth", "subpage": "login" });
+		canRoute("signup", { "page": "auth", "subpage": "signup" });
+
+		dev.warn = oldlog;
+	});
+}
+//!steal-remove-end
 
 }
