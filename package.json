@@ -59,7 +59,7 @@
   "devDependencies": {
     "can-map": "^3.0.0-pre.7",
     "can-list": "^3.0.0-pre.4",
-    "can-define": "^0.8.0",
+    "can-define": "^1.0.1",
     "bit-docs": "0.0.7",
     "jshint": "^2.9.1",
     "cssify": "^1.0.2",
