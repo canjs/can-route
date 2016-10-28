@@ -161,9 +161,11 @@ var canRoute = function (url, defaults) {
 	if (colonMatcher.test(url)) {
 		matcher = colonMatcher;
 
+		//!steal-remove-start
 		dev.warn('update route "' + url + '" to "' + url.replace(colonMatcher, function(name, key) {
 			return '{' + key + '}';
 		}) + '"');
+		//!steal-remove-end
 	} else {
 		matcher = curliesMatcher;
 	}
@@ -194,10 +196,12 @@ var canRoute = function (url, defaults) {
 			var sameDefaultValues = !diffObject(r.defaults, defaults).length;
 
 			if (sameMapKeys && sameDefaultValues) {
+				//!steal-remove-start
 				dev.warn('two routes were registered with matching keys:\n' +
 					'\t(1) route("' + r.route + '", ' + JSON.stringify(r.defaults) + ')\n' +
 					'\t(2) route("' + url + '", ' + JSON.stringify(defaults) + ')\n' +
 					'(1) will always be chosen since it was registered first');
+				//!steal-remove-end
 			}
 		});
 	}
@@ -539,7 +543,9 @@ assign(canRoute, {
 		return paramsMatcher.test(url) ? deparam(url.slice(1)) : {};
 	},
 	map: function(data){
+		//!steal-remove-start
 		dev.warn('Set route.data directly instead of calling route.map');
+		//!steal-remove-end
 		canRoute.data = data;
 	},
 	/**
