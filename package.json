@@ -54,7 +54,7 @@
     "can-event": "^3.0.1",
     "can-observation": "^3.0.1",
     "can-simple-map": "^3.0.0",
-    "can-util": "^3.0.1"
+    "can-util": "^3.0.4"
   },
   "devDependencies": {
     "can-map": "^3.0.0-pre.7",
