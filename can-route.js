@@ -186,25 +186,23 @@ var canRoute = function (url, defaults) {
 	test += url.substr(lastIndex)
 		.replace("\\", "");
 
+	//!steal-remove-start
 	// warn if new route uses same map properties as an existing route
-	if (dev) {
-		each(canRoute.routes, function(r) {
-			var existingKeys = r.names.concat(Object.keys(r.defaults)).sort();
-			var keys = names.concat(Object.keys(defaults)).sort();
+	each(canRoute.routes, function(r) {
+		var existingKeys = r.names.concat(Object.keys(r.defaults)).sort();
+		var keys = names.concat(Object.keys(defaults)).sort();
 
-			var sameMapKeys = !diff(existingKeys, keys).length;
-			var sameDefaultValues = !diffObject(r.defaults, defaults).length;
+		var sameMapKeys = !diff(existingKeys, keys).length;
+		var sameDefaultValues = !diffObject(r.defaults, defaults).length;
 
-			if (sameMapKeys && sameDefaultValues) {
-				//!steal-remove-start
-				dev.warn('two routes were registered with matching keys:\n' +
-					'\t(1) route("' + r.route + '", ' + JSON.stringify(r.defaults) + ')\n' +
-					'\t(2) route("' + url + '", ' + JSON.stringify(defaults) + ')\n' +
-					'(1) will always be chosen since it was registered first');
-				//!steal-remove-end
-			}
-		});
-	}
+		if (sameMapKeys && sameDefaultValues) {
+			dev.warn('two routes were registered with matching keys:\n' +
+				'\t(1) route("' + r.route + '", ' + JSON.stringify(r.defaults) + ')\n' +
+				'\t(2) route("' + url + '", ' + JSON.stringify(defaults) + ')\n' +
+				'(1) will always be chosen since it was registered first');
+		}
+	});
+	//!steal-remove-end
 
 	// Add route in a form that can be easily figured out.
 	canRoute.routes[url] = {
