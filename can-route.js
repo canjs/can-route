@@ -30,7 +30,7 @@ var diffObject = require('can-util/js/diff-object/diff-object');
 // Helper methods used for matching routes.
 // `RegExp` used to match route variables of the type '{name}'.
 // Any word character or a period is matched.
-var curliesMatcher = /\{([\w.]+)\}/g;
+var curliesMatcher = /\{\s*([\w.]+)\s*\}/g;
 var colonMatcher = /\:([\w.]+)/g;
 // Regular expression for identifying &amp;key=value lists.
 var paramsMatcher = /^(?:&[^=]+=[^&]*)+/;

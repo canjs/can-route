@@ -1061,3 +1061,35 @@ test("matched() compute", function() {
 });
 
 }
+
+test("param with whitespace in interpolated string (#45)", function () {
+	canRoute.routes = {};
+	canRoute("{ page }", {
+		page: "index"
+	})
+
+	var res = canRoute.param({
+		page: "index"
+	});
+	equal(res, "")
+
+	canRoute("pages/{ p1 }/{    p2   }/{	p3	}", {
+		p1: "index",
+		p2: "foo",
+		p3: "bar"
+	})
+
+	res = canRoute.param({
+		p1: "index",
+		p2: "foo",
+		p3: "bar"
+	});
+	equal(res, "pages///")
+
+	res = canRoute.param({
+		p1: "index",
+		p2: "baz",
+		p3: "bar"
+	});
+	equal(res, "pages//baz/")
+});
