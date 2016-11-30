@@ -28,16 +28,6 @@
     "develop": "done-serve --static --develop --port 8080"
   },
   "main": "can-route",
-  "browser": {
-    "transform": [
-      "cssify"
-    ]
-  },
-  "browserify": {
-    "transform": [
-      "cssify"
-    ]
-  },
   "keywords": [
     "canjs",
     "canjs-plugin",
@@ -62,7 +52,6 @@
     "can-define": "^1.0.1",
     "bit-docs": "0.0.7",
     "jshint": "^2.9.1",
-    "cssify": "^1.0.2",
     "steal": "^0.16.0",
     "steal-qunit": "^0.1.1",
     "steal-tools": "^0.16.0",
