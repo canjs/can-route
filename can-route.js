@@ -4,7 +4,7 @@ var canEvent = require('can-event');
 var Observation = require('can-observation');
 var compute = require('can-compute');
 
-var namespace = require('can-util/namespace');
+var namespace = require('can-namespace');
 var deparam = require('can-util/js/deparam/deparam');
 var each = require('can-util/js/each/each');
 var string = require('can-util/js/string/string');
@@ -16,7 +16,7 @@ var isWebWorker =  require('can-util/js/is-web-worker/is-web-worker');
 var isBrowserWindow =  require('can-util/js/is-browser-window/is-browser-window');
 var makeArray = require('can-util/js/make-array/make-array');
 var assign = require("can-util/js/assign/assign");
-var types = require('can-util/js/types/types');
+var types = require('can-types');
 var dev = require('can-util/js/dev/dev');
 var diff = require('can-util/js/diff/diff');
 var diffObject = require('can-util/js/diff-object/diff-object');
