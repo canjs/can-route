@@ -209,7 +209,7 @@ var canRoute = function (url, defaults) {
 		// A regular expression that will match the route when variable values
 		// are present; i.e. for (`{page}/{type}`) the `RegExp` is `/([\w\.]*)/([\w\.]*)/` which
 		// will match for any value of `{page}` and `{type}` (word chars or period).
-		test: new RegExp("^" + test + "($|" + wrapQuote(querySeparator) + ")"),
+		test: new RegExp("^" + test + "($|\\?|" + wrapQuote(querySeparator) + ")"),
 		// The original URL, same as the index for this entry in routes.
 		route: url,
 		// An `array` of all the variable names in this route.
