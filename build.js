@@ -1,7 +1,7 @@
 var stealTools = require("steal-tools");
 
 stealTools.export({
-	system: {
+	steal: {
 		main: ["can-route", "can-define/map/map"],
 		config: __dirname + "/package.json!npm"
 	},

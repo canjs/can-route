@@ -33,11 +33,10 @@
     "canjs-plugin",
     "donejs"
   ],
-  "system": {
+  "steal": {
     "configDependencies": [
       "live-reload"
-    ],
-    "npmAlgorithm": "flat"
+    ]
   },
   "dependencies": {
     "can-compute": "^3.0.0",
@@ -49,18 +48,18 @@
     "can-util": "^3.1.1"
   },
   "devDependencies": {
-    "can-map": "^3.0.3",
-    "can-list": "^3.0.1",
-    "can-define": "^1.0.1",
     "bit-docs": "0.0.7",
-    "jshint": "^2.9.1",
-    "steal": "^0.16.0",
-    "steal-qunit": "^0.1.1",
-    "steal-tools": "^0.16.0",
-    "testee": "^0.3.0",
-    "generator-donejs": "^0.9.0",
+    "can-define": "^1.0.1",
+    "can-list": "^3.0.1",
+    "can-map": "^3.0.3",
+    "done-serve": "^0.2.0",
     "donejs-cli": "^0.9.5",
-    "done-serve": "^0.2.0"
+    "generator-donejs": "^0.9.0",
+    "jshint": "^2.9.1",
+    "steal": "^1.2.9",
+    "steal-qunit": "^1.0.1",
+    "steal-tools": "^1.1.2",
+    "testee": "^0.3.1"
   },
   "bit-docs": {
     "dependencies": {
