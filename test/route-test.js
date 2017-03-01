@@ -609,18 +609,19 @@ if (typeof steal !== 'undefined') {
 	test("removing things from the hash", function () {
 
 		setupRouteTest(function (iframe, iCanRoute, loc) {
-
 			iCanRoute.bind('change', function () {
 
 				equal(iCanRoute.attr('foo'), 'bar', 'expected value');
 				iCanRoute.unbind('change');
-				iCanRoute.bind('change', function(){
-
+				iCanRoute.bind('change', function(ev, prop){
+					console.log(arguments)
 					equal(iCanRoute.attr('personId'), '3', 'personId');
 					equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
 					iCanRoute.unbind('change');
 
-					teardownRouteTest();
+					if (prop === 'personId') {
+						teardownRouteTest();
+					}
 				});
 				setTimeout(function () {
 					iframe.contentWindow.location.hash = '#!personId=3';
