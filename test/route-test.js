@@ -614,7 +614,6 @@ if (typeof steal !== 'undefined') {
 				equal(iCanRoute.attr('foo'), 'bar', 'expected value');
 				iCanRoute.unbind('change');
 				iCanRoute.bind('change', function(ev, prop){
-					console.log(arguments)
 					equal(iCanRoute.attr('personId'), '3', 'personId');
 					equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
 					iCanRoute.unbind('change');
