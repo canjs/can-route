@@ -52,7 +52,7 @@
     "can-define": "^1.0.1",
     "can-list": "^3.0.1",
     "can-map": "^3.0.3",
-    "done-serve": "^0.2.0",
+    "done-serve": "^1.0.0",
     "donejs-cli": "^0.9.5",
     "generator-donejs": "^0.9.0",
     "jshint": "^2.9.1",
