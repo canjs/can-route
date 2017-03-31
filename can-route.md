@@ -120,7 +120,7 @@ route.attr('type', 'image/bar');
 
 The URL will look like this:
 
-    http://randomurl/#!type=image%2Fbar
+    https://example.com/#!type=image%2Fbar
 
 The location hash will look like this:
 
