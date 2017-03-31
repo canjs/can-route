@@ -107,6 +107,25 @@ change the <code>hash</code>.
 
 If using [can-map] or [can-simple-map] to back your route, update `route.data` using `attr`.
 
+### Encoded `/`
+
+If the change in your route data includes a `/`, the `/` will be encoded into `%2F`.
+You will see this result in the URL and `location.hash`.
+
+```js
+route.data.type = 'image/bar';
+// OR
+route.attr('type', 'image/bar');
+```
+
+The URL will look like this:
+
+    https://example.com/#!type=image%2Fbar
+
+The location hash will look like this:
+
+    #!type=image%2Fbar
+
 ## Creating a route
 
 Use `route(url, defaults)` to create a
