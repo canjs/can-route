@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "can-compute": "^3.0.0",
+    "can-deparam": "^1.0.1",
     "can-event": "^3.0.1",
     "can-namespace": "1.0.0",
     "can-observation": "^3.0.1",
