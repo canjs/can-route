@@ -5,7 +5,7 @@ var Observation = require('can-observation');
 var compute = require('can-compute');
 
 var namespace = require('can-namespace');
-var deparam = require('can-util/js/deparam/deparam');
+var deparam = require('can-deparam');
 var each = require('can-util/js/each/each');
 var string = require('can-util/js/string/string');
 var isFunction = require('can-util/js/is-function/is-function');
