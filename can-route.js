@@ -5,11 +5,11 @@ var Observation = require('can-observation');
 var compute = require('can-compute');
 
 var namespace = require('can-namespace');
+var param = require('can-param');
 var deparam = require('can-deparam');
 var each = require('can-util/js/each/each');
 var string = require('can-util/js/string/string');
 var isFunction = require('can-util/js/is-function/is-function');
-var param = require('can-util/js/param/param');
 var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
 var deepAssign = require('can-util/js/deep-assign/deep-assign');
 var isWebWorker =  require('can-util/js/is-web-worker/is-web-worker');
