@@ -1,5 +1,7 @@
 # can-route
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-route.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/canjs/can-route.png?branch=master)](https://travis-ci.org/canjs/can-route)
 
 > __Note:__ This is the CanJS [can-route](https://github.com/canjs/can-route) module. The old `can-route` has been renamed to [did-route](https://www.npmjs.com/package/did-route). Many thanks to [@michaelrhodes](https://github.com/michaelrhodes) for letting us use the `can-route` module name.
