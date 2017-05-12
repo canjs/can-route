@@ -73,6 +73,20 @@ Understanding how maps work is essential to understanding can-route.
 
 You can listen to changes in a map with `on(eventName, handler(ev, args...))` and change can-route's properties by modifying `route.data`.
 
+Create an `AppState` and attach it to a stache template like:
+
+```js
+const AppState = DefineMap.extend({
+    page: "string"
+});
+
+let appState = new AppState();
+route.data = appState;
+
+let renderer = stache("....")(appState);
+route.ready();
+```
+
 ### Listening to changes in can-route
 
 Listen to changes in history by [can-event.addEventListener listening] to
