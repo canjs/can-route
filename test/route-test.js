@@ -96,6 +96,13 @@ test("deparam - `:page` syntax", function () {
 		where: "there",
 		route: ":page/:index"
 	}, "default value and queryparams");
+
+	obj = canRoute.deparam("foo/%0g");
+	deepEqual(obj, {
+		index: "%0g",
+		page: "foo",
+		route: ":page/:index"
+	}, "can decode malformed urls");
 });
 
 test("deparam of invalid url", function () {

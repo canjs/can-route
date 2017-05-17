@@ -334,6 +334,14 @@ setState =canRoute.setState = function () {
 	}
 };
 
+var decode = function(str){
+	try {
+		return decodeURIComponent(str);
+	} catch(ex) {
+		return unescape(str);
+	}
+};
+
 /**
  * @static
  */
@@ -528,7 +536,7 @@ assign(canRoute, {
 			// parts if that part is not empty.
 			each(parts, function (part, i) {
 				if (part && part !== querySeparator) {
-					obj[route.names[i]] = decodeURIComponent(part);
+					obj[route.names[i]] = decode(part);
 				}
 			});
 			obj.route = route.route;
