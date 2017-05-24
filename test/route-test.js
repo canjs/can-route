@@ -1079,6 +1079,24 @@ test("matched() compute", function() {
 	}, 200);
 });
 
+test("triggers __url event anytime a there's a change to individual properties", function() {
+	canRoute('{page}');
+	canRoute('{page}/{section}');
+	canRoute.ready();
+
+	var matchedCount = 0;
+	canRoute.on('__url', function() {
+		// any time a route property is changed, not just the matched route
+		matchedCount++;
+	});
+
+	canRoute.data.page = 'two'; //-> fire matched event as we are in '{page}'
+	canRoute.data.section = 'a'; //-> fire matched event as we are in '{page}/{section}'
+	canRoute.data.section = 'b'; // still in '{page}/{section}', no matched event
+
+	equal(matchedCount, 3, 'calls __url event every time a property is changed');
+});
+
 //!steal-remove-start
 if (dev) {
 	test("should warn when two routes have same map properties", function () {
