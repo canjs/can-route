@@ -1093,3 +1093,45 @@ test("param with whitespace in interpolated string (#45)", function () {
 	});
 	equal(res, "pages//baz/")
 });
+
+
+test("triggers __url event anytime a there's a change to individual properties", function(){
+	mockRoute.start();
+
+	var AppState = DefineMap.extend({seal: false},{"*": "stringOrObservable"});
+	var appState = new AppState({});
+
+	canRoute.data = appState;
+	canRoute('{page}');
+	canRoute('{page}/{section}');
+
+	QUnit.stop();
+	canRoute.ready();
+
+	var matchedCount = 0;
+	canRoute.on('__url', function() {
+		// any time a route property is changed, not just the matched route
+		matchedCount++;
+	});
+
+	setTimeout(function() {
+		canRoute.data.page = 'two';
+	}, 30);
+
+	setTimeout(function() {
+		canRoute.data.section = 'a';
+	}, 60);
+
+	setTimeout(function() {
+		canRoute.data.section = 'b';
+	}, 90);
+
+	setTimeout(function(){
+		// 1st call is going from undefined to empty string
+		equal(matchedCount, 4, 'calls __url event every time a property is changed');
+
+		mockRoute.stop();
+		QUnit.start();
+	}, 200);
+
+});

@@ -875,8 +875,15 @@ assign(canRoute, {
 
 each(['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off'], function(name) {
 	// exposing all internal canEvent evt's to canRoute
-	canRoute[name] = function() {
-		return canEvent[name].apply(eventsObject, arguments);
+	canRoute[name] = function(eventName) {
+		if (eventName === '__url') {
+			return canEvent[name].apply(eventsObject, arguments);
+		}
+
+		if (!canRoute.data[name]) {
+			return;
+		}
+		return canRoute.data[name].apply(canRoute.data, arguments);
 	};
 });
 
