@@ -92,7 +92,7 @@ You can listen to changes in a map with `on(eventName, handler(ev, args...))` an
 ### Listening to changes in can-route
 
 Listen to changes in history by [can-event.addEventListener listening] to
-changes in can-route's `matched` compute:
+changes of can-route's `matched` compute:
 
 ```js
 route.matched.on('change', function(ev, attr, how, newVal, oldVal) {
