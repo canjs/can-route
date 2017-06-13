@@ -5,11 +5,11 @@ var Observation = require('can-observation');
 var compute = require('can-compute');
 
 var namespace = require('can-namespace');
-var deparam = require('can-util/js/deparam/deparam');
+var param = require('can-param');
+var deparam = require('can-deparam');
 var each = require('can-util/js/each/each');
 var string = require('can-util/js/string/string');
 var isFunction = require('can-util/js/is-function/is-function');
-var param = require('can-util/js/param/param');
 var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
 var deepAssign = require('can-util/js/deep-assign/deep-assign');
 var isWebWorker =  require('can-util/js/is-web-worker/is-web-worker');
@@ -334,6 +334,14 @@ setState =canRoute.setState = function () {
 	}
 };
 
+var decode = function(str){
+	try {
+		return decodeURIComponent(str);
+	} catch(ex) {
+		return unescape(str);
+	}
+};
+
 /**
  * @static
  */
@@ -528,7 +536,7 @@ assign(canRoute, {
 			// parts if that part is not empty.
 			each(parts, function (part, i) {
 				if (part && part !== querySeparator) {
-					obj[route.names[i]] = decodeURIComponent(part);
+					obj[route.names[i]] = decode(part);
 				}
 			});
 			obj.route = route.route;

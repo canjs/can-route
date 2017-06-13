@@ -67,11 +67,27 @@ can-route keeps the state of the hash in-sync with the `data` contained within i
 
 ## data
 
-Underlying can-route is an observable map: `route.data`. Depending on what type of map your application uses this could be a [can-map], a [can-define/map/map], or maybe even a [can-simple-map].
+Underlying `can-route` is an observable map: `route.data`. Depending on what type of map your application uses this could be a [can-map], a [can-define/map/map], or maybe even a [can-simple-map].
 
-Understanding how maps work is essential to understanding can-route.
+Here’s an example using [can-define/map/map DefineMap] to back `can-route`:
 
-You can listen to changes in a map with `on(eventName, handler(ev, args...))` and change can-route's properties by modifying `route.data`.
+```js
+var DefineMap = require("can-define/map/map");
+var route = require("can-route");
+
+var AppViewModel = DefineMap.extend({
+    page: "string"
+});
+
+var appState = new AppViewModel();
+route.data = appState;
+route('{page}', {page: 'home'});
+route.ready();
+```
+
+Understanding how maps work is essential to understanding `can-route`.
+
+You can listen to changes in a map with `on(eventName, handler(ev, args...))` and change `can-route`’s properties by modifying `route.data`.
 
 ### Listening to changes in can-route
 
@@ -106,6 +122,25 @@ When you make changes to can-route, they will automatically
 change the <code>hash</code>.
 
 If using [can-map] or [can-simple-map] to back your route, update `route.data` using `attr`.
+
+### Encoded `/`
+
+If the change in your route data includes a `/`, the `/` will be encoded into `%2F`.
+You will see this result in the URL and `location.hash`.
+
+```js
+route.data.type = 'image/bar';
+// OR
+route.attr('type', 'image/bar');
+```
+
+The URL will look like this:
+
+    https://example.com/#!type=image%2Fbar
+
+The location hash will look like this:
+
+    #!type=image%2Fbar
 
 ## Creating a route
 
