@@ -20,7 +20,8 @@ var types = require('can-types');
 var dev = require('can-util/js/dev/dev');
 var diff = require('can-util/js/diff/diff');
 var diffObject = require('can-util/js/diff-object/diff-object');
-
+var canReflect = require('can-reflect');
+var canSymbol = require('can-symbol');
 
 // ## route.js
 // `can-route`
@@ -923,7 +924,7 @@ Object.defineProperty(canRoute,"data", {
 		}
 	},
 	set: function(data) {
-		if( types.isConstructor( data ) ){
+		if( canReflect.isConstructorLike(data) ){
 			data = new data();
 		}
 		// if it's a map, we make it always set strings for backwards compat
@@ -944,13 +945,6 @@ canRoute.attr = function(){
 //Allow for overriding of route batching by can.transaction
 canRoute.batch = canBatch;
 
-var oldIsCallableForValue = types.isCallableForValue;
-types.isCallableForValue = function(obj){
-    if(obj === canRoute) {
-        return false;
-    } else {
-        return oldIsCallableForValue.call(this, obj);
-    }
-};
+canReflect.setKeyValue(canRoute, canSymbol.for("can.isFunctionLike"), false);
 
 module.exports = namespace.route = canRoute;
