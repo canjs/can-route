@@ -47,6 +47,7 @@
     "can-param": "^1.0.1",
     "can-reflect": "^1.0.0-pre.3",
     "can-simple-map": "^3.2.0-pre.8",
+    "can-symbol": "^1.0.0-pre.1",
     "can-types": "^1.1.0-pre.3",
     "can-util": "^3.9.0-pre.7"
   },
