@@ -83,15 +83,15 @@ var attrHelper = function (prop, value) {
 		return this.attr.apply(this, arguments);
 	} else {
 		if(arguments.length > 1) {
-			this.set(prop, value);
+			canReflect.setKeyValue(this, prop, value);
 			return this;
 		} else if(typeof prop === 'object') {
-			this.set(prop);
+			canReflect.assignDeep(this,prop);
 			return this;
 		} else if(arguments.length === 1){
-			return this.get(prop);
+			return canReflect.getKeyValue(this, prop);
 		} else {
-			return this.toObject();
+			return canReflect.unwrap(this);
 		}
 	}
 
