@@ -45,7 +45,7 @@
     "can-namespace": "1.0.0",
     "can-observation": "^3.3.0-pre.1",
     "can-param": "^1.0.1",
-    "can-reflect": "^1.1.0-pre.3",
+    "can-reflect": "^1.2.1",
     "can-simple-map": "^3.3.0-pre.2",
     "can-symbol": "^1.0.0-pre.1",
     "can-types": "^1.1.0-pre.3",
