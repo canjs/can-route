@@ -256,20 +256,24 @@ var onRouteDataChange = function (ev, newProps, oldProps) {
 // add type coercion during Map setter to coerce all values to strings
 var stringCoercingMapDecorator = function(map) {
 
-	var attrSuper = map.attr;
+	var sym = canSymbol.for("can.route.stringCoercingMapDecorator");
+	if(!map.attr[sym]) {
+		var attrSuper = map.attr;
 
-	map.attr = function(prop, val) {
-		var serializable = this.define === undefined || this.define[prop] === undefined || !!this.define[prop].serialize,
-			args;
+		map.attr = function(prop, val) {
+			var serializable = this.define === undefined || this.define[prop] === undefined || !!this.define[prop].serialize,
+				args;
 
-		if (serializable) { // if setting non-str non-num attr
-			args = stringify(Array.apply(null, arguments));
-		} else {
-			args = arguments;
-		}
+			if (serializable) { // if setting non-str non-num attr
+				args = stringify(Array.apply(null, arguments));
+			} else {
+				args = arguments;
+			}
 
-		return attrSuper.apply(this, args);
-	};
+			return attrSuper.apply(this, args);
+		};
+		canReflect.setKeyValue(map.attr, sym, true);
+	}
 
 	return map;
 };
