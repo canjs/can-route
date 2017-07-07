@@ -1120,6 +1120,25 @@ if (dev) {
 
 		dev.warn = oldlog;
 	});
+
+	test("setting route.data with the same map doesn't add the decorator function multiple times", function () {
+		var oldData = canRoute.data;
+		var map = new Map();
+		for(var i = 0; i < 10000; i++) {
+			canRoute.data = map;
+		}
+
+		canRoute.ready();
+
+		try {
+			map.attr("foo", "bar");
+			ok(true, "did not cause 'Maximum call stack size exceeded'");
+		} catch(err) {}
+		finally {
+			canRoute.data = oldData;
+		}
+	});
+
 }
 //!steal-remove-end
 
