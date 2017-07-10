@@ -61,7 +61,7 @@
     "steal": "^1.2.9",
     "steal-qunit": "^1.0.1",
     "steal-tools": "^1.1.2",
-    "testee": "^0.6.1"
+    "testee": "^0.7.0"
   },
   "bit-docs": {
     "dependencies": {
