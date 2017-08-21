@@ -6,11 +6,13 @@
 [![Travis build status](https://travis-ci.org/canjs/can-route.svg?branch=master)](https://travis-ci.org/canjs/can-route)
 [![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-route.svg)](https://greenkeeper.io/)
 
+> __Note:__ This is the CanJS [can-route](https://github.com/canjs/can-route) module. The old `can-route` has been renamed to [did-route](https://www.npmjs.com/package/did-route). Many thanks to [@michaelrhodes](https://github.com/michaelrhodes) for letting us use the `can-route` module name.
+
 Create a route matching rule. Optionally provide defaults that will be applied to the [can-map] when the route matches.
 
 ## Documentation
 
-Read the [API docs on CanJS.com](https://canjs.com/doc/can-route.html).
+Read the [can-route API docs on CanJS.com](https://canjs.com/doc/can-route.html).
 
 ## Changelog
 
