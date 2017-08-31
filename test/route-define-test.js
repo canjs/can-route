@@ -529,7 +529,7 @@ if (typeof steal !== 'undefined') {
 
 				iCanRoute.serializedCompute.unbind('change');
 				iCanRoute.serializedCompute.bind('change', function(){
-
+					
 					equal(iCanRoute.attr('personId'), '3', 'personId');
 					equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
 					iCanRoute.unbind('change');

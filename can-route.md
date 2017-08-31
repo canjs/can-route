@@ -67,11 +67,27 @@ can-route keeps the state of the hash in-sync with the `data` contained within i
 
 ## data
 
-Underlying can-route is an observable map: `route.data`. Depending on what type of map your application uses this could be a [can-map], a [can-define/map/map], or maybe even a [can-simple-map].
+Underlying `can-route` is an observable map: `route.data`. Depending on what type of map your application uses this could be a [can-map], a [can-define/map/map], or maybe even a [can-simple-map].
 
-Understanding how maps work is essential to understanding can-route.
+Here’s an example using [can-define/map/map DefineMap] to back `can-route`:
 
-You can listen to changes in a map with `on(eventName, handler(ev, args...))` and change can-route's properties by modifying `route.data`.
+```js
+var DefineMap = require("can-define/map/map");
+var route = require("can-route");
+
+var AppViewModel = DefineMap.extend({
+    page: "string"
+});
+
+var appState = new AppViewModel();
+route.data = appState;
+route('{page}', {page: 'home'});
+route.ready();
+```
+
+Understanding how maps work is essential to understanding `can-route`.
+
+You can listen to changes in a map with `on(eventName, handler(ev, args...))` and change `can-route`’s properties by modifying `route.data`.
 
 ### Listening to changes in can-route
 

@@ -20,7 +20,8 @@ var types = require('can-types');
 var dev = require('can-util/js/dev/dev');
 var diff = require('can-util/js/diff/diff');
 var diffObject = require('can-util/js/diff-object/diff-object');
-
+var canReflect = require('can-reflect');
+var canSymbol = require('can-symbol');
 
 // ## route.js
 // `can-route`
@@ -82,15 +83,15 @@ var attrHelper = function (prop, value) {
 		return this.attr.apply(this, arguments);
 	} else {
 		if(arguments.length > 1) {
-			this.set(prop, value);
+			canReflect.setKeyValue(this, prop, value);
 			return this;
 		} else if(typeof prop === 'object') {
-			this.set(prop);
+			canReflect.assignDeep(this,prop);
 			return this;
 		} else if(arguments.length === 1){
-			return this.get(prop);
+			return canReflect.getKeyValue(this, prop);
 		} else {
-			return this.toObject();
+			return canReflect.unwrap(this);
 		}
 	}
 
@@ -254,21 +255,24 @@ var onRouteDataChange = function (ev, newProps, oldProps) {
 // everything in the backing Map is a string
 // add type coercion during Map setter to coerce all values to strings
 var stringCoercingMapDecorator = function(map) {
+	var sym = canSymbol.for("can.route.stringCoercingMapDecorator");
+	if(!map.attr[sym]) {
+		var attrSuper = map.attr;
 
-	var attrSuper = map.attr;
+		map.attr = function(prop, val) {
+			var serializable = this.define === undefined || this.define[prop] === undefined || !!this.define[prop].serialize,
+				args;
 
-	map.attr = function(prop, val) {
-		var serializable = this.define === undefined || this.define[prop] === undefined || !!this.define[prop].serialize,
-			args;
+			if (serializable) { // if setting non-str non-num attr
+				args = stringify(Array.apply(null, arguments));
+			} else {
+				args = arguments;
+			}
 
-		if (serializable) { // if setting non-str non-num attr
-			args = stringify(Array.apply(null, arguments));
-		} else {
-			args = arguments;
-		}
-
-		return attrSuper.apply(this, args);
-	};
+			return attrSuper.apply(this, args);
+		};
+		canReflect.setKeyValue(map.attr, sym, true);
+	}
 
 	return map;
 };
@@ -331,6 +335,14 @@ setState =canRoute.setState = function () {
 		// trigger a url change so its possible to live-bind on url-based changes
 		canEvent.dispatch.call(eventsObject,"__url",[hash, lastHash]);
 		canRoute.batch.stop();
+	}
+};
+
+var decode = function(str){
+	try {
+		return decodeURIComponent(str);
+	} catch(ex) {
+		return unescape(str);
 	}
 };
 
@@ -528,7 +540,7 @@ assign(canRoute, {
 			// parts if that part is not empty.
 			each(parts, function (part, i) {
 				if (part && part !== querySeparator) {
-					obj[route.names[i]] = decodeURIComponent(part);
+					obj[route.names[i]] = decode(part);
 				}
 			});
 			obj.route = route.route;
@@ -915,7 +927,7 @@ Object.defineProperty(canRoute,"data", {
 		}
 	},
 	set: function(data) {
-		if( types.isConstructor( data ) ){
+		if( canReflect.isConstructorLike(data) ){
 			data = new data();
 		}
 		// if it's a map, we make it always set strings for backwards compat
@@ -936,13 +948,6 @@ canRoute.attr = function(){
 //Allow for overriding of route batching by can.transaction
 canRoute.batch = canBatch;
 
-var oldIsCallableForValue = types.isCallableForValue;
-types.isCallableForValue = function(obj){
-    if(obj === canRoute) {
-        return false;
-    } else {
-        return oldIsCallableForValue.call(this, obj);
-    }
-};
+canReflect.setKeyValue(canRoute, canSymbol.for("can.isFunctionLike"), false);
 
 module.exports = namespace.route = canRoute;
