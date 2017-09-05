@@ -1124,9 +1124,13 @@ if (dev) {
 	test("should not be display warning for matching keys when the routes do not match (#99)", function () {
 		expect(1);
 		var oldlog = dev.warn;
+		var expectedWarningText = 'two routes were registered with matching keys:\n' +
+				'\t(1) route("login", {"page":"auth"})\n' +
+				'\t(2) route("signup", {"page":"auth"})\n' +
+				'(1) will always be chosen since it was registered first';
 
 		dev.warn = function(text) {
-			ok(true, text);
+			ok(text === expectedWarningText, text)
 		};
 
 		//should warn
