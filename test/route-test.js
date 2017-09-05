@@ -1121,6 +1121,29 @@ if (dev) {
 		dev.warn = oldlog;
 	});
 
+	test("should not be display warning for matching keys when the routes do not match (#99)", function () {
+		expect(1);
+		var oldlog = dev.warn;
+
+		dev.warn = function(text) {
+			ok(true, text);
+		};
+
+		//should warn
+		canRoute("login", { "page":"auth" });
+		canRoute("signup", { "page":"auth" });
+
+		//should not warn
+		canRoute("login2/", { "page":"auth2" });
+		canRoute("login2", { "page":"auth2" });
+
+		//should not warn
+		canRoute("login3", { "page":"auth3" });
+		canRoute("login3", { "page":"auth3" });
+
+		dev.warn = oldlog;
+	});
+
 	test("setting route.data with the same map doesn't add the decorator function multiple times", function () {
 		var oldData = canRoute.data;
 		var map = new Map();

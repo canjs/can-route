@@ -192,11 +192,12 @@ var canRoute = function (url, defaults) {
 	each(canRoute.routes, function(r) {
 		var existingKeys = r.names.concat(Object.keys(r.defaults)).sort();
 		var keys = names.concat(Object.keys(defaults)).sort();
-
 		var sameMapKeys = !diff(existingKeys, keys).length;
 		var sameDefaultValues = !diffObject(r.defaults, defaults).length;
+		//the regex removes the trailing slash
+		var matchingRoutesWithoutTrailingSlash = r.route.replace(/\/$/, "") === url.replace(/\/$/, "");
 
-		if (sameMapKeys && sameDefaultValues) {
+		if (sameMapKeys && sameDefaultValues && !matchingRoutesWithoutTrailingSlash) {
 			dev.warn('two routes were registered with matching keys:\n' +
 				'\t(1) route("' + r.route + '", ' + JSON.stringify(r.defaults) + ')\n' +
 				'\t(2) route("' + url + '", ' + JSON.stringify(defaults) + ')\n' +
