@@ -52,10 +52,10 @@
     "can-util": "^3.9.0-pre.7"
   },
   "devDependencies": {
-    "can-stache-key": "^0.0.4",
     "can-define": "^1.3.3",
     "can-list": "^3.2.0",
     "can-map": "^3.3.1",
+    "can-stache-key": "^0.1.0",
     "done-serve": "^0.2.0",
     "jshint": "^2.9.1",
     "steal": "^1.2.9",
