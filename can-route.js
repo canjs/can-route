@@ -877,15 +877,29 @@ assign(canRoute, {
 
 // The functions in the following list applied to `canRoute` (e.g. `canRoute.attr('...')`) will
 // instead act on the `canRoute.data` observe.
-each(['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off', 'delegate', 'undelegate', 'removeAttr', 'compute', '_get', '___get','each'], function (name) {
+
+var bindToCanRouteData = function(name, args) {
+	if (!canRoute.data[name]) {
+		return;
+	}
+	return canRoute.data[name].apply(canRoute.data, args);
+};
+
+each(['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off'], function(name) {
+	// exposing all internal canEvent evt's to canRoute
+	canRoute[name] = function(eventName) {
+		if (eventName === '__url') {
+			return canEvent[name].apply(eventsObject, arguments);
+		}
+		return bindToCanRouteData(name, arguments);
+	};
+});
+
+each(['delegate', 'undelegate', 'removeAttr', 'compute', '_get', '___get', 'each'], function (name) {
 	canRoute[name] = function () {
 		// `delegate` and `undelegate` require
 		// the `can/map/delegate` plugin
-		if (!canRoute.data[name]) {
-			return;
-		}
-
-		return canRoute.data[name].apply(canRoute.data, arguments);
+		return bindToCanRouteData(name, arguments);
 	};
 });
 
