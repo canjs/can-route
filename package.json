@@ -18,14 +18,15 @@
     "version": "git commit -am \"Update dist for release\" && git checkout -b release && git add -f dist/",
     "postversion": "git push --tags && git checkout master && git branch -D release && git push",
     "testee": "testee test/test.html --browsers firefox",
-    "test": "npm run jshint && npm run testee",
+    "test": "npm run detect-cycle && npm run jshint && npm run testee",
     "jshint": "jshint ./*.js --config",
     "release:pre": "npm version prerelease && npm publish --tag pre",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
     "build": "node build.js",
-    "develop": "done-serve --static --develop --port 8080"
+    "develop": "done-serve --static --develop --port 8080",
+    "detect-cycle": "detect-cyclic-packages"
   },
   "main": "can-route",
   "keywords": [
@@ -56,6 +57,7 @@
     "can-list": "^3.2.0",
     "can-map": "^3.3.1",
     "can-stache-key": "^0.1.0",
+    "detect-cyclic-packages": "^1.0.0",
     "done-serve": "^0.2.0",
     "jshint": "^2.9.1",
     "steal": "^1.2.9",
