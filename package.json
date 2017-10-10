@@ -57,7 +57,7 @@
     "can-list": "^3.2.0",
     "can-map": "^3.3.1",
     "can-stache-key": "^0.1.0",
-    "detect-cyclic-packages": "^1.1.0",
+    "detect-cyclic-packages": "^1.1.1",
     "done-serve": "^0.2.0",
     "jshint": "^2.9.1",
     "steal": "^1.2.9",
