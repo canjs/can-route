@@ -1170,23 +1170,4 @@ if (dev) {
 
 }
 //!steal-remove-end
-
-test("canRoute.data should be observable when using simple map#119", function(){
-	setupRouteTest(function (iframe, iCanRoute, loc, win) {
-		
-		var c = compute(function(){
-			return iCanRoute.data;
-		});
-
-		canReflect.onValue(c, function(p) {
-			
-		});
-		ok (true);		
-		setTimeout(function () {
-
-			teardownRouteTest();
-		}, 30);
-	}, "testing-no-map.html");
-});
-
 }
