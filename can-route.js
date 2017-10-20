@@ -274,7 +274,6 @@ var stringCoercingMapDecorator = function(map) {
 		};
 		canReflect.setKeyValue(map.attr, sym, true);
 	}
-
 	return map;
 };
 

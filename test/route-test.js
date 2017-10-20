@@ -5,6 +5,8 @@ var QUnit = require('steal-qunit');
 var Map = require('can-map');
 var makeArray = require('can-util/js/make-array/make-array');
 var dev = require('can-util/js/dev/dev');
+var canReflect = require('can-reflect');
+var compute = require('can-compute');
 
 require('can-observation');
 
@@ -551,8 +553,8 @@ test("dashes in routes", function () {
 	window.location.hash = "";
 });
 var teardownRouteTest;
-var setupRouteTest = function(callback){
-
+var setupRouteTest = function(callback, filename){
+	filename = filename || 'testing.html';
 	var testarea = document.getElementById('qunit-fixture');
 	var iframe = document.createElement('iframe');
 	stop();
@@ -561,7 +563,7 @@ var setupRouteTest = function(callback){
 		args.unshift(iframe);
 		callback.apply(null, args);
 	};
-	iframe.src = __dirname + "/testing.html?"+Math.random();
+	iframe.src = __dirname + "/" + filename + "?" +Math.random();
 	testarea.appendChild(iframe);
 	teardownRouteTest = function(){
 		setTimeout(function(){
@@ -1168,5 +1170,23 @@ if (dev) {
 
 }
 //!steal-remove-end
+
+test("canRoute.data should be observable when using simple map#119", function(){
+	setupRouteTest(function (iframe, iCanRoute, loc, win) {
+		
+		var c = compute(function(){
+			return iCanRoute.data;
+		});
+
+		canReflect.onValue(c, function(p) {
+			
+		});
+		ok (true);		
+		setTimeout(function () {
+
+			teardownRouteTest();
+		}, 30);
+	}, "testing-no-map.html");
+});
 
 }
