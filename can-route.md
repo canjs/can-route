@@ -2,7 +2,8 @@
 @group can-route.static static
 @download can/route
 @test can-route/test.html
-@parent can-core
+@parent can-routing
+@collection can-core
 @link ../docco/route/route.html docco
 @package ./package.json
 
