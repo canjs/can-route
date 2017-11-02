@@ -1,8 +1,7 @@
 /*jshint -W079 */
-var canBatch = require('can-event/batch/batch');
-var canEvent = require('can-event');
+var eventQueue = require('can-event-queue');
 var Observation = require('can-observation');
-var compute = require('can-compute');
+var ObservationRecorder = require('can-observation-recorder');
 
 var namespace = require('can-namespace');
 var param = require('can-param');
@@ -16,7 +15,6 @@ var isWebWorker =  require('can-util/js/is-web-worker/is-web-worker');
 var isBrowserWindow =  require('can-util/js/is-browser-window/is-browser-window');
 var makeArray = require('can-util/js/make-array/make-array');
 var assign = require("can-util/js/assign/assign");
-var types = require('can-types');
 var dev = require('can-util/js/dev/dev');
 var diff = require('can-util/js/diff/diff');
 var diffObject = require('can-util/js/diff-object/diff-object');
@@ -135,7 +133,7 @@ var changingData;
 // List of attributes that have changed since last update
 var changedAttrs = [];
 // A dummy events object used to dispatch url change events on.
-var eventsObject = assign({}, canEvent);
+var eventsObject = eventQueue({});
 
 var canRoute = function (url, defaults) {
 	// if route ends with a / and url starts with a /, remove the leading / of the url
@@ -247,7 +245,7 @@ var onRouteDataChange = function (ev, newProps, oldProps) {
 			path =canRoute.param(serialized, true);
 		canRoute._call("setURL", path, newProps, old);
 		// trigger a url change so its possible to live-bind on url-based changes
-		canEvent.dispatch.call(eventsObject,"__url",[path, lastHash]);
+		eventsObject.dispatch("__url",[path, lastHash]);
 		lastHash = path;
 		changedAttrs = [];
 	}, 10);
@@ -334,7 +332,7 @@ setState =canRoute.setState = function () {
 		canRoute.attr(curParams);
 		curParams.route = matched;
 		// trigger a url change so its possible to live-bind on url-based changes
-		canEvent.dispatch.call(eventsObject,"__url",[hash, lastHash]);
+		eventsObject.dispatch("__url",[hash, lastHash]);
 		canRoute.batch.stop();
 	}
 };
@@ -346,6 +344,8 @@ var decode = function(str){
 		return unescape(str);
 	}
 };
+
+var matches = new SimpleObservable();
 
 /**
  * @static
@@ -663,7 +663,7 @@ assign(canRoute, {
 	url: function (options, merge) {
 
 		if (merge) {
-			Observation.add(eventsObject,"__url");
+			ObservationRecorder.add(eventsObject,"__url");
 			var baseOptions = canRoute.deparam(canRoute._call("matchingPartOfURL"));
 			options = assign(assign({}, baseOptions), options);
 		}
@@ -771,7 +771,7 @@ assign(canRoute, {
 	 */
 	current: function (options, subsetMatch) {
 		// "reads" the url so the url is live-bindable.
-		Observation.add(eventsObject,"__url");
+		ObservationRecorder.add(eventsObject,"__url");
 		if(subsetMatch) {
 			// everything in options shouhld be in baseOptions
 			var baseOptions = canRoute.deparam(canRoute._call("matchingPartOfURL"));
@@ -872,7 +872,13 @@ assign(canRoute, {
 	 * route.matched(); // "{type}/{subtype}"
 	 * ```
 	 */
-	matched: compute()
+	matched: function(newVal){
+		if(arguments.length) {
+			matches.set(newVal);
+		} else {
+			return matches.get();
+		}
+	}
 });
 
 // The functions in the following list applied to `canRoute` (e.g. `canRoute.attr('...')`) will
@@ -889,7 +895,7 @@ each(['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off'], f
 	// exposing all internal canEvent evt's to canRoute
 	canRoute[name] = function(eventName) {
 		if (eventName === '__url') {
-			return canEvent[name].apply(eventsObject, arguments);
+			return eventsObject[name].apply(eventsObject, arguments);
 		}
 		return bindToCanRouteData(name, arguments);
 	};
@@ -913,7 +919,7 @@ var serializedCompute;
 Object.defineProperty(canRoute,"serializedCompute", {
 	get: function(){
 		if(!serializedCompute) {
-			serializedCompute = compute(function(){
+			serializedCompute = new Observation(function(){
 				return canRoute.data.serialize();
 			});
 		}
@@ -924,21 +930,8 @@ Object.defineProperty(canRoute,"data", {
 	get: function(){
 		if(routeData) {
 			return routeData;
-		} else if( types.DefaultMap ) {
-
-			if( types.DefaultMap.prototype.toObject ) {
-				var DefaultRouteMap = types.DefaultMap.extend({
-					seal: false
-				},{
-					"*": "stringOrObservable"
-				});
-				return setRouteData(new DefaultRouteMap());
-			} else {
-				return setRouteData( stringCoercingMapDecorator( new types.DefaultMap() ) );
-			}
-
 		} else {
-			throw new Error("can.route.data accessed without being set");
+			return setRouteData( stringCoercingMapDecorator( new SimpleMap() ) );
 		}
 	},
 	set: function(data) {
@@ -960,8 +953,6 @@ canRoute.attr = function(){
 	return attrHelper.apply(canRoute.data,arguments);
 };
 
-//Allow for overriding of route batching by can.transaction
-canRoute.batch = canBatch;
 
 canReflect.setKeyValue(canRoute, canSymbol.for("can.isFunctionLike"), false);
 

@@ -2,11 +2,9 @@
 /* jshint -W079 */
 var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
-var Map = require('can-map');
+var SimpleMap = require('can-simple-map');
 var makeArray = require('can-util/js/make-array/make-array');
 var dev = require('can-util/js/dev/dev');
-
-require('can-observation');
 
 QUnit.module("can/route with can-map", {
 	setup: function () {
@@ -14,7 +12,7 @@ QUnit.module("can/route with can-map", {
 		canRoute.defaultBinding = "hashchange";
 		this.fixture = document.getElementById("qunit-fixture");
 	}
-})
+});
 
 if (("onhashchange" in window)) {
 
@@ -646,7 +644,7 @@ if (typeof steal !== 'undefined') {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
 			iCanRoute("{type}/{id}");
-			var AppState = Map.extend();
+			var AppState = SimpleMap.extend();
 			var appState = new AppState({type: "dog", id: '4'});
 
 			iCanRoute.map(appState);
@@ -847,11 +845,11 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("updating bound can.Map causes single update with a coerced string value", function() {
+	test("updating bound SimpleMap causes single update with a coerced string value", function() {
 		expect(1);
 
 		setupRouteTest(function (iframe, route) {
-			var appVM = new Map();
+			var appVM = new SimpleMap();
 
 			route.map(appVM);
 			route.ready();
@@ -869,7 +867,7 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("updating unserialized prop on bound can.Map causes single update without a coerced string value", function() {
+	/*test("updating unserialized prop on bound can.Map causes single update without a coerced string value", function() {
 		expect(1);
 
 		setupRouteTest(function (iframe, route) {
@@ -891,7 +889,7 @@ if (typeof steal !== 'undefined') {
 				teardownRouteTest();
 			}, 5);
 		});
-	});
+	});*/
 
 	test("hash doesn't update to itself with a !", function() {
 		stop();
