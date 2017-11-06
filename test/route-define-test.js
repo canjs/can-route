@@ -560,60 +560,9 @@ test(".url with merge=true", function(){
 
 });
 
-test(".url with merge=true (#16)", function(){
-	mockRoute.start()
-
-	var AppState = DefineMap.extend({seal: false},{"*": "stringOrObservable"});
-	var appState = new AppState({});
 
 
-	canRoute.map(appState);
-	canRoute.ready();
 
-	QUnit.stop();
-
-	appState.set({'foo': 'bar',page: "recipe", id: 5});
-
-	// TODO: expose a way to know when the url has changed.
-	setTimeout(function(){
-
-		QUnit.ok(canRoute.url({}, true), "empty is true");
-		QUnit.ok(canRoute.url({page: "recipe"}, true), "page:recipe is true");
-
-		QUnit.ok(canRoute.url({page: "recipe", id: 5}, true), "number to string works");
-		QUnit.ok(canRoute.url({page: "recipe", id: 6}, true), "not all equal");
-
-		mockRoute.stop();
-		QUnit.start();
-	},200);
-
-});
-
-test("matched() compute", function() {
-	stop();
-	var AppState = DefineMap.extend({
-		seal: false
-	}, {
-		type: "string",
-		subtype: "string"
-	});
-	var appState = new AppState();
-
-	canRoute.data = appState;
-	canRoute("{type}", { type: "foo" });
-	canRoute("{type}/{subtype}");
-	canRoute.ready();
-
-	equal(appState.route, undefined, "should not set route on appState");
-	equal(canRoute.matched(), "{type}", "should set route.matched property");
-
-	appState.subtype = "bar";
-
-	setTimeout(function() {
-		equal(canRoute.matched(), "{type}/{subtype}", "should update route.matched property");
-		start();
-	}, 200);
-});
 
 }
 

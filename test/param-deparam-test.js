@@ -489,7 +489,7 @@ if (dev) {
 			equal(text.split(":")[0], "two routes were registered with matching keys");
 		};
 
-		canRoute("{page}", { subpage: "bar" });
+		canRoute("foo/{page}/{subpage}");
 		canRoute("{page}/{subpage}");
 
 		dev.warn = oldlog;
