@@ -1,7 +1,9 @@
 /*jshint -W079 */
+var queues = require("can-queues");
 var eventQueue = require('can-event-queue');
 var Observation = require('can-observation');
 var ObservationRecorder = require('can-observation-recorder');
+var SimpleObservable = require("can-simple-observable");
 
 var namespace = require('can-namespace');
 var param = require('can-param');
@@ -20,6 +22,8 @@ var diff = require('can-util/js/diff/diff');
 var diffObject = require('can-util/js/diff-object/diff-object');
 var canReflect = require('can-reflect');
 var canSymbol = require('can-symbol');
+var makeCompute = require("can-simple-observable/make-compute/make-compute");
+var SimpleMap = require("can-simple-map");
 
 // ## route.js
 // `can-route`
@@ -323,7 +327,7 @@ setState =canRoute.setState = function () {
 	// if the hash data is currently changing, or
 	// the hash is what we set it to anyway, do NOT change the hash
 	if (!changingData || hash !== lastHash) {
-		canRoute.batch.start();
+		queues.batch.start();
 		recursiveClean(oldParams, curParams,canRoute.data);
 
 		matched = curParams.route;
@@ -333,7 +337,7 @@ setState =canRoute.setState = function () {
 		curParams.route = matched;
 		// trigger a url change so its possible to live-bind on url-based changes
 		eventsObject.dispatch("__url",[hash, lastHash]);
-		canRoute.batch.stop();
+		queues.batch.stop();
 	}
 };
 
@@ -345,7 +349,7 @@ var decode = function(str){
 	}
 };
 
-var matches = new SimpleObservable();
+var matchedObservable = new SimpleObservable();
 
 /**
  * @static
@@ -787,10 +791,10 @@ assign(canRoute, {
 			// don't greedily match slashes in routing rules
 			matchSlashes: false,
 			bind: function () {
-				canEvent.on.call(window, 'hashchange', setState);
+				eventQueue.on.call(window, 'hashchange', setState);
 			},
 			unbind: function () {
-				canEvent.on.call(window, 'hashchange', setState);
+				eventQueue.on.call(window, 'hashchange', setState);
 			},
 			// Gets the part of the url we are determinging the route from.
 			// For hashbased routing, it's everything after the #, for
@@ -826,14 +830,14 @@ assign(canRoute, {
 	_setup: function () {
 		if (!canRoute.currentBinding) {
 			canRoute._call("bind");
-			canRoute.serializedCompute.addEventListener("change", onRouteDataChange);
+			canReflect.onValue( canRoute.serializedObservation, onRouteDataChange, "notify");
 			canRoute.currentBinding =canRoute.defaultBinding;
 		}
 	},
 	_teardown: function () {
 		if (canRoute.currentBinding) {
 			canRoute._call("unbind");
-			canRoute.serializedCompute.removeEventListener("change", onRouteDataChange);
+			canReflect.offValue( canRoute.serializedObservation, onRouteDataChange, "notify");
 			canRoute.currentBinding = null;
 		}
 		clearTimeout(timer);
@@ -872,13 +876,7 @@ assign(canRoute, {
 	 * route.matched(); // "{type}/{subtype}"
 	 * ```
 	 */
-	matched: function(newVal){
-		if(arguments.length) {
-			matches.set(newVal);
-		} else {
-			return matches.get();
-		}
-	}
+	matched: makeCompute( matchedObservable )
 });
 
 // The functions in the following list applied to `canRoute` (e.g. `canRoute.attr('...')`) will
@@ -886,13 +884,13 @@ assign(canRoute, {
 
 var bindToCanRouteData = function(name, args) {
 	if (!canRoute.data[name]) {
-		return;
+		return canRoute.data.addEventListener.apply(canRoute.data, args);
 	}
 	return canRoute.data[name].apply(canRoute.data, args);
 };
 
 each(['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off'], function(name) {
-	// exposing all internal canEvent evt's to canRoute
+	// exposing all internal eventQueue evt's to canRoute
 	canRoute[name] = function(eventName) {
 		if (eventName === '__url') {
 			return eventsObject[name].apply(eventsObject, arguments);
@@ -915,13 +913,23 @@ var setRouteData = function(data){
 	routeData = data;
 	return routeData;
 };
+var serializedObservation;
 var serializedCompute;
+
+Object.defineProperty(canRoute,"serializedObservation", {
+	get: function(){
+		if(!serializedObservation) {
+			serializedObservation = new Observation(function canRouteSerialized(){
+				return canReflect.serialize( canRoute.data );
+			});
+		}
+		return serializedObservation;
+	}
+});
 Object.defineProperty(canRoute,"serializedCompute", {
 	get: function(){
 		if(!serializedCompute) {
-			serializedCompute = new Observation(function(){
-				return canRoute.data.serialize();
-			});
+			serializedCompute = makeCompute(canRoute.serializedObservation);
 		}
 		return serializedCompute;
 	}

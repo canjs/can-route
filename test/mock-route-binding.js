@@ -1,7 +1,7 @@
 var canRoute = require("can-route");
-var compute = require("can-compute");
+var SimpleObservable = require("can-simple-observable");
 
-var routeCompute = compute("");
+var routeValue = new SimpleObservable("");
 
 canRoute.bindings.mock = {
 	paramsMatcher: /^(?:&[^=]+=[^&]*)+/,
@@ -9,24 +9,24 @@ canRoute.bindings.mock = {
 	// don't greedily match slashes in routing rules
 	matchSlashes: false,
 	bind: function () {
-		routeCompute.bind("change", canRoute.setState);
+		routeValue.on(canRoute.setState);
 	},
 	unbind: function () {
-		routeCompute.unbind("change", canRoute.setState);
+		routeValue.off(canRoute.setState);
 	},
 	// Gets the part of the url we are determinging the route from.
 	// For hashbased routing, it's everything after the #, for
 	// pushState it's configurable
 	matchingPartOfURL: function () {
-		return routeCompute().split(/#!?/)[1] || "";
+		return routeValue.get().split(/#!?/)[1] || "";
 	},
 	// gets called with the serializedcanRoute data after a route has changed
 	// returns what the url has been updated to (for matching purposes)
 	setURL: function (path) {
 		if(path[0] !== "#") {
-			routeCompute("#"+(path || ""));
+			routeValue.set("#"+(path || ""));
 		} else {
-			routeCompute(path || "");
+			routeValue.set(path || "");
 		}
 		return path;
 	},
@@ -41,7 +41,7 @@ module.exports = {
 		canRoute._teardown();
 		canRoute.currentBinding = null;
 		canRoute.defaultBinding = "mock";
-		routeCompute("");
+		routeValue.set("");
 		//canRoute._setup();
 	},
 	stop: function(){
@@ -50,5 +50,5 @@ module.exports = {
 		//canRoute.bindings.mock.unbind();
 		//canRoute._setup();
 	},
-	hash: routeCompute
+	hash: routeValue
 };

@@ -5,7 +5,7 @@
 </head>
 <body>
 <p>This is a dummy page to use<br/> for testing route goodness</p>
-<script type="text/javascript" src="../node_modules/steal/steal.js" main="@empty">
+<script type="text/javascript" src="../node_modules/steal/steal-sans-promises.js" main="@empty">
 
 
     // System.config(configuration);
@@ -13,13 +13,16 @@
         System.import('can-route'),
         System.import('can-observation'),
         System.import('can-stache-key'),
-        System.import('can-define/map/map')
+        System.import('can-define/map/map'),
+        System.import('can-queues'),
+        System.import('can-reflect')
     ]).then(function(modules){
         var route = modules[0];
-        window.ObserveInfo = modules[1];
+        window.Observation = modules[1];
         window.observeReader = modules[2];
         window.DefineMap = modules[3];
-
+        window.queues = modules[4];
+        window.canReflect = modules[5];
         setTimeout(function () {
           window.parent.routeTestReady && window.parent.routeTestReady(route, window.location, window)
         }, 30);
