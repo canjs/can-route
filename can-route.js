@@ -240,7 +240,7 @@ Object.defineProperty(canRoute,"routes",{
 	 *  - length - The number of parts in the URL separated by '/'.
 	 */
  	get: function() {
- 		return registerRoute.routes
+ 		return registerRoute.routes;
  	},
 	set: function(newVal) {
 		return registerRoute.routes = newVal;
@@ -248,7 +248,7 @@ Object.defineProperty(canRoute,"routes",{
 });
 Object.defineProperty(canRoute,"defaultBinding",{
  	get: function(){
-		return bindingProxy.defaultBinding
+		return bindingProxy.defaultBinding;
 	},
 	set: function(newVal){
 		bindingProxy.defaultBinding = newVal;
