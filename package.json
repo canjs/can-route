@@ -49,10 +49,12 @@
     "can-simple-map": "^4.0.0-pre.9",
     "can-simple-observable": "^2.0.0-pre.21",
     "can-symbol": "^1.0.0",
-    "can-util": "^3.9.0"
+    "can-util": "^3.9.0",
+    "can-key-tree": "<2.0.0"
   },
   "devDependencies": {
     "can-define": "^2.0.0-pre.0",
+    "can-map": "^4.0.0-pre.8",
     "can-stache-key": "^1.0.0-pre.0",
     "detect-cyclic-packages": "^1.1.0",
     "done-serve": "^0.2.0",

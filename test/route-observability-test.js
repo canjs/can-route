@@ -23,7 +23,8 @@ QUnit.test("on/off binding", function () {
 	canRoute.attr('foo', 'bar');
 });
 
-
+//var queues = require("can-queues");
+//queues.log("flush");
 test("matched() compute", function() {
 
 	mockRoute.start();
@@ -44,9 +45,7 @@ test("matched() compute", function() {
 
 	equal(appState.route, undefined, "should not set route on appState");
 	equal(canRoute.matched(), "{type}", "should set route.matched property");
-
 	appState.subtype = "bar";
-
 	var check = function(){
 		if(canRoute.matched() === "{type}/{subtype}") {
 			QUnit.ok(true, "moved to right route");

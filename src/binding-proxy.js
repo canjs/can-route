@@ -1,8 +1,16 @@
 var makeArray = require('can-util/js/make-array/make-array');
 var canSymbol = require("can-symbol");
+var SimpleObservable = require("can-simple-observable");
+
+var defaultBinding = new SimpleObservable("hashchange")
 
 var bindingProxy = {
-    defaultBinding: "hashchange",
+    get defaultBinding(){
+        return defaultBinding.get();
+    },
+    set defaultBinding(newVal){
+        defaultBinding.set(newVal);
+    },
     currentBinding: null,
     bindings: {},
     call: function(){

@@ -1,14 +1,10 @@
 var bindingProxy = require("./binding-proxy");
-var ObservationRecorder = require('can-observation-recorder');
 var routeDeparam = require("./deparam");
 var routeParam = require("./param");
 
 var assign = require("can-util/js/assign/assign");
 var each = require('can-util/js/each/each');
 var string = require('can-util/js/string/string');
-
-var urlDispatcher = require("./-url-dispatcher");
-
 
 
 var makeProps = function (props) {
@@ -37,7 +33,6 @@ var matchCheck = function(source, matcher){
 function canRoute_url(options, merge) {
 
     if (merge) {
-        ObservationRecorder.add(urlDispatcher,"__url");
         var baseOptions = routeDeparam(bindingProxy.call("can.getValue"));
         options = assign(assign({}, baseOptions), options);
     }
@@ -186,11 +181,9 @@ module.exports = {
      * ```
      */
     current: function canRoute_current(options, subsetMatch) {
-		// "reads" the url so the url is live-bindable.
-		ObservationRecorder.add(urlDispatcher,"__url");
 		if(subsetMatch) {
 			// everything in options shouhld be in baseOptions
-			var baseOptions = routeDeparam( bindingProxy.call("matchingPartOfURL") );
+			var baseOptions = routeDeparam( bindingProxy.call("getValue") );
 			return matchCheck(options, baseOptions);
 		} else {
 			return bindingProxy.call("can.getValue") === routeParam(options);

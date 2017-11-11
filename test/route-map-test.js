@@ -2,10 +2,9 @@
 /* jshint -W079 */
 var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
-var SimpleMap = require('can-simple-map');
 var makeArray = require('can-util/js/make-array/make-array');
 var dev = require('can-util/js/dev/dev');
-
+var CanMap = require("can-map");
 QUnit.module("can/route with can-map", {
 	setup: function () {
 		canRoute._teardown();
@@ -22,7 +21,7 @@ var setupRouteTest = function(callback){
 	var testarea = document.getElementById('qunit-fixture');
 	var iframe = document.createElement('iframe');
 	stop();
-	window.routeTestReady = function(){
+	window.routeTestReady = function(iCanRoute){
 		var args = makeArray(arguments)
 		args.unshift(iframe);
 		callback.apply(null, args);
@@ -63,30 +62,16 @@ if (typeof steal !== 'undefined') {
 
 	});
 
-	test("initial route fires twice", function () {
-		stop();
-		expect(1);
-		window.routeTestReady = function (iCanRoute, loc) {
-			iCanRoute("", {});
-			iCanRoute.matched.bind('change', function(){
-				ok(true, 'change triggered once')
-				start();
-			});
-			iCanRoute.ready();
-		}
-		var iframe = document.createElement('iframe');
-		iframe.src = __dirname+"/testing.html?5";
-		this.fixture.appendChild(iframe);
-	});
 
 	test("removing things from the hash", function () {
 
 		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute.bind('change', function () {
+			iCanRoute.bind('change', function change1() {
 
 				equal(iCanRoute.attr('foo'), 'bar', 'expected value');
 				iCanRoute.unbind('change');
-				iCanRoute.bind('change', function(ev, prop){
+
+				iCanRoute.bind('change', function change2(ev, prop){
 					equal(iCanRoute.attr('personId'), '3', 'personId');
 					equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
 					iCanRoute.unbind('change');
@@ -109,10 +94,10 @@ if (typeof steal !== 'undefined') {
 	});
 
 	test("canRoute.map: conflicting route values, hash should win", function(){
-		setupRouteTest(function (iframe, iCanRoute, loc) {
+		setupRouteTest(function (iframe, iCanRoute, loc, win) {
 
 			iCanRoute("{type}/{id}");
-			var AppState = SimpleMap.extend();
+			var AppState = win.CanMap.extend();
 			var appState = new AppState({type: "dog", id: '4'});
 
 			iCanRoute.map(appState);
@@ -242,42 +227,6 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("canRoute.current is live-bindable (#1156)", function () {
-		setupRouteTest(function (iframe, iCanRoute, loc, win) {
-			iCanRoute.ready();
-			var isOnTestPage = new win.ObserveInfo(
-				function(){
-					return iCanRoute.current({page: "test"});
-				},
-				null,
-				{
-					updater: function(){
-						teardownRouteTest();
-					},
-					_primaryDepth: 0
-				});
-			isOnTestPage.getValueAndBind();
-
-			equal(iCanRoute.current({page: "test"}), false, "initially not on test page")
-			setTimeout(function(){
-				iCanRoute.attr("page","test");
-			},20);
-		});
-	});
-
-	test("can.compute.read should not call canRoute (#1154)", function () {
-		setupRouteTest(function (iframe, iCanRoute, loc, win) {
-			iCanRoute.attr("page","test");
-			iCanRoute.ready();
-
-			var val = win.observeReader.read({route: iCanRoute},win.observeReader.reads("route")).value;
-
-			setTimeout(function(){
-				equal(val,iCanRoute,"read correctly");
-				teardownRouteTest();
-			},1);
-		});
-	});
 
 	test("routes should deep clean", function() {
 		expect(2);
@@ -316,8 +265,8 @@ if (typeof steal !== 'undefined') {
 	test("updating bound SimpleMap causes single update with a coerced string value", function() {
 		expect(1);
 
-		setupRouteTest(function (iframe, route) {
-			var appVM = new SimpleMap();
+		setupRouteTest(function (iframe, route, loc, win) {
+			var appVM =  new win.CanMap();
 
 			route.map(appVM);
 			route.ready();
@@ -494,66 +443,5 @@ if (typeof require === 'undefined') {
 
 }
 
-
-
-test("two way binding canRoute.map with can.Map instance", function(){
-	expect(1);
-	var AppState = Map.extend();
-	var appState = new AppState();
-
-	canRoute.map(appState);
-
-	canRoute.on('change', function(){
-		equal(canRoute.attr('name'), 'Brian', 'appState is bound to canRoute');
-		canRoute.off('change');
-		appState.removeAttr('name');
-	});
-	appState.attr('name', 'Brian');
-});
-
-test("matched() compute", function() {
-	stop();
-	var AppState = Map.extend();
-	var appState = new AppState();
-
-	canRoute.data = appState;
-	canRoute("{type}", { type: "foo" });
-	canRoute("{type}/{subtype}");
-	canRoute.ready();
-
-	equal(appState.attr("route"), undefined, "should not set route on appState");
-	equal(canRoute.matched(), "{type}", "should set route.matched property");
-
-	appState.attr("subtype", "bar");
-
-	setTimeout(function() {
-		equal(canRoute.matched(), "{type}/{subtype}", "should update route.matched property");
-		start();
-	}, 200);
-});
-
-//!steal-remove-start
-if (dev) {
-
-	test("setting route.data with the same map doesn't add the decorator function multiple times", function () {
-		var oldData = canRoute.data;
-		var map = new Map();
-		for(var i = 0; i < 10000; i++) {
-			canRoute.data = map;
-		}
-
-		canRoute.ready();
-
-		try {
-			map.attr("foo", "bar");
-			ok(true, "did not cause 'Maximum call stack size exceeded'");
-		} catch(err) {}
-		finally {
-			canRoute.data = oldData;
-		}
-	});
-
-}
-//!steal-remove-end
 
 }
