@@ -42,8 +42,6 @@ function canRoute(url, defaults){
 // A ~~throttled~~ debounced function called multiple times will only fire once the
 // timer runs down. Each call resets the timer.
 var timer;
-// Are data changes pending that haven't yet updated the hash
-var changingData;
 // A dummy events object used to dispatch url change events on.
 var matchedObservable = new Observation(function canRoute_matchedRoute(){
 	var url = bindingProxy.call("can.getValue");
@@ -56,14 +54,11 @@ var matchedObservable = new Observation(function canRoute_matchedRoute(){
 // This function is ~~throttled~~ debounced so it only updates once even if multiple values changed.
 // This might be able to use batchNum and avoid this.
 function updateUrl(serializedData) {
-	// indicate that data is changing
-	changingData = 1;
 	// collect attributes that are changing
 	clearTimeout(timer);
 	timer = setTimeout(function () {
 
 		// indicate that the hash is set to look like the data
-		changingData = 0;
 		var serialized =canRoute.data.serialize(),
 			route = routeParam.getMatchedRoute(serialized),
 			path = routeParam.paramFromRoute(route, serialized);
@@ -91,14 +86,14 @@ function updateRouteData() {
 	var hash = bindingProxy.call("can.getValue");
 	// if the hash data is currently changing, or
 	// the hash is what we set it to anyway, do NOT change the hash
-	if ( !changingData ) {
-		queues.batch.start();
 
-		var state = canRoute.deparam(hash);
-		delete state.route;
-		canReflect.update(canRoute.data,state);
-		queues.batch.stop();
-	}
+	queues.batch.start();
+
+	var state = canRoute.deparam(hash);
+	delete state.route;
+	canReflect.update(canRoute.data,state);
+	queues.batch.stop();
+
 }
 //!steal-remove-start
 Object.defineProperty(updateRouteData, "name", {
@@ -242,7 +237,6 @@ assign(canRoute, {
 			canRoute.currentBinding = null;
 		}
 		clearTimeout(timer);
-		changingData = 0;
 	},
 	/**
 	 * @function can-route.matched matched
