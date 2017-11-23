@@ -127,7 +127,7 @@ locations.done(function(){
 	viewModel.locations = locations;
 
 	// call ready after the AppViewModel is fully initialized
-	route.ready();
+	route.start();
 });
 ```
 

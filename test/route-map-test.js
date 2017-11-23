@@ -52,7 +52,7 @@ if (typeof steal !== 'undefined') {
 				teardownRouteTest();
 			});
 
-			iCanRoute.ready();
+			iCanRoute.start();
 
 			setTimeout(function () {
 
@@ -85,7 +85,7 @@ if (typeof steal !== 'undefined') {
 				}, 100);
 
 			});
-			iCanRoute.ready();
+			iCanRoute.start();
 			setTimeout(function () {
 
 				iframe.contentWindow.location.hash = '#!foo=bar';
@@ -103,7 +103,7 @@ if (typeof steal !== 'undefined') {
 			iCanRoute.map(appState);
 
 			loc.hash = "#!cat/5";
-			iCanRoute.ready();
+			iCanRoute.start();
 
 			setTimeout(function () {
 
@@ -127,7 +127,7 @@ if (typeof steal !== 'undefined') {
 
 			iCanRoute.map(appState);
 			loc.hash = "#!cat/5";
-			iCanRoute.ready();
+			iCanRoute.start();
 
 			setTimeout(function () {
 
@@ -149,7 +149,7 @@ if (typeof steal !== 'undefined') {
 	test("updating the hash", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
-			iCanRoute.ready();
+			iCanRoute.start();
 			iCanRoute("{type}/{id}");
 			iCanRoute.attr({
 				type: "bar",
@@ -171,7 +171,7 @@ if (typeof steal !== 'undefined') {
 
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
-			iCanRoute.ready()
+			iCanRoute.start()
 			iCanRoute("active");
 			iCanRoute("");
 
@@ -190,7 +190,7 @@ if (typeof steal !== 'undefined') {
 
 	test("unsticky routes", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute.ready();
+			iCanRoute.start();
 			iCanRoute("{type}");
 			iCanRoute("{type}/{id}");
 			iCanRoute.attr({
@@ -231,7 +231,7 @@ if (typeof steal !== 'undefined') {
 	test("routes should deep clean", function() {
 		expect(2);
 		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute.ready();
+			iCanRoute.start();
 			var hash1 = canRoute.url({
 				panelA: {
 					name: "fruit",
@@ -269,7 +269,7 @@ if (typeof steal !== 'undefined') {
 			var appVM =  new win.CanMap();
 
 			route.map(appVM);
-			route.ready();
+			route.start();
 
 			appVM.bind('action', function(ev, newVal) {
 				strictEqual(newVal, '10');
@@ -293,7 +293,7 @@ if (typeof steal !== 'undefined') {
 			}}))();
 
 			route.map(appVM);
-			route.ready();
+			route.start();
 
 			appVM.bind('action', function(ev, newVal) {
 				equal(typeof newVal, 'function');
@@ -312,7 +312,7 @@ if (typeof steal !== 'undefined') {
 		stop();
 		window.routeTestReady = function (iCanRoute, loc) {
 
-			iCanRoute.ready();
+			iCanRoute.start();
 			iCanRoute("{path}");
 
 			iCanRoute.attr('path', 'foo');

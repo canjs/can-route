@@ -83,7 +83,7 @@ var AppViewModel = DefineMap.extend({
 var appState = new AppViewModel();
 route.data = appState;
 route('{page}', {page: 'home'});
-route.ready();
+route.start();
 ```
 
 Understanding how maps work is essential to understanding `can-route`.
@@ -200,7 +200,7 @@ After your application has created all of its routes, call [can-route.ready]
 to set can-route's data to match the current hash:
 
 ```js
-route.ready();
+route.start();
 ```
 
 ## Changing the route
@@ -237,7 +237,7 @@ In order for a route to be matched, all of the map properties it uses must be se
 
 ```js
 route('{page}/{section}');
-route.ready();
+route.start();
 
 route.data.page = 'contact';
 route.data.section = 'email';
@@ -249,7 +249,7 @@ If a route contains default values, these map properties must also be set to mat
 
 ```js
 route('{page}', { section: 'email' });
-route.ready();
+route.start();
 
 route.data.page = 'contact';
 route.data.section = 'email';
@@ -264,7 +264,7 @@ If multiple routes have all of their properties set, the route with the highest 
 ```js
 route('{page}');
 route('{page}/{section}');
-route.ready();
+route.start();
 
 route.data.page = 'two';
 route.data.section = 'a';
@@ -279,7 +279,7 @@ If multiple routes are still matched, the route that was registered first will b
 ```js
 route('', { page: 'home' });
 route('{section}');
-route.ready();
+route.start();
 
 route.data.page = 'home';
 route.data.section = 'a';

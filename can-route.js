@@ -59,7 +59,7 @@ function updateUrl(serializedData) {
 	timer = setTimeout(function () {
 
 		// indicate that the hash is set to look like the data
-		var serialized =canRoute.data.serialize(),
+		var serialized = canReflect.serialize( canRoute.data ),
 			route = routeParam.getMatchedRoute(serialized),
 			path = routeParam.paramFromRoute(route, serialized);
 
@@ -165,7 +165,7 @@ assign(canRoute, {
 	 *
 	 * Initializes can-route.
 	 *
-	 * @signature `route.ready()`
+	 * @signature `route.start()`
 	 *
 	 * Sets up the two-way binding between the hash and the can-route observable
 	 * map and sets the route map to its initial values.
@@ -173,7 +173,7 @@ assign(canRoute, {
 	 * ```js
 	 * route("{page}", { page: "home" }));
 	 *
-	 * route.ready();
+	 * route.start();
 	 * route.data.page; // -> "home"
 	 * ```
 	 *
@@ -183,15 +183,19 @@ assign(canRoute, {
 	 *
 	 * ## Use
 	 *
-	 * After setting all your routes, call `route.ready()`.
+	 * After setting all your routes, call `route.start()`.
 	 *
 	 * ```js
 	 * route("overview/{dateStart}-{dateEnd}");
 	 * route("{type}/{id}");
-	 * route.ready();
+	 * route.start();
 	 * ```
 	 */
 	ready: function (val) {
+		console.warn("Use can-rotue.start() instead of can-route.start()");
+		canRoute.start();
+	},
+	start: function(val){
 		if (val !== true) {
 			canRoute._setup();
 			if(isBrowserWindow() || isWebWorker()) {

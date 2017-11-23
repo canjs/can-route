@@ -41,7 +41,7 @@ test("matched() compute", function() {
 	canRoute.data = appState;
 	canRoute("{type}", { type: "foo" });
 	canRoute("{type}/{subtype}");
-	canRoute.ready();
+	canRoute.start();
 
 	equal(appState.route, undefined, "should not set route on appState");
 	equal(canRoute.matched(), "{type}", "should set route.matched property");

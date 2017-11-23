@@ -19,7 +19,7 @@ test(".url with merge=true (#16)", function(){
 
 
 	canRoute.map(appState);
-	canRoute.ready();
+	canRoute.start();
 
 
 
