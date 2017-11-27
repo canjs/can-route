@@ -183,7 +183,7 @@ module.exports = {
     current: function canRoute_current(options, subsetMatch) {
 		if(subsetMatch) {
 			// everything in options shouhld be in baseOptions
-			var baseOptions = routeDeparam( bindingProxy.call("getValue") );
+			var baseOptions = routeDeparam( bindingProxy.call("can.getValue") );
 			return matchCheck(options, baseOptions);
 		} else {
 			return bindingProxy.call("can.getValue") === routeParam(options);
