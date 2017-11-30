@@ -4,6 +4,7 @@ var dev = require('can-util/js/dev/dev');
 
 QUnit.module("can-route .param and .deparam",{
     setup: function(){
+        canRoute.defaultBinding = "hashchange";
         canRoute.routes = {};
     }
 });
