@@ -58,7 +58,7 @@
     "can-observe": "^2.0.0-pre.10",
     "can-stache-key": "^1.0.0-pre.12",
     "detect-cyclic-packages": "^1.1.0",
-    "done-serve": "^0.2.0",
+    "done-serve": "^1.5.0",
     "jshint": "^2.9.1",
     "steal": "^1.2.9",
     "steal-qunit": "^1.0.1",
