@@ -5,10 +5,15 @@
 </head>
 <body>
 <p>This is a dummy page to use<br/> for testing route goodness</p>
-<script type="text/javascript" src="../node_modules/steal/steal-sans-promises.js" main="@empty">
 
+<!-- For the main CanJS test suite -->
+<script type="text/javascript" src="../../../node_modules/steal/steal-sans-promises.js" main="@empty"></script>
 
-    // System.config(configuration);
+<!-- For this repo’s test suite -->
+<script type="text/javascript" src="../node_modules/steal/steal-sans-promises.js" main="@empty"></script>
+
+<script>
+  steal.done().then(function() {
     Promise.all([
         System.import('can-route'),
         System.import('can-observation'),
@@ -27,6 +32,7 @@
           window.parent.routeTestReady && window.parent.routeTestReady(route, window.location, window)
         }, 30);
     });
+  });
 </script>
 
 </body>
