@@ -32,11 +32,6 @@
     "canjs-plugin",
     "donejs"
   ],
-  "steal": {
-    "configDependencies": [
-      "live-reload"
-    ]
-  },
   "dependencies": {
     "can-deparam": "^1.0.1",
     "can-event-queue": "<2.0.0",
@@ -55,7 +50,7 @@
   "devDependencies": {
     "can-define": "^2.0.0-pre.18",
     "can-map": "^4.0.0-pre.9",
-    "can-observe": "^2.0.0-pre.10",
+    "can-observe": "^2.0.0-pre.16",
     "can-stache-key": "^1.0.0-pre.12",
     "detect-cyclic-packages": "^1.1.0",
     "done-serve": "^1.5.0",
