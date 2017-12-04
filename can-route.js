@@ -192,7 +192,9 @@ assign(canRoute, {
 	 * ```
 	 */
 	ready: function (val) {
-		console.warn("Use can-rotue.start() instead of can-route.start()");
+		//!steal-remove-start
+		dev.warn("Use can-route.start() instead of can-route.ready()");
+		//!steal-remove-end
 		canRoute.start();
 	},
 	start: function(val){
