@@ -7,7 +7,7 @@ This is the internal map underlying can-route. It can be set in order to cross-b
 
 ## Background
 
-One of the biggest challenges in a complex application is getting all the different parts of the app to talk to each other simply, cleanly, and reliably. 
+One of the biggest challenges in a complex application is getting all the different parts of the app to talk to each other simply, cleanly, and reliably.
 
 An elegant way to solve this problem is using the [Observer Pattern](http://en.wikipedia.org/wiki/Observer_pattern). A single object, which can be called [Application ViewModel](https://www.youtube.com/watch?v=LrzK4exG5Ss), holds the high level state of the application.
 
@@ -95,7 +95,7 @@ var AppViewModel = DefineMap.extend({
 			})
 			return selected.join(',');
 		},
-		
+
 		// toggle selected from a comma separated list of ids
 		set: function(val){
 			var arr = val;
@@ -126,7 +126,7 @@ var locations = new Location.List({});
 locations.done(function(){
 	viewModel.locations = locations;
 
-	// call ready after the AppViewModel is fully initialized
+	// call start after the AppViewModel is fully initialized
 	route.start();
 });
 ```

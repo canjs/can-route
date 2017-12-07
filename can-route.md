@@ -19,14 +19,14 @@ route("{page}", { page: "home" });
 
 Will apply **cart** when the url is `#cart` and **home** when the url is `#`.
 
-@param {String} template the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces ( { } ). Identifiers wrapped in braces are interpreted as being properties on can-route's map. Examples:
+@param {String} template the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces ( { } ). Identifiers wrapped in braces are interpreted as being properties on can-route’s map. Examples:
 
 ```js
 route("{foo}")
 route("foo/{bar}")
 ```
 
-@param {Object} [defaults] An object of default values. These defaults are applied to can-route's map when the route is matched.
+@param {Object} [defaults] An object of default values. These defaults are applied to can-route’s map when the route is matched.
 
 @return {can-route}
 
@@ -36,11 +36,11 @@ route("foo/{bar}")
 
 ## Background information
 
-To support the browser's back button and bookmarking in a JavaScript
+To support the browser’s back button and bookmarking in a JavaScript
  application, most applications use
 the `window.location.hash`.  By
 changing the hash (via a link or JavaScript),
-one is able to add to the browser's history
+one is able to add to the browser’s history
 without changing the page.
 
 This provides the basics needed to
@@ -93,7 +93,7 @@ You can listen to changes in a map with `on(eventName, handler(ev, args...))` an
 ### Listening to changes in can-route
 
 Listen to changes in history by [can-event.addEventListener listening] to
-changes of can-route's `matched` compute:
+changes of can-route’s `matched` compute:
 
 ```js
 route.matched.on('change', function(ev, attr, how, newVal, oldVal) {
@@ -147,7 +147,7 @@ The location hash will look like this:
 
 Use `route(url, defaults)` to create a
 route. A route is a mapping from a url to
-an object (that is the route's state).
+an object (that is the route’s state).
 In order to map to a specific properties in the url,
 prepend a colon to the name of the property like:
 
@@ -156,7 +156,7 @@ route("#!content/{type}");
 ```
 
 If no routes are added, or no route is matched,
-can-route's data is updated with the [can-route.deparam deparamed]
+can-route’s data is updated with the [can-route.deparam deparamed]
 hash.
 
 ```js
@@ -166,7 +166,7 @@ location.hash = "#!type=videos";
 
 Once routes are added and the hash changes,
 can-route looks for matching routes and uses them
-to update can-route's data.
+to update can-route’s data.
 
 ```js
 route("#!content/{type}");
@@ -196,8 +196,8 @@ location.hash = "#!";
 
 ## Initializing can-route
 
-After your application has created all of its routes, call [can-route.ready]
-to set can-route's data to match the current hash:
+After your application has created all of its routes, call [can-route.start]
+to set can-route’s data to match the current hash:
 
 ```js
 route.start();
@@ -205,7 +205,7 @@ route.start();
 
 ## Changing the route
 
-Typically, you don't set `location.hash`
+Typically, you don’t set `location.hash`
 directly. Instead, you can change properties on can-route
 like:
 

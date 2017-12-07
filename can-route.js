@@ -3,13 +3,12 @@ var queues = require("can-queues");
 var Observation = require('can-observation');
 
 var namespace = require('can-namespace');
-
+var devLog = require('can-log/dev/dev');
 var each = require('can-util/js/each/each');
 var isFunction = require('can-util/js/is-function/is-function');
 var isWebWorker =  require('can-util/js/is-web-worker/is-web-worker');
 var isBrowserWindow =  require('can-util/js/is-browser-window/is-browser-window');
 var assign = require("can-util/js/assign/assign");
-var dev = require('can-util/js/dev/dev');
 var canReflect = require('can-reflect');
 var canSymbol = require('can-symbol');
 var makeCompute = require("can-simple-observable/make-compute/make-compute");
@@ -79,7 +78,7 @@ Object.defineProperty(updateUrl, "name", {
 // Deparameterizes the portion of the hash of interest and assign the
 // values to the `route.data` removing existing values no longer in the hash.
 // updateRouteData is called typically by hashchange which fires asynchronously
-// So it's possible that someone started changing the data before the
+// So it’s possible that someone started changing the data before the
 // hashchange event fired.  For this reason, it will not set the route data
 // if the data is changing or the hash already matches the hash that was set.
 function updateRouteData() {
@@ -154,14 +153,15 @@ assign(canRoute, {
 	deparam: routeDeparam,
 	map: function(data){
 		//!steal-remove-start
-		dev.warn('Set route.data directly instead of calling route.map');
+		devLog.warn('Set route.data directly instead of calling route.map');
 		//!steal-remove-end
 		canRoute.data = data;
 	},
 
 	/**
-	 * @function can-route.ready ready
+	 * @function can-route.start start
 	 * @parent can-route.static
+	 * @release 3.3
 	 *
 	 * Initializes can-route.
 	 *
@@ -191,13 +191,7 @@ assign(canRoute, {
 	 * route.start();
 	 * ```
 	 */
-	ready: function (val) {
-		//!steal-remove-start
-		dev.warn("Use can-route.start() instead of can-route.ready()");
-		//!steal-remove-end
-		canRoute.start();
-	},
-	start: function(val){
+	start: function (val) {
 		if (val !== true) {
 			canRoute._setup();
 			if(isBrowserWindow() || isWebWorker()) {
@@ -279,7 +273,7 @@ var bindToCanRouteData = function(name, args) {
 };
 
 each(['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off'], function(name) {
-	// exposing all internal eventQueue evt's to canRoute
+	// exposing all internal eventQueue evt’s to canRoute
 	canRoute[name] = function(eventName, handler) {
 		if (eventName === '__url') {
 			return bindingProxy.call("can.onValue", handler );
@@ -382,7 +376,7 @@ Object.defineProperty(canRoute,"data", {
 		if( canReflect.isConstructorLike(data) ){
 			data = new data();
 		}
-		// if it's a map, we make it always set strings for backwards compat
+		// if it’s a map, we make it always set strings for backwards compat
 		if( "attr" in data ) {
 			setRouteData( stringCoercingMapDecorator(data) );
 		} else {
