@@ -7,6 +7,7 @@ var compute = require('can-compute');
 var namespace = require('can-namespace');
 var param = require('can-param');
 var deparam = require('can-deparam');
+var devLog = require('can-log/dev/dev');
 var each = require('can-util/js/each/each');
 var string = require('can-util/js/string/string');
 var isFunction = require('can-util/js/is-function/is-function');
@@ -313,7 +314,7 @@ var matchCheck = function(source, matcher){
 var // Deparameterizes the portion of the hash of interest and assign the
 // values to the `route.data` removing existing values no longer in the hash.
 // setState is called typically by hashchange which fires asynchronously
-// So it's possible that someone started changing the data before the
+// So it’s possible that someone started changing the data before the
 // hashchange event fired.  For this reason, it will not set the route data
 // if the data is changing or the hash already matches the hash that was set.
 setState =canRoute.setState = function () {
@@ -412,7 +413,7 @@ assign(canRoute, {
 				return false;
 			}
 		});
-		// If we have a route name in our `canRoute` data, and it's
+		// If we have a route name in our `canRoute` data, and it’s
 		// just as good as what currently matches, use that
 		if (canRoute.routes[routeName] && matchesData(canRoute.routes[routeName], data) === matches) {
 			route = canRoute.routes[routeName];
@@ -477,8 +478,8 @@ assign(canRoute, {
 	 * ```
 	 *
 	 *
-	 * It's important to make sure the hash or exclamation point is not passed
-	 * to `route.deparam` otherwise it will be included in the first property's
+	 * It’s important to make sure the hash or exclamation point is not passed
+	 * to `route.deparam` otherwise it will be included in the first property’s
 	 * name.
 	 *
 	 * ```js
@@ -582,8 +583,8 @@ assign(canRoute, {
 	/**
 	 * @function can-route.ready ready
 	 * @parent can-route.static
-	 *
-	 * Initializes can-route.
+	 * @description Initializes can-route.
+	 * @deprecated {3.3} Use [can-route.start start()] instead.
 	 *
 	 * @signature `route.ready()`
 	 *
@@ -612,6 +613,46 @@ assign(canRoute, {
 	 * ```
 	 */
 	ready: function (val) {
+		//!steal-remove-start
+		devLog.warn('ready() is deprecated; use start() instead');
+		//!steal-remove-end
+		canRoute.start();
+		return canRoute;
+	},
+	/**
+	 * @function can-route.start start
+	 * @parent can-route.static
+	 * @release 3.3
+	 *
+	 * Initializes can-route.
+	 *
+	 * @signature `route.start()`
+	 *
+	 * Sets up the two-way binding between the hash and the can-route observable
+	 * map and sets the route map to its initial values.
+	 *
+	 * ```js
+	 * route("{page}", { page: "home" }));
+	 *
+	 * route.start();
+	 * route.data.page; // -> "home"
+	 * ```
+	 *
+	 * @return {can-route} The can-route object.
+	 *
+	 * @body
+	 *
+	 * ## Use
+	 *
+	 * After setting all your routes, call `route.start()`.
+	 *
+	 * ```js
+	 * route("overview/{dateStart}-{dateEnd}");
+	 * route("{type}/{id}");
+	 * route.start();
+	 * ```
+	 */
+	start: function (val) {
 		if (val !== true) {
 			canRoute._setup();
 			if(isBrowserWindow() || isWebWorker()) {
@@ -626,7 +667,7 @@ assign(canRoute, {
 	 * @description Creates a URL fragment based on registered routes given a set of data.
 	 * @signature `route.url(data [, merge])`
 	 *
-	 * Make a URL fragment that when set to window.location.hash will update can-route's properties
+	 * Make a URL fragment that when set to window.location.hash will update can-route’s properties
 	 * to match those in `data`.
 	 *
 	 * ```js
@@ -676,7 +717,7 @@ assign(canRoute, {
 	 * data and the registered routes.
 	 * @signature `route.link(innerText, data, props [, merge])`
 	 *
-	 * Make an anchor tag (`<A>`) that when clicked on will update can-route's
+	 * Make an anchor tag (`<A>`) that when clicked on will update can-route’s
 	 * properties to match those in `data`.
 	 *
 	 * @param {Object} innerText The text inside the link.
@@ -754,7 +795,7 @@ assign(canRoute, {
 	 *
 	 * ## Use
 	 *
-	 * Checks the page's current URL to see if the route represents the options
+	 * Checks the page’s current URL to see if the route represents the options
 	 * passed into the function.
 	 *
 	 * Returns true if the options represent the current URL.
@@ -793,8 +834,8 @@ assign(canRoute, {
 				canEvent.on.call(window, 'hashchange', setState);
 			},
 			// Gets the part of the url we are determinging the route from.
-			// For hashbased routing, it's everything after the #, for
-			// pushState it's configurable
+			// For hashbased routing, it’s everything after the #, for
+			// pushState it’s configurable
 			matchingPartOfURL: function () {
 				var loc =canRoute.location || location;
 				return loc.href.split(/#!?/)[1] || "";
@@ -812,7 +853,7 @@ assign(canRoute, {
 	},
 	defaultBinding: "hashchange",
 	currentBinding: null,
-	// ready calls setup
+	// start calls setup
 	// setup binds and listens to data changes
 	// bind listens to whatever you should be listening to
 	// data changes tries to set the path
@@ -886,7 +927,7 @@ var bindToCanRouteData = function(name, args) {
 };
 
 each(['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off'], function(name) {
-	// exposing all internal canEvent evt's to canRoute
+	// exposing all internal canEvent evt’s to canRoute
 	canRoute[name] = function(eventName) {
 		if (eventName === '__url') {
 			return canEvent[name].apply(eventsObject, arguments);
@@ -945,7 +986,7 @@ Object.defineProperty(canRoute,"data", {
 		if( canReflect.isConstructorLike(data) ){
 			data = new data();
 		}
-		// if it's a map, we make it always set strings for backwards compat
+		// if it’s a map, we make it always set strings for backwards compat
 		if( "attr" in data ) {
 			setRouteData( stringCoercingMapDecorator(data) );
 		} else {
