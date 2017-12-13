@@ -1030,6 +1030,7 @@ if (typeof require === 'undefined') {
 
 test("on/off binding", function () {
 	canRoute.routes = {};
+	canRoute.attr('foo', 'notbar');
 	expect(1)
 
 	canRoute.on('foo', function () {
