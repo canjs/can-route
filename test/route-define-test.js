@@ -529,7 +529,7 @@ if (typeof steal !== 'undefined') {
 
 				iCanRoute.serializedCompute.unbind('change');
 				iCanRoute.serializedCompute.bind('change', function(){
-					
+
 					equal(iCanRoute.attr('personId'), '3', 'personId');
 					equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
 					iCanRoute.unbind('change');
@@ -1098,7 +1098,7 @@ test("param with whitespace in interpolated string (#45)", function () {
 test("triggers __url event anytime a there's a change to individual properties", function(){
 	mockRoute.start();
 
-	var AppState = DefineMap.extend({seal: false},{"*": "stringOrObservable"});
+	var AppState = DefineMap.extend({seal: false},{"*": "stringOrObservable", page: "string", section: "string"});
 	var appState = new AppState({});
 
 	canRoute.data = appState;
@@ -1109,29 +1109,31 @@ test("triggers __url event anytime a there's a change to individual properties",
 	canRoute.start();
 
 	var matchedCount = 0;
-	canRoute.on('__url', function() {
+	var onMatchCall = {
+		1: function section_a() {
+			canRoute.data.section = 'a';
+		},
+		2: function section_b() {
+			canRoute.data.section = 'b';
+		},
+		3: function(){
+			// 1st call is going from undefined to empty string
+			equal(matchedCount, 3, 'calls __url event every time a property is changed');
+
+			canRoute.off('__url', updateMatchedCount);
+			mockRoute.stop();
+			QUnit.start();
+		}
+	};
+	var updateMatchedCount = function() {
 		// any time a route property is changed, not just the matched route
 		matchedCount++;
-	});
+		onMatchCall[matchedCount]();
+	};
+	canRoute.on('__url', updateMatchedCount);
 
-	setTimeout(function() {
+	setTimeout(function page_two() {
 		canRoute.data.page = 'two';
-	}, 30);
-
-	setTimeout(function() {
-		canRoute.data.section = 'a';
-	}, 60);
-
-	setTimeout(function() {
-		canRoute.data.section = 'b';
-	}, 90);
-
-	setTimeout(function(){
-		// 1st call is going from undefined to empty string
-		equal(matchedCount, 4, 'calls __url event every time a property is changed');
-
-		mockRoute.stop();
-		QUnit.start();
-	}, 200);
+	}, 50);
 
 });
