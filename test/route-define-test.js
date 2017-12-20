@@ -616,14 +616,10 @@ test("triggers __url event anytime a there's a change to individual properties",
 	var matchedCount = 0;
 	var onMatchCall = {
 		1: function section_a() {
-			//setTimeout(function(){
 			canRoute.data.section = 'a';
-			//},30);
 		},
 		2: function section_b() {
-			//setTimeout(function(){
 			canRoute.data.section = 'b';
-			//},30);
 		},
 		3: function(){
 			// 1st call is going from undefined to empty string
@@ -642,6 +638,5 @@ test("triggers __url event anytime a there's a change to individual properties",
 	setTimeout(function page_two() {
 		canRoute.data.page = 'two';
 	}, 50);
-
 
 });
