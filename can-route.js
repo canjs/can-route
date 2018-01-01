@@ -56,10 +56,10 @@ function updateUrl(serializedData) {
 	// collect attributes that are changing
 	clearTimeout(timer);
 	timer = setTimeout(function () {
-
 		// indicate that the hash is set to look like the data
 		var serialized = canReflect.serialize( canRoute.data ),
-			route = routeParam.getMatchedRoute(serialized),
+			currentRouteName = matchedObservable.get(),
+			route = routeParam.getMatchedRoute(serialized, currentRouteName),
 			path = routeParam.paramFromRoute(route, serialized);
 
 		bindingProxy.call("can.setValue", path);
@@ -199,10 +199,13 @@ assign(canRoute, {
 				// into .data
 				var hash = bindingProxy.call("can.getValue");
 				queues.batch.start();
+				// get teh data
 				var state = canRoute.deparam(hash);
 				delete state.route;
+
 				canReflect.assign(canRoute.data,state);
 				queues.batch.stop();
+				updateUrl();
 			}
 		}
 		return canRoute;

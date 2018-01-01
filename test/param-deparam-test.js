@@ -358,14 +358,13 @@ test("better matching precident", function () {
 		"foo/bar");
 });
 
-test("param with route defined", function () {
+test("param with currentRoute name", function () {
 	canRoute("holler")
 	canRoute("foo");
 
 	var res = canRoute.param({
-		foo: "abc",
-		route: "foo"
-	});
+		foo: "abc"
+	},"foo");
 
 	equal(res, "foo&foo=abc")
 });
