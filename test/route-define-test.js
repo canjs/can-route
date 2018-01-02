@@ -110,7 +110,7 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("canRoute.map: conflicting route values, hash should win", function(){
+	test("canRoute.map: conflicting route values, hash should win (canjs/canjs#979)", function(){
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
 			iCanRoute("{type}/{id}");
@@ -135,32 +135,33 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(){
-		setupRouteTest(function (iframe, iCanRoute, loc, win) {
-
-			iCanRoute("{type}/{id}");
-			var AppState = win.DefineMap.extend({seal: false},{});
-			var appState = new AppState({section: 'home'});
-
-			iCanRoute.map(appState);
-			loc.hash = "#!cat/5";
-			iCanRoute.start();
-
-			setTimeout(function () {
-
-				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!cat/5&section=home", "same URL");
-				equal(appState.get("type"), "cat", "hash populates the appState");
-				equal(appState.get("id"), "5", "hash populates the appState");
-				equal(appState.get("section"), "home", "appState keeps its properties");
-				ok(iCanRoute.data === appState, "canRoute.data is the same as appState");
+	test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data (canjs/canjs#979)", function(){
+		QUnit.stop();
+		mockRoute.start();
 
 
-				teardownRouteTest();
+		canRoute("{type}/{id}");
+		var AppState = DefineMap.extend({seal: false},{});
+		var appState = new AppState({section: 'home'});
 
-			}, 30);
+		canRoute.data = appState;
+		mockRoute.hash.set("#!cat/5"); // type and id get added ... this will call update url to add everything
+		canRoute.start();
 
-		});
+		setTimeout(function () {
+
+			equal(mockRoute.hash.get(), "#cat/5&section=home", "same URL");
+			equal(appState.get("type"), "cat", "hash populates the appState");
+			equal(appState.get("id"), "5", "hash populates the appState");
+			equal(appState.get("section"), "home", "appState keeps its properties");
+			ok(canRoute.data === appState, "canRoute.data is the same as appState");
+
+
+			mockRoute.stop();
+			QUnit.start();
+		}, 30);
+
+
 	});
 
 	test("updating the hash", function () {
@@ -184,25 +185,25 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("sticky enough routes", function () {
+	test("sticky enough routes (canjs#36)", function () {
 
-		setupRouteTest(function (iframe, iCanRoute, loc) {
+		QUnit.stop();
 
-			iCanRoute.start()
-			iCanRoute("active");
-			iCanRoute("");
+		mockRoute.start();
+		canRoute("active");
+		canRoute("");
 
-			loc.hash = "#!active";
+		mockRoute.hash.set("#active");
+		canRoute.start()
 
-			setTimeout(function () {
+		setTimeout(function () {
 
-				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!active");
+			var after = mockRoute.hash.get();
+			equal(after, "#active");
+			mockRoute.stop();
+			QUnit.start();
 
-				teardownRouteTest();
-
-			}, 30);
-		});
+		}, 30);
 	});
 
 	test("unsticky routes", function () {
@@ -510,7 +511,7 @@ test("on/off binding", function () {
 test("two way binding canRoute.map with DefineMap instance", function(){
 	expect(2);
 	stop();
-	mockRoute.start()
+	mockRoute.start();
 
 	var AppState = DefineMap.extend({seal: false},{"*": "stringOrObservable"});
 	var appState = new AppState();

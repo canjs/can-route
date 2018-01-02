@@ -37,16 +37,16 @@ var matchesData = function (route, data) {
 	return count;
 };
 
-function getMatchedRoute(data) {
+function getMatchedRoute(data, routeName) {
 	// Check if the provided data keys match the names in any routes;
     // Get the one with the most matches.
     var route,
         // Need to have at least 1 match.
         matches = 0,
         matchCount,
-        routeName = data.route,
+        routeName,
         propCount = 0;
-		
+
     delete data.route;
 
     each(data, function () {
@@ -117,6 +117,10 @@ function paramFromRoute(route, data) {
  * @description Get a route path from given data.
  * @signature `route.param(data)`
  * @param {data} object The data to populate the route with.
+ * @param {String} [currentRouteName] The current route name.  If provided, this
+ * can be used to "stick" the url to a previous route. By "stick", we mean that
+ * if there are multiple registered routes that match the `object`, the
+ * the `currentRouteName` will be used.
  * @return {String} The route, with the data populated in it.
  *
  * @body
@@ -139,8 +143,8 @@ function paramFromRoute(route, data) {
  *   // -> "video/5&isNew=false"
  * ```
  */
-function canRoute_param(data) {
- 	return paramFromRoute(getMatchedRoute(data), data);
+function canRoute_param(data, currentRouteName) {
+ 	return paramFromRoute(getMatchedRoute(data, currentRouteName), data);
 }
 module.exports = canRoute_param;
 canRoute_param.paramFromRoute = paramFromRoute;
