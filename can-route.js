@@ -4,11 +4,6 @@ var Observation = require('can-observation');
 
 var namespace = require('can-namespace');
 var devLog = require('can-log/dev/dev');
-var each = require('can-util/js/each/each');
-var isFunction = require('can-util/js/is-function/is-function');
-var isWebWorker =  require('can-util/js/is-web-worker/is-web-worker');
-var isBrowserWindow =  require('can-util/js/is-browser-window/is-browser-window');
-var assign = require("can-util/js/assign/assign");
 var canReflect = require('can-reflect');
 var canSymbol = require('can-symbol');
 var makeCompute = require("can-simple-observable/make-compute/make-compute");
@@ -20,6 +15,11 @@ var routeParam = require("./src/param");
 var routeDeparam = require("./src/deparam");
 var bindingProxy = require("./src/binding-proxy");
 var hashchange = require("./src/hashchange");
+
+var isWebWorker =  require('can-globals/is-web-worker/is-web-worker');
+var isBrowserWindow =  require('can-globals/is-browser-window/is-browser-window');
+
+
 
 bindingProxy.bindings.hashchange = hashchange;
 bindingProxy.defaultBinding = "hashchange";
@@ -149,7 +149,7 @@ Object.defineProperty(canRoute,"currentBinding",{
 	}
 });
 
-assign(canRoute, {
+canReflect.assignMap(canRoute, {
 	param: routeParam,
 	deparam: routeDeparam,
 	map: function(data){
@@ -232,7 +232,7 @@ var bindToCanRouteData = function(name, args) {
 	return canRoute.data[name].apply(canRoute.data, args);
 };
 
-each(['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off'], function(name) {
+['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off'].forEach(function(name) {
 	// exposing all internal eventQueue evt’s to canRoute
 	canRoute[name] = function(eventName, handler) {
 		if (eventName === '__url') {
@@ -242,7 +242,7 @@ each(['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off'], f
 	};
 });
 
-each(['delegate', 'undelegate', 'removeAttr', 'compute', '_get', '___get', 'each'], function (name) {
+['delegate', 'undelegate', 'removeAttr', 'compute', '_get', '___get', 'each'].forEach(function (name) {
 	canRoute[name] = function () {
 		// `delegate` and `undelegate` require
 		// the `can/map/delegate` plugin
@@ -285,14 +285,14 @@ var stringify = function (obj) {
 			obj = obj.serialize();
 		} else {
 			// Get array from array-like or shallow-copy object
-			obj = isFunction(obj.slice) ? obj.slice() : assign({}, obj);
+			obj = typeof obj.slice === "function" ? obj.slice() : canReflect.assign({}, obj);
 		}
 		// Convert each object property or array item into stringified new
-		each(obj, function (val, prop) {
+		canReflect.eachKey(obj, function (val, prop) {
 			obj[prop] = stringify(val);
 		});
 		// Object supports toString function
-	} else if (obj !== undefined && obj !== null && isFunction(obj.toString)) {
+	} else if (obj !== undefined && obj !== null && (typeof obj.toString === "function" )) {
 		obj = obj.toString();
 	}
 

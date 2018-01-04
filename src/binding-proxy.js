@@ -1,8 +1,8 @@
-var makeArray = require('can-util/js/make-array/make-array');
+var canReflect = require('can-reflect');
 var canSymbol = require("can-symbol");
 var SimpleObservable = require("can-simple-observable");
 
-var defaultBinding = new SimpleObservable("hashchange")
+var defaultBinding = new SimpleObservable("hashchange");
 
 var bindingProxy = {
     get defaultBinding(){
@@ -14,7 +14,7 @@ var bindingProxy = {
     currentBinding: null,
     bindings: {},
     call: function(){
-        var args = makeArray(arguments),
+        var args = canReflect.toArray(arguments),
             prop = args.shift(),
             binding = bindingProxy.bindings[bindingProxy.currentBinding ||bindingProxy.defaultBinding],
             method = binding[prop.indexOf("can.") === 0 ? canSymbol.for(prop) : prop];

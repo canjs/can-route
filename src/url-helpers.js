@@ -1,15 +1,13 @@
 var bindingProxy = require("./binding-proxy");
 var routeDeparam = require("./deparam");
 var routeParam = require("./param");
-
-var assign = require("can-util/js/assign/assign");
-var each = require('can-util/js/each/each');
+var canReflect = require("can-reflect");
 var string = require('can-util/js/string/string');
 
 
 var makeProps = function (props) {
 	var tags = [];
-	each(props, function (val, name) {
+	canReflect.eachKey(props, function (val, name) {
 		tags.push((name === 'className' ? 'class' : name) + '="' +
 			(name === "href" ? val : string.esc(val)) + '"');
 	});
@@ -34,7 +32,7 @@ function canRoute_url(options, merge) {
 
     if (merge) {
         var baseOptions = routeDeparam(bindingProxy.call("can.getValue"));
-        options = assign(assign({}, baseOptions), options);
+        options = canReflect.assignMap(canReflect.assignMap({}, baseOptions), options);
     }
     return bindingProxy.call("root") +routeParam(options);
 }
@@ -132,7 +130,7 @@ module.exports = {
      */
     link: function canRoute_link(name, options, props, merge) {
         return "<a " + makeProps(
-            assign({
+            canReflect.assignMap({
                 href: canRoute_url(options, merge)
             }, props)) + ">" + name + "</a>";
     },

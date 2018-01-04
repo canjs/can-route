@@ -3,7 +3,8 @@
 var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
 var DefineMap = require('can-define/map/map');
-var makeArray = require('can-util/js/make-array/make-array');
+var canReflect = require('can-reflect');
+
 var mockRoute = require("./mock-route-binding");
 
 require('can-observation');
@@ -27,7 +28,7 @@ var setupRouteTest = function(callback){
 	var iframe = document.createElement('iframe');
 	stop();
 	window.routeTestReady = function(){
-		var args = makeArray(arguments)
+		var args = canReflect.toArray(arguments)
 		args.unshift(iframe);
 		callback.apply(null, args);
 	};
