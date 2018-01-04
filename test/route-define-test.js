@@ -249,14 +249,14 @@ if (typeof steal !== 'undefined') {
 		setupRouteTest(function (iframe, iCanRoute, loc, win) {
 			iCanRoute.start();
 			var isOnTestPage = new win.Observation(function(){
-				return iCanRoute.current({page: "test"});
+				return iCanRoute.isCurrent({page: "test"});
 			});
 
 			win.canReflect.onValue(isOnTestPage, function(){
 				teardownRouteTest();
 			});
 
-			equal(iCanRoute.current({page: "test"}), false, "initially not on test page")
+			equal(iCanRoute.isCurrent({page: "test"}), false, "initially not on test page")
 			setTimeout(function(){
 				iCanRoute.attr("page","test");
 			},20);
@@ -407,8 +407,7 @@ test("escaping periods", function () {
 
 	var obj = canRoute.deparam("can.Control.html");
 	deepEqual(obj, {
-		page: "can.Control",
-		route: "{page}\\.html"
+		page: "can.Control"
 	});
 
 	equal(canRoute.param({

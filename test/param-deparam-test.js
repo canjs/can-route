@@ -9,33 +9,34 @@ QUnit.module("can-route .param and .deparam",{
     }
 });
 
-test("deparam", function () {
+test("deparam and rule", function () {
 
-	canRoute("{page}", {
+	canRoute.register("{page}", {
 		page: "index"
 	});
 
 	var obj = canRoute.deparam("can.Control");
 	deepEqual(obj, {
-		page: "can.Control",
-		route: "{page}"
+		page: "can.Control"
 	});
+    QUnit.equal(canRoute.rule("can.Control"), "{page}");
 
 	obj = canRoute.deparam("");
 	deepEqual(obj, {
-		page: "index",
-		route: "{page}"
+		page: "index"
 	});
+    QUnit.equal(canRoute.rule(""), "{page}");
 
 	obj = canRoute.deparam("can.Control&where=there");
 	deepEqual(obj, {
 		page: "can.Control",
-		where: "there",
-		route: "{page}"
+		where: "there"
 	});
 
+    QUnit.equal(canRoute.rule("can.Control&where=there"), "{page}");
+
 	canRoute.routes = {};
-	canRoute("{page}/{index}", {
+	canRoute.register("{page}/{index}", {
 		page: "index",
 		index: "foo"
 	});
@@ -44,14 +45,15 @@ test("deparam", function () {
 	deepEqual(obj, {
 		page: "can.Control",
 		index: "foo",
-		where: "there",
-		route: "{page}/{index}"
+		where: "there"
 	}, "default value and queryparams");
+
+    QUnit.equal(canRoute.rule("can.Control/&where=there"), "{page}/{index}");
 });
 
 test("deparam of invalid url", function () {
 	var obj;
-	canRoute("pages/{var1}/{var2}/{var3}", {
+	canRoute.register("pages/{var1}/{var2}/{var3}", {
 		var1: 'default1',
 		var2: 'default2',
 		var3: 'default3'
@@ -68,9 +70,10 @@ test("deparam of invalid url", function () {
 	deepEqual(obj, {
 		var1: 'val1',
 		var2: 'val2',
-		var3: 'val3',
-		route: "pages/{var1}/{var2}/{var3}"
+		var3: 'val3'
 	});
+    QUnit.equal(canRoute.rule("pages/val1/val2/val3&invalid-parameters"), "pages/{var1}/{var2}/{var3}");
+
 });
 
 test("deparam of url with non-generated hash (manual override)", function () {
@@ -88,7 +91,7 @@ test("deparam of url with non-generated hash (manual override)", function () {
 });
 
 test("param", function () {
-	canRoute("pages/{page}", {
+	canRoute.register("pages/{page}", {
 		page: "index"
 	})
 
@@ -103,7 +106,7 @@ test("param", function () {
 	});
 	equal(res, "pages/foo&index=bar")
 
-	canRoute("pages/{page}/{foo}", {
+	canRoute.register("pages/{page}/{foo}", {
 		page: "index",
 		foo: "bar"
 	})
@@ -134,7 +137,7 @@ test("param", function () {
 
 test("param - `:page` syntax", function () {
 	canRoute.routes = {};
-	canRoute("pages/:page", {
+	canRoute.register("pages/:page", {
 		page: "index"
 	})
 
@@ -149,7 +152,7 @@ test("param - `:page` syntax", function () {
 	});
 	equal(res, "pages/foo&index=bar")
 
-	canRoute("pages/:page/:foo", {
+	canRoute.register("pages/:page/:foo", {
 		page: "index",
 		foo: "bar"
 	})
@@ -195,7 +198,7 @@ test("symmetry", function () {
 });
 
 test("light param", function () {
-	canRoute("{page}", {
+	canRoute.register("{page}", {
 		page: "index"
 	})
 
@@ -204,7 +207,7 @@ test("light param", function () {
 	});
 	equal(res, "")
 
-	canRoute("pages/{p1}/{p2}/{p3}", {
+	canRoute.register("pages/{p1}/{p2}/{p3}", {
 		p1: "index",
 		p2: "foo",
 		p3: "bar"
@@ -227,7 +230,7 @@ test("light param", function () {
 
 test('param doesnt add defaults to params', function () {
 
-	canRoute("pages/{p1}", {
+	canRoute.register("pages/{p1}", {
 		p2: "foo"
 	})
 	var res = canRoute.param({
@@ -239,7 +242,7 @@ test('param doesnt add defaults to params', function () {
 
 test("param-deparam", function () {
 
-	canRoute("{page}/{type}", {
+	canRoute.register("{page}/{type}", {
 		page: "index",
 		type: "foo"
 	})
@@ -298,7 +301,7 @@ test("param-deparam", function () {
 
 test("deparam-param", function () {
 	canRoute.routes = {};
-	canRoute("{foo}/{bar}", {
+	canRoute.register("{foo}/{bar}", {
 		foo: 1,
 		bar: 2
 	});
@@ -311,28 +314,29 @@ test("deparam-param", function () {
 	var deparamed = canRoute.deparam("/")
 	deepEqual(deparamed, {
 		foo: 1,
-		bar: 2,
-		route: "{foo}/{bar}"
-	})
+		bar: 2
+	});
+    QUnit.equal(canRoute.rule("/"), "{foo}/{bar}");
 });
 
 test("precident", function () {
-	canRoute("{who}", {
+	canRoute.register("{who}", {
 		who: "index"
 	});
-	canRoute("search/{search}");
+	canRoute.register("search/{search}");
 
 	var obj = canRoute.deparam("can.Control");
 	deepEqual(obj, {
-		who: "can.Control",
-		route: "{who}"
+		who: "can.Control"
 	});
+    QUnit.equal(canRoute.rule("can.Control"), "{who}");
 
 	obj = canRoute.deparam("search/can.Control");
 	deepEqual(obj, {
 		search: "can.Control",
-		route: "search/{search}"
 	}, "bad deparam");
+    QUnit.equal(canRoute.rule("search/can.Control"), "search/{search}");
+
 
 	equal(canRoute.param({
 			search: "can.Control"
@@ -346,10 +350,10 @@ test("precident", function () {
 });
 
 test("better matching precident", function () {
-	canRoute("{type}", {
+	canRoute.register("{type}", {
 		who: "index"
 	});
-	canRoute("{type}/{id}");
+	canRoute.register("{type}/{id}");
 
 	equal(canRoute.param({
 			type: "foo",
@@ -359,8 +363,8 @@ test("better matching precident", function () {
 });
 
 test("param with currentRoute name", function () {
-	canRoute("holler")
-	canRoute("foo");
+	canRoute.register("holler")
+	canRoute.register("foo");
 
 	var res = canRoute.param({
 		foo: "abc"
@@ -371,10 +375,10 @@ test("param with currentRoute name", function () {
 
 test("route endings", function () {
 	canRoute.routes = {};
-	canRoute("foo", {
+	canRoute.register("foo", {
 		foo: true
 	});
-	canRoute("food", {
+	canRoute.register("food", {
 		food: true
 	});
 
@@ -384,7 +388,7 @@ test("route endings", function () {
 });
 
 test("strange characters", function () {
-	canRoute("{type}/{id}");
+	canRoute.register("{type}/{id}");
 	var res = canRoute.deparam("foo/" + encodeURIComponent("\/"))
 	equal(res.id, "\/")
 	res = canRoute.param({
@@ -395,34 +399,36 @@ test("strange characters", function () {
 });
 
 test("empty default is matched even if last", function () {
-	canRoute("{who}");
-	canRoute("", {
+	canRoute.register("{who}");
+	canRoute.register("", {
 		foo: "bar"
 	})
 
 	var obj = canRoute.deparam("");
 	deepEqual(obj, {
-		foo: "bar",
-		route: ""
+		foo: "bar"
 	});
+
+    QUnit.equal(canRoute.rule(""), "");
 });
 
 test("order matched", function () {
-	canRoute("{foo}");
-	canRoute("{bar}")
+	canRoute.register("{foo}");
+	canRoute.register("{bar}")
 
 	var obj = canRoute.deparam("abc");
 	deepEqual(obj, {
-		foo: "abc",
-		route: "{foo}"
+		foo: "abc"
 	});
+
+    QUnit.equal(canRoute.rule("abc"), "{foo}");
 });
 
 test("param order matching", function () {
-	canRoute("", {
+	canRoute.register("", {
 		bar: "foo"
 	});
-	canRoute("something/{bar}");
+	canRoute.register("something/{bar}");
 	var res = canRoute.param({
 		bar: "foo"
 	});
@@ -431,12 +437,12 @@ test("param order matching", function () {
 	// picks the first that matches everything ...
 	canRoute.routes = {};
 
-	canRoute("{recipe}", {
+	canRoute.register("{recipe}", {
 		recipe: "recipe1",
 		task: "task3"
 	});
 
-	canRoute("{recipe}/{task}", {
+	canRoute.register("{recipe}/{task}", {
 		recipe: "recipe1",
 		task: "task3"
 	});
@@ -456,13 +462,12 @@ test("param order matching", function () {
 });
 
 test("dashes in routes", function () {
-	canRoute("{foo}-{bar}");
+	canRoute.register("{foo}-{bar}");
 
 	var obj = canRoute.deparam("abc-def");
 	deepEqual(obj, {
 		foo: "abc",
-		bar: "def",
-		route: "{foo}-{bar}"
+		bar: "def"
 	});
 });
 
@@ -476,8 +481,8 @@ if (dev) {
 			equal(text.split(":")[0], "two routes were registered with matching keys");
 		};
 
-		canRoute("{page}/{subpage}");
-		canRoute("foo/{page}/{subpage}");
+		canRoute.register("{page}/{subpage}");
+		canRoute.register("foo/{page}/{subpage}");
 
 		dev.warn = oldlog;
 	});
@@ -489,8 +494,8 @@ if (dev) {
 			equal(text.split(":")[0], "two routes were registered with matching keys");
 		};
 
-		canRoute("foo/{page}/{subpage}");
-		canRoute("{page}/{subpage}");
+		canRoute.register("foo/{page}/{subpage}");
+		canRoute.register("{page}/{subpage}");
 
 		dev.warn = oldlog;
 	});
@@ -503,8 +508,8 @@ if (dev) {
 			ok(false, text);
 		};
 
-		canRoute("login", { "page": "auth", "subpage": "login" });
-		canRoute("signup", { "page": "auth", "subpage": "signup" });
+		canRoute.register("login", { "page": "auth", "subpage": "login" });
+		canRoute.register("signup", { "page": "auth", "subpage": "signup" });
 
 		dev.warn = oldlog;
 	});
@@ -522,16 +527,16 @@ if (dev) {
 		};
 
 		//should warn
-		canRoute("login", { "page":"auth" });
-		canRoute("signup", { "page":"auth" });
+		canRoute.register("login", { "page":"auth" });
+		canRoute.register("signup", { "page":"auth" });
 
 		//should not warn
-		canRoute("login2/", { "page":"auth2" });
-		canRoute("login2", { "page":"auth2" });
+		canRoute.register("login2/", { "page":"auth2" });
+		canRoute.register("login2", { "page":"auth2" });
 
 		//should not warn
-		canRoute("login3", { "page":"auth3" });
-		canRoute("login3", { "page":"auth3" });
+		canRoute.register("login3", { "page":"auth3" });
+		canRoute.register("login3", { "page":"auth3" });
 
 		dev.warn = oldlog;
 	});

@@ -1,7 +1,41 @@
-@function can-route.data data
+@property {Object|HTMLElement} can-route.data data
 @parent can-route.static
 
-This is the internal map underlying can-route. It can be set in order to cross-bind a top level state object (Application ViewModel) to can-route.
+This is the internal observable object underlying [can-route]. It can be set in order to cross-bind a top level state object (Application ViewModel) to can-route.
+
+@type {Object} If `route.data` is set to a [can-reflect]ed observable object of
+key-value pairs, once [can-route.start] is called, changes in `route.data`'s
+properties will update the hash and vice-versa.
+
+```js
+import DefineMap from "can-define/map/map";
+import route from "can-route";
+
+route.data = new DefineMap({page: ""});
+route.register("{page}");
+route.start();
+```
+
+
+@type {HTMLElement} If `route.data` is set to an element, its
+observable [can-view-model] will be used as the observable connected
+to the browser's hash.  
+
+```js
+import Component from "can-component";
+import route from "can-route";
+
+Component.extend({
+	tag: "my-app",
+	autoMount: true,
+	ViewModel: ...,
+	view: ...
+})
+
+route.data = document.querySelector("my-app");
+route.register("{page}");
+route.start();
+```
 
 @body
 

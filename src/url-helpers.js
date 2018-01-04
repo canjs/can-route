@@ -137,12 +137,12 @@ module.exports = {
             }, props)) + ">" + name + "</a>";
     },
     /**
-     * @function can-route.current current
+     * @function can-route.isCurrent isCurrent
      * @parent can-route.static
      *
      * Check if data represents the current route.
      *
-     * @signature `route.current(data [,subsetMatch] )`
+     * @signature `route.isCurrent(data [,subsetMatch] )`
      *
      * Compares `data` to the current route. Used to verify if an object is
      * representative of the current route.
@@ -150,8 +150,8 @@ module.exports = {
      * ```
      * route.data.set({page: "recipes", id: '5'});
      *
-     * route.current({page: "recipes"});       //-> false
-     * route.current({page: "recipes"}, true); //-> true
+     * route.isCurrent({page: "recipes"});       //-> false
+     * route.isCurrent({page: "recipes"}, true); //-> true
      * ```
      *
      *   @param {Object} data Data to check agains the current route.
@@ -172,15 +172,15 @@ module.exports = {
      *
      * ```js
      * route.data.id = 5; // location.hash -> "#!id=5"
-     * route.current({ id: 5 }); // -> true
-     * route.current({ id: 5, type: 'videos' }); // -> false
+     * route.isCurrent({ id: 5 }); // -> true
+     * route.isCurrent({ id: 5, type: 'videos' }); // -> false
      *
      * route.data.type = 'videos';
      *   // location.hash -> #!id=5&type=videos
-     * route.current({ id: 5, type: 'videos' }); // -> true
+     * route.isCurrent({ id: 5, type: 'videos' }); // -> true
      * ```
      */
-    current: function canRoute_current(options, subsetMatch) {
+    isCurrent: function canRoute_isCurrent(options, subsetMatch) {
 		if(subsetMatch) {
 			// everything in options shouhld be in baseOptions
 			var baseOptions = routeDeparam( bindingProxy.call("can.getValue") );

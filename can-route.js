@@ -30,6 +30,9 @@ bindingProxy.defaultBinding = "hashchange";
 // `window.location.hash` with a `Map`._
 
 function canRoute(url, defaults){
+	//!steal-remove-start
+	devLog.warn('Call route.register(url,defaults) instead of calling route(url, defaults)');
+	//!steal-remove-end
 	registerRoute.register(url, defaults);
 	return canRoute;
 }
@@ -42,9 +45,9 @@ function canRoute(url, defaults){
 // timer runs down. Each call resets the timer.
 var timer;
 // A dummy events object used to dispatch url change events on.
-var matchedObservable = new Observation(function canRoute_matchedRoute(){
+var currentRuleObservable = new Observation(function canRoute_matchedRoute(){
 	var url = bindingProxy.call("can.getValue");
-	return canRoute.deparam(url).route;
+	return canRoute.rule(url);
 });
 
 
@@ -58,7 +61,7 @@ function updateUrl(serializedData) {
 	timer = setTimeout(function () {
 		// indicate that the hash is set to look like the data
 		var serialized = canReflect.serialize( canRoute.data ),
-			currentRouteName = matchedObservable.get(),
+			currentRouteName = currentRuleObservable.get(),
 			route = routeParam.getMatchedRoute(serialized, currentRouteName),
 			path = routeParam.paramFromRoute(route, serialized);
 
@@ -71,8 +74,6 @@ Object.defineProperty(updateUrl, "name", {
 	value: "can-route.updateUrl"
 });
 //!steal-remove-end
-
-
 
 
 // Deparameterizes the portion of the hash of interest and assign the
@@ -158,39 +159,7 @@ assign(canRoute, {
 		canRoute.data = data;
 	},
 
-	/**
-	 * @function can-route.start start
-	 * @parent can-route.static
-	 * @release 3.3
-	 *
-	 * Initializes can-route.
-	 *
-	 * @signature `route.start()`
-	 *
-	 * Sets up the two-way binding between the hash and the can-route observable
-	 * map and sets the route map to its initial values.
-	 *
-	 * ```js
-	 * route("{page}", { page: "home" }));
-	 *
-	 * route.start();
-	 * route.data.page; // -> "home"
-	 * ```
-	 *
-	 * @return {can-route} The can-route object.
-	 *
-	 * @body
-	 *
-	 * ## Use
-	 *
-	 * After setting all your routes, call `route.start()`.
-	 *
-	 * ```js
-	 * route("overview/{dateStart}-{dateEnd}");
-	 * route("{type}/{id}");
-	 * route.start();
-	 * ```
-	 */
+
 	start: function (val) {
 		if (val !== true) {
 			canRoute._setup();
@@ -212,7 +181,7 @@ assign(canRoute, {
 	},
 	url: urlHelpers.url,
 	link: urlHelpers.link,
-	current: urlHelpers.current,
+	isCurrent: urlHelpers.isCurrent,
 	bindings: bindingProxy.bindings,
 
 	// ready calls setup
@@ -241,29 +210,17 @@ assign(canRoute, {
 		}
 		clearTimeout(timer);
 	},
-	/**
-	 * @function can-route.matched matched
-	 * @parent can-route.static
-	 * @description A compute representing the currently matched route.
-	 * @signature `route.matched()`
-	 * @return {String} The currently matched route.
-	 *
-	 * @body
-	 * Use `route.matched()` to find the currently matched route.
-	 *
-	 * ```js
-	 * route("{type}", { type: "foo" });
-	 * route("{type}/{subtype}");
-	 *
-	 * route.matched(); // "{type}"
-	 *
-	 * route.data.subtype = "foo";
-	 *
-	 * route.matched(); // "{type}/{subtype}"
-	 * ```
-	 */
-	matched: makeCompute( matchedObservable )
+
+	currentRule: makeCompute( currentRuleObservable ),
+	register: registerRoute.register,
+	rule: function(url){
+		var rule = routeDeparam.getRule(url);
+		if(rule) {
+			return rule.route;
+		}
+	}
 });
+
 
 // The functions in the following list applied to `canRoute` (e.g. `canRoute.attr('...')`) will
 // instead act on the `canRoute.data` observe.
@@ -367,6 +324,7 @@ var stringCoercingMapDecorator = function(map) {
 	return map;
 };
 
+var viewModelSymbol = canSymbol.for("can.viewModel");
 Object.defineProperty(canRoute,"data", {
 	get: function(){
 		if(routeData) {
@@ -378,6 +336,9 @@ Object.defineProperty(canRoute,"data", {
 	set: function(data) {
 		if( canReflect.isConstructorLike(data) ){
 			data = new data();
+		}
+		if(data && data[viewModelSymbol] !== undefined) {
+			data = data[viewModelSymbol];
 		}
 		// if it’s a map, we make it always set strings for backwards compat
 		if( "attr" in data ) {
@@ -409,5 +370,9 @@ canRoute.attr = function(prop, value){
 
 
 canReflect.setKeyValue(canRoute, canSymbol.for("can.isFunctionLike"), false);
+
+// LEGACY
+canRoute.matched = canRoute.currentRule;
+canRoute.current = canRoute.isCurrent;
 
 module.exports = namespace.route = canRoute;
