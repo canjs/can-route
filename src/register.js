@@ -1,12 +1,13 @@
 // This file contains the function that allows the registration of routes
-var diff = require('can-util/js/diff/diff');
-var diffObject = require('can-util/js/diff-object/diff-object');
+var canReflect = require("can-reflect");
 
-var dev = require('can-util/js/dev/dev');
-var each = require('can-util/js/each/each');
+var dev = require('can-log/dev/dev');
 
 var bindingProxy = require("./binding-proxy");
 var regexps = require("./regexps");
+
+var diff = require('can-util/js/diff/diff');
+var diffObject = require('can-util/js/diff-object/diff-object');
 // `RegExp` used to match route variables of the type '{name}'.
 // Any word character or a period is matched.
 
@@ -74,7 +75,7 @@ var RouteRegistry = {
 
     	//!steal-remove-start
     	// warn if new route uses same map properties as an existing route
-    	each(RouteRegistry.routes, function(r) {
+    	canReflect.eachKey(RouteRegistry.routes, function(r) {
     		var existingKeys = r.names.concat(Object.keys(r.defaults)).sort();
     		var keys = names.concat(Object.keys(defaults)).sort();
     		var sameMapKeys = !diff(existingKeys, keys).length;

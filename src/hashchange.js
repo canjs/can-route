@@ -3,12 +3,13 @@ var paramsMatcher = /^(?:&[^=]+=[^&]*)+/;
 
 var LOCATION = require('can-globals/location/location');
 var canReflect = require("can-reflect");
-var domEvents = require("can-util/dom/events/events");
+
 var ObservationRecorder = require("can-observation-recorder");
 var queues = require("can-queues");
 var KeyTree = require("can-key-tree");
 var SimpleObservable = require("can-simple-observable");
 
+var domEvents = require("can-dom-events");
 
 function getHash(){
     var loc = LOCATION();
@@ -21,10 +22,10 @@ function HashchangeObservable() {
     this.handlers = new KeyTree([Object,Array],{
         onFirst: function(){
             self.value = getHash();
-            domEvents.addEventListener.call(window, 'hashchange', dispatchHandlers);
+            domEvents.addEventListener(window, 'hashchange', dispatchHandlers);
         },
         onEmpty: function(){
-            domEvents.removeEventListener.call(window, 'hashchange', dispatchHandlers);
+            domEvents.removeEventListener(window, 'hashchange', dispatchHandlers);
         }
     });
 }

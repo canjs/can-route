@@ -2,9 +2,9 @@
 /* jshint -W079 */
 var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
-var makeArray = require('can-util/js/make-array/make-array');
-var dev = require('can-util/js/dev/dev');
-var CanMap = require("can-map");
+var canReflect = require('can-reflect');
+
+
 QUnit.module("can/route with can-map", {
 	setup: function () {
 		canRoute._teardown();
@@ -22,7 +22,7 @@ var setupRouteTest = function(callback){
 	var iframe = document.createElement('iframe');
 	stop();
 	window.routeTestReady = function(iCanRoute){
-		var args = makeArray(arguments)
+		var args = canReflect.toArray(arguments)
 		args.unshift(iframe);
 		callback.apply(null, args);
 	};

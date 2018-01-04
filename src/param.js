@@ -1,7 +1,4 @@
-var each = require('can-util/js/each/each');
-var assign = require("can-util/js/assign/assign");
-var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
-
+var canReflect = require("can-reflect");
 var param = require('can-param');
 
 var register = require("./register");
@@ -44,16 +41,15 @@ function getMatchedRoute(data, routeName) {
         // Need to have at least 1 match.
         matches = 0,
         matchCount,
-        routeName,
         propCount = 0;
 
     delete data.route;
 
-    each(data, function () {
+    canReflect.eachKey(data, function () {
         propCount++;
     });
     // Otherwise find route.
-    each(register.routes, function (temp, name) {
+    canReflect.eachKey(register.routes, function (temp, name) {
         // best route is the first with all defaults matching
 
         matchCount = matchesData(temp, data);
@@ -80,7 +76,7 @@ function paramFromRoute(route, data) {
 		matcher;
 	if (route) {
 
-        cpy = assign({}, data);
+        cpy = canReflect.assignMap({}, data);
         // fall back to legacy :foo RegExp if necessary
         matcher = regexps.colon.test(route.route) ? regexps.colon : regexps.curlies;
         // Create the url by replacing the var names with the provided data.
@@ -91,7 +87,7 @@ function paramFromRoute(route, data) {
         })
         .replace("\\", "");
         // Remove matching default values
-        each(route.defaults, function (val, name) {
+        canReflect.eachKey(route.defaults, function (val, name) {
             if (cpy[name] === val) {
                 delete cpy[name];
             }
@@ -107,7 +103,7 @@ function paramFromRoute(route, data) {
         return res + (after ? bindingProxy.call("querySeparator") + after : "");
     }
     // If no route was found, there is no hash URL, only paramters.
-    return isEmptyObject(data) ? "" :bindingProxy.call("querySeparator") + param(data);
+    return canReflect.size(data) === 0 ? "" :bindingProxy.call("querySeparator") + param(data);
 }
 
 

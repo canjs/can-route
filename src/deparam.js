@@ -1,6 +1,5 @@
 var deparam = require('can-deparam');
 var canReflect = require("can-reflect");
-var deepAssign = require('can-util/js/deep-assign/deep-assign');
 
 var bindingProxy = require("./binding-proxy");
 var register = require("./register");
@@ -108,7 +107,7 @@ function canRoute_deparam(url) {
             obj = (remainder && paramsMatcher.test(remainder)) ? deparam(remainder.slice(1)) : {};
 
         // Add the default values for this route.
-        obj = deepAssign(true, {}, route.defaults, obj);
+        obj = canReflect.assignDeep(canReflect.assignDeep({}, route.defaults), obj);
         // Overwrite each of the default values in `obj` with those in
         // parts if that part is not empty.
         parts.forEach(function (part, i) {

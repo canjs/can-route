@@ -1,6 +1,6 @@
 var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
-var dev = require('can-util/js/dev/dev');
+var dev = require('can-log/dev/dev');
 
 QUnit.module("can-route .param and .deparam",{
     setup: function(){
@@ -18,7 +18,7 @@ test("deparam and rule", function () {
 	var obj = canRoute.deparam("can.Control");
 	deepEqual(obj, {
 		page: "can.Control"
-	});
+	}, "deparam");
     QUnit.equal(canRoute.rule("can.Control"), "{page}");
 
 	obj = canRoute.deparam("");
