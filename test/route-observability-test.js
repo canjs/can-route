@@ -25,7 +25,7 @@ QUnit.test("on/off binding", function () {
 
 //var queues = require("can-queues");
 //queues.log("flush");
-test("matched() compute", function() {
+test("currentRule() compute", function() {
 
 	mockRoute.start();
 	QUnit.stop();
@@ -39,15 +39,15 @@ test("matched() compute", function() {
 	var appState = new AppState();
 
 	canRoute.data = appState;
-	canRoute("{type}", { type: "foo" });
-	canRoute("{type}/{subtype}");
+	canRoute.register("{type}", { type: "foo" });
+	canRoute.register("{type}/{subtype}");
 	canRoute.start();
 
 	equal(appState.route, undefined, "should not set route on appState");
-	equal(canRoute.matched(), "{type}", "should set route.matched property");
+	equal(canRoute.currentRule(), "{type}", "should set route.currentRule property");
 	appState.subtype = "bar";
 	var check = function(){
-		if(canRoute.matched() === "{type}/{subtype}") {
+		if(canRoute.currentRule() === "{type}/{subtype}") {
 			QUnit.ok(true, "moved to right route");
 			mockRoute.stop();
 			start();

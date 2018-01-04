@@ -357,8 +357,7 @@ test("escaping periods", function () {
 
 	var obj = canRoute.deparam("can.Control.html");
 	deepEqual(obj, {
-		page: "can.Control",
-		route: "{page}\\.html"
+		page: "can.Control"
 	});
 
 	equal(canRoute.param({

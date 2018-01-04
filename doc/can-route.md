@@ -1,38 +1,43 @@
-@function can-route can-route
+@module {Object} can-route can-route
 @group can-route.static static
 @download can/route
 @test can-route/test.html
 @parent can-routing
 @collection can-core
 @link ../docco/route/route.html docco
-@package ./package.json
+@package ../package.json
 
-@description Manage browser history and client state by synchronizing the `window.location.hash` with a map.
+@description Manage browser history and client state by synchronizing the `window.location.hash` with an observable.
 
-@signature `route(template [, defaults])`
+@type {Object}
 
-Create a route matching rule. Optionally provide defaults that will be applied to the underlying map when the route matches.
+  Exports an object with `can-route`'s methods. The
+  following describes the properties and methods on
+  the can-route export:
 
-```js
-route("{page}", { page: "home" });
-```
+  ```js
+  {
+    data,     // The bound observable.
+    register, // Register routes that translate between
+              // the url and the bound observable.
+    start     // Begin updating the bound observable with
+              // url data and vice versa.
 
-Will apply **cart** when the url is `#cart` and **home** when the url is `#`.
+    deparam,  // Given url fragment, return the data for it.
+    rule,     // Given url fragment, return the routing rule
 
-@param {String} template the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces ( { } ). Identifiers wrapped in braces are interpreted as being properties on can-route’s map. Examples:
+    param,    // Given data, return a url fragment.
+    url,      // Given data, return a url for it.
+    link      // Given data, return an <a> tag for it.
 
-```js
-route("{foo}")
-route("foo/{bar}")
-```
-
-@param {Object} [defaults] An object of default values. These defaults are applied to can-route’s map when the route is matched.
-
-@return {can-route}
+    isCurrent,  // Given data, return true if the current url matches
+                // the data.
+    currentRule // Return the matched rule name.
+  }
+  ```
 
 @body
 
-## Use
 
 ## Background information
 
@@ -64,13 +69,57 @@ the data in can-route looks like:
 
     { type: 'videos', id: 5 }
 
-can-route keeps the state of the hash in-sync with the `data` contained within it.
+can-route keeps the state of the hash in-sync with the [can-route.data] contained within it.
 
 ## data
 
-Underlying `can-route` is an observable map: `route.data`. Depending on what type of map your application uses this could be a [can-map], a [can-define/map/map], or maybe even a [can-simple-map].
+Underlying `can-route` is an observable map: [can-route.data can-route.data]. Depending on what type of map your application uses this could be a [can-define/map/map], [can-observe.Object] or maybe even a [can-simple-map].
 
-Here’s an example using [can-define/map/map DefineMap] to back `can-route`:
+Typically, the map is the view-model of the top-level [can-component] in your
+application.  For example, the following defines `<my-app>`, and uses the view-model
+of a `<my-app>` element already in the page as the `route.data`:
+
+```js
+import Component from "can-component";
+import route from "can-route";
+import DefineMap from "can-define/map/map";
+import stache from "can-stache";
+import "can-stache-route-helpers";
+
+Component.extend({
+    tag: "my-app",
+    autoMount: true,
+    ViewModel: DefineMap.extend({
+        page: "string"
+    }),
+    view: stache(`
+        {{#switch(page)}}
+            {{#case("home")}}
+                <h1>Home Page</h1>
+                <a href="{{#routeUrl(page='products')}}">Products</a>
+            {{/case}}
+            {{#case("products")}}
+                <h1>Products</h1>
+                <a href="{{#routeUrl(page='home')}}">Home</a>
+            {{/case}}
+            {{#default()}}
+                <h1>Page Not Found</h1>
+                <a href="{{#routeUrl(page='home')}}">Home</a>
+            {{/default}}
+        {{/switch}}
+    `)
+});
+
+route.data = document.querySelector("my-app");
+route.register("{page}");
+route.start();
+```
+
+> NOTE: The `route.data = document.querySelector("my-app")` statement is what
+> sets `route.data` to `<my-app>`'s view-model.
+
+An observable can be set as `route.data` directly.  The following sets `route.data`
+to an `AppViewModel` instance:
 
 ```js
 var DefineMap = require("can-define/map/map");
@@ -82,7 +131,7 @@ var AppViewModel = DefineMap.extend({
 
 var appState = new AppViewModel();
 route.data = appState;
-route('{page}', {page: 'home'});
+route.register('{page}', {page: 'home'});
 route.start();
 ```
 
@@ -90,33 +139,40 @@ Understanding how maps work is essential to understanding `can-route`.
 
 You can listen to changes in a map with `on(eventName, handler(ev, args...))` and change `can-route`’s properties by modifying `route.data`.
 
-### Listening to changes in can-route
+### Listening to changes in state
 
-Listen to changes in history by [can-event.addEventListener listening] to
-changes of can-route’s `matched` compute:
+Listen to changes in the url by listening on the underlying route data.  For example,
+your route data and rule might have a page property:
 
 ```js
-route.matched.on('change', function(ev, attr, how, newVal, oldVal) {
-	// attr changed from oldVal -> newVal
+var AppViewModel = DefineMap.extend({
+    page: "string"
 });
+route.data = new AppViewModel();
+route.register("{page}");
+route.start();
 ```
 
- - `attr` - the name of the changed attribute
- - `how` - the type of Observe change event (add, set or remove)
- - `newVal`/`oldVal` - the new and old values of the attribute
+You can listen to when the url changes from `"#!recipes"` to `"#!settings"` with:
+
+```js
+route.data.on('page', function(ev, newVal, oldVal) {
+	// page changed from "recipes" to "settings"
+});
+```
 
 ### Updating can-route
 
 When using a [can-define/map/map DefineMap] to back can-route, create changes in the route data by modifying it directly:
 
 ```js
-route.data.type = 'image';
+route.data.page = 'images';
 ```
 
 Or change multiple properties at once like:
 
 ```js
-route.data.set({type: 'page', id: 5}, true);
+route.data.update({page: 'tasks', id: 5});
 ```
 
 When you make changes to can-route, they will automatically
@@ -145,14 +201,14 @@ The location hash will look like this:
 
 ## Creating a route
 
-Use `route(url, defaults)` to create a
-route. A route is a mapping from a url to
-an object (that is the route’s state).
+Use `route.register(url, defaults)` to create a
+routing rule. A rule is a mapping from a url to
+an object (that is the route’s data).
 In order to map to a specific properties in the url,
 prepend a colon to the name of the property like:
 
 ```js
-route("#!content/{type}");
+route.register("#!content/{type}");
 ```
 
 If no routes are added, or no route is matched,
@@ -169,7 +225,7 @@ can-route looks for matching routes and uses them
 to update can-route’s data.
 
 ```js
-route("#!content/{type}");
+route.register("#!content/{type}");
 location.hash = "#!content/images";
 // route -> {type : "images"}
 route.data.type = "songs";
@@ -179,7 +235,7 @@ route.data.type = "songs";
 Default values can be added to a route:
 
 ```js
-route("content/{type}",{type: "videos" });
+route.register("content/{type}",{type: "videos" });
 location.hash = "#!content/"
 // route -> {type : "videos"}
 // location.hash -> "#!content/"
@@ -188,7 +244,7 @@ location.hash = "#!content/"
 Defaults can also be set on the root page of your app:
 
 ```js
-route("", { page: "index" });
+route.register("", { page: "index" });
 location.hash = "#!";
 // route -> {page : "index"}
 // location.hash -> "#!"
@@ -226,7 +282,7 @@ route.link("Videos", {type: 'videos'});
 
 ## Finding the matched route
 
-The matched route is stored in the compute `route.matched` and is used to set the `window.location.hash`. The process can-route uses to find the matched route is:
+The matched rule is stored in the compute `route.currentRule` and is used to set the `window.location.hash`. The process can-route uses to find the matched rule is:
   - Find all routes with all of their map properties set
   - If multiple routes are matched, find the route with the highest number of set properties
   - If multiple routes are still matched, use the route that was registered first
@@ -236,25 +292,25 @@ The matched route is stored in the compute `route.matched` and is used to set th
 In order for a route to be matched, all of the map properties it uses must be set. For example, in the following route, `page` and `section` must be set in order for this route to be matched:
 
 ```js
-route('{page}/{section}');
+route.register('{page}/{section}');
 route.start();
 
 route.data.page = 'contact';
 route.data.section = 'email';
 
-route.matched(); // "{page}/{section}"
+route.currentRule(); // "{page}/{section}"
 ```
 
 If a route contains default values, these map properties must also be set to match the default value in order for the route to be matched:
 
 ```js
-route('{page}', { section: 'email' });
+route.register('{page}', { section: 'email' });
 route.start();
 
 route.data.page = 'contact';
 route.data.section = 'email';
 
-route.matched(); // "{page}"
+route.currentRule(); // "{page}"
 ```
 
 ### Find the route with the highest number of set properties
@@ -262,14 +318,14 @@ route.matched(); // "{page}"
 If multiple routes have all of their properties set, the route with the highest number of set properties will be used:
 
 ```js
-route('{page}');
-route('{page}/{section}');
+route.register('{page}');
+route.register('{page}/{section}');
 route.start();
 
 route.data.page = 'two';
 route.data.section = 'a';
 
-route.matched(); // "{page}/{section}"
+route.currentRule(); // "{page}/{section}"
 ```
 
 ### Find the route that was registered first
@@ -277,12 +333,12 @@ route.matched(); // "{page}/{section}"
 If multiple routes are still matched, the route that was registered first will be matched:
 
 ```js
-route('', { page: 'home' });
-route('{section}');
+route.register('', { page: 'home' });
+route.register('{section}');
 route.start();
 
 route.data.page = 'home';
 route.data.section = 'a';
 
-route.matched(); // ""
+route.currentRule(); // ""
 ```

@@ -1,5 +1,5 @@
 var deparam = require('can-deparam');
-var each = require('can-util/js/each/each');
+var canReflect = require("can-reflect");
 var deepAssign = require('can-util/js/deep-assign/deep-assign');
 
 var bindingProxy = require("./binding-proxy");
@@ -12,6 +12,30 @@ var decode = function(str){
 		return unescape(str);
 	}
 };
+
+function canRoute_getRule(url){
+	var root =bindingProxy.call("root");
+    if (root.lastIndexOf("/") === root.length - 1 &&
+        url.indexOf("/") === 0) {
+        url = url.substr(1);
+    }
+
+    // See if the url matches any routes by testing it against the `route.test` `RegExp`.
+    // By comparing the URL length the most specialized route that matches is used.
+    var route = {
+        length: -1
+    };
+
+    canReflect.eachKey(register.routes, function (temp, name) {
+        if (temp.test.test(url) && temp.length > route.length) {
+            route = temp;
+        }
+    });
+    // If a route was matched.
+    if (route.length > -1) {
+		return route;
+	}
+}
 
 /**
  * @function can-route.deparam deparam
@@ -65,30 +89,13 @@ var decode = function(str){
  *   // -> { id: 5, route: "{type}/{id}", type: "videos" }
  * ```
  */
-module.exports = function canRoute_deparam(url) {
+function canRoute_deparam(url) {
 
-    // remove the url
-    var root =bindingProxy.call("root");
-    if (root.lastIndexOf("/") === root.length - 1 &&
-        url.indexOf("/") === 0) {
-        url = url.substr(1);
-    }
-
-    // See if the url matches any routes by testing it against the `route.test` `RegExp`.
-    // By comparing the URL length the most specialized route that matches is used.
-    var route = {
-        length: -1
-    },
-        querySeparator =bindingProxy.call("querySeparator"),
-        paramsMatcher =bindingProxy.call("paramsMatcher");
-
-    each(register.routes, function (temp, name) {
-        if (temp.test.test(url) && temp.length > route.length) {
-            route = temp;
-        }
-    });
+    var route = canRoute_getRule(url),
+		querySeparator =bindingProxy.call("querySeparator"),
+		paramsMatcher =bindingProxy.call("paramsMatcher");
     // If a route was matched.
-    if (route.length > -1) {
+    if (route) {
 
         var // Since `RegExp` backreferences are used in `route.test` (parens)
         // the parts will contain the full matched string and each variable (back-referenced) value.
@@ -104,12 +111,11 @@ module.exports = function canRoute_deparam(url) {
         obj = deepAssign(true, {}, route.defaults, obj);
         // Overwrite each of the default values in `obj` with those in
         // parts if that part is not empty.
-        each(parts, function (part, i) {
+        parts.forEach(function (part, i) {
             if (part && part !== querySeparator) {
                 obj[route.names[i]] = decode(part);
             }
         });
-        obj.route = route.route;
         return obj;
     }
     // If no route was matched, it is parsed as a `&amp;key=value` list.
@@ -117,4 +123,9 @@ module.exports = function canRoute_deparam(url) {
         url = querySeparator + url;
     }
     return paramsMatcher.test(url) ? deparam(url.slice(1)) : {};
-};
+}
+
+canRoute_deparam.getRule = canRoute_getRule;
+
+
+module.exports = canRoute_deparam;
