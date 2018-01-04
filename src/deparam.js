@@ -12,13 +12,19 @@ var decode = function(str){
 	}
 };
 
-function canRoute_getRule(url){
+// TODO: I'm not totally sure this belongs here. This might be shifted to can-route-pushstate.
+function toURLFragment(url){
 	var root =bindingProxy.call("root");
-    if (root.lastIndexOf("/") === root.length - 1 &&
-        url.indexOf("/") === 0) {
+	// if the root ends with `/` and the url starts with it, remove /
+    if (root.lastIndexOf("/") === root.length - 1 && url.indexOf("/") === 0) {
         url = url.substr(1);
     }
+	return url;
+}
 
+function canRoute_getRule(url){
+
+	url = toURLFragment(url);
     // See if the url matches any routes by testing it against the `route.test` `RegExp`.
     // By comparing the URL length the most specialized route that matches is used.
     var route = {
@@ -93,7 +99,10 @@ function canRoute_deparam(url) {
     var route = canRoute_getRule(url),
 		querySeparator =bindingProxy.call("querySeparator"),
 		paramsMatcher =bindingProxy.call("paramsMatcher");
-    // If a route was matched.
+
+	url = toURLFragment(url);
+
+	// If a route was matched.
     if (route) {
 
         var // Since `RegExp` backreferences are used in `route.test` (parens)
