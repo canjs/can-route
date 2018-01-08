@@ -228,19 +228,15 @@ if (typeof steal !== 'undefined') {
 				var time = new Date()
 				setTimeout(function innerTimer() {
 					var after = loc.href.substr(loc.href.indexOf("#"));
-					if (after === "#!bar/" + encodeURIComponent("\/")) {
+					var isMatch = after === "#!bar/" + encodeURIComponent("\/");
+					var isWaitingTooLong = new Date() - time > 2000;
+					if (isMatch || isWaitingTooLong) {
 						equal(after, "#!bar/" + encodeURIComponent("\/"), "should go to type/id");
-
 						teardownRouteTest();
-					} else if (new Date() - time > 2000) {
-						ok(false, "hash is " + after);
-						can.remove(can.$(iframe))
 					} else {
-						setTimeout(innerTimer, 30)
+						setTimeout(innerTimer, 30);
 					}
-
 				}, 100);
-
 			}, 100);
 
 		});
