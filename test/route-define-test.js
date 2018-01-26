@@ -493,7 +493,7 @@ if (typeof steal !== 'undefined') {
 				teardownRouteTest();
 			})
 
-			iCanRoute.ready();
+			iCanRoute.start();
 
 			setTimeout(function () {
 
@@ -512,7 +512,7 @@ if (typeof steal !== 'undefined') {
 				ok(true, 'change triggered once')
 				start();
 			});
-			iCanRoute.ready();
+			iCanRoute.start();
 		}
 		var iframe = document.createElement('iframe');
 		iframe.src = __dirname+"/define-testing.html?5";
@@ -529,7 +529,7 @@ if (typeof steal !== 'undefined') {
 
 				iCanRoute.serializedCompute.unbind('change');
 				iCanRoute.serializedCompute.bind('change', function(){
-					
+
 					equal(iCanRoute.attr('personId'), '3', 'personId');
 					equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
 					iCanRoute.unbind('change');
@@ -541,7 +541,7 @@ if (typeof steal !== 'undefined') {
 				}, 100);
 
 			});
-			iCanRoute.ready();
+			iCanRoute.start();
 			setTimeout(function () {
 
 				iframe.contentWindow.location.hash = '#!foo=bar';
@@ -559,7 +559,7 @@ if (typeof steal !== 'undefined') {
 			iCanRoute.map(appState);
 
 			loc.hash = "#!cat/5";
-			iCanRoute.ready();
+			iCanRoute.start();
 
 			setTimeout(function () {
 
@@ -583,7 +583,7 @@ if (typeof steal !== 'undefined') {
 
 			iCanRoute.map(appState);
 			loc.hash = "#!cat/5";
-			iCanRoute.ready();
+			iCanRoute.start();
 
 			setTimeout(function () {
 
@@ -605,7 +605,7 @@ if (typeof steal !== 'undefined') {
 	test("updating the hash", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
-			iCanRoute.ready();
+			iCanRoute.start();
 			iCanRoute("{type}/{id}");
 			iCanRoute.attr({
 				type: "bar",
@@ -627,7 +627,7 @@ if (typeof steal !== 'undefined') {
 
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
-			iCanRoute.ready()
+			iCanRoute.start()
 			iCanRoute("active");
 			iCanRoute("");
 
@@ -646,7 +646,7 @@ if (typeof steal !== 'undefined') {
 
 	test("unsticky routes", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute.ready();
+			iCanRoute.start();
 			iCanRoute("{type}");
 			iCanRoute("{type}/{id}");
 			iCanRoute.attr({
@@ -685,7 +685,7 @@ if (typeof steal !== 'undefined') {
 
 	test("canRoute.current is live-bindable (#1156)", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc, win) {
-			iCanRoute.ready();
+			iCanRoute.start();
 			var isOnTestPage = new win.ObserveInfo(
 				function(){
 					return iCanRoute.current({page: "test"});
@@ -709,7 +709,7 @@ if (typeof steal !== 'undefined') {
 	test("can.compute.read should not call canRoute (#1154)", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc, win) {
 			iCanRoute.attr("page","test");
-			iCanRoute.ready();
+			iCanRoute.start();
 
 			var val = win.observeReader.read({route: iCanRoute},win.observeReader.reads("route")).value;
 
@@ -723,7 +723,7 @@ if (typeof steal !== 'undefined') {
 	test("routes should deep clean", function() {
 		expect(2);
 		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute.ready();
+			iCanRoute.start();
 			var hash1 = canRoute.url({
 				panelA: {
 					name: "fruit",
@@ -762,7 +762,7 @@ if (typeof steal !== 'undefined') {
 			var appVM = new MyMap();
 
 			route.map(appVM);
-			route.ready();
+			route.start();
 
 			appVM.bind('action', function(ev, newVal) {
 				strictEqual(newVal, '10');
@@ -786,7 +786,7 @@ if (typeof steal !== 'undefined') {
 			}))();
 
 			route.map(appVM);
-			route.ready();
+			route.start();
 
 			appVM.bind('action', function(ev, newVal) {
 				equal(typeof newVal, 'function');
@@ -805,7 +805,7 @@ if (typeof steal !== 'undefined') {
 		stop();
 		window.routeTestReady = function (iCanRoute, loc) {
 
-			iCanRoute.ready();
+			iCanRoute.start();
 			iCanRoute("{path}");
 
 			iCanRoute.attr('path', 'foo');
@@ -962,7 +962,7 @@ test("two way binding canRoute.map with DefineMap instance", function(){
 
 
 	canRoute.map(appState);
-	canRoute.ready();
+	canRoute.start();
 
 	canRoute.serializedCompute.bind('change', function(){
 
@@ -988,7 +988,7 @@ test(".url with merge=true", function(){
 
 
 	canRoute.map(appState);
-	canRoute.ready();
+	canRoute.start();
 
 	QUnit.stop();
 
@@ -1013,7 +1013,7 @@ test(".url with merge=true (#16)", function(){
 
 
 	canRoute.map(appState);
-	canRoute.ready();
+	canRoute.start();
 
 	QUnit.stop();
 
@@ -1047,7 +1047,7 @@ test("matched() compute", function() {
 	canRoute.data = appState;
 	canRoute("{type}", { type: "foo" });
 	canRoute("{type}/{subtype}");
-	canRoute.ready();
+	canRoute.start();
 
 	equal(appState.route, undefined, "should not set route on appState");
 	equal(canRoute.matched(), "{type}", "should set route.matched property");
@@ -1098,7 +1098,7 @@ test("param with whitespace in interpolated string (#45)", function () {
 test("triggers __url event anytime a there's a change to individual properties", function(){
 	mockRoute.start();
 
-	var AppState = DefineMap.extend({seal: false},{"*": "stringOrObservable"});
+	var AppState = DefineMap.extend({seal: false},{"*": "stringOrObservable", page: "string", section: "string"});
 	var appState = new AppState({});
 
 	canRoute.data = appState;
@@ -1106,32 +1106,34 @@ test("triggers __url event anytime a there's a change to individual properties",
 	canRoute('{page}/{section}');
 
 	QUnit.stop();
-	canRoute.ready();
+	canRoute.start();
 
 	var matchedCount = 0;
-	canRoute.on('__url', function() {
+	var onMatchCall = {
+		1: function section_a() {
+			canRoute.data.section = 'a';
+		},
+		2: function section_b() {
+			canRoute.data.section = 'b';
+		},
+		3: function(){
+			// 1st call is going from undefined to empty string
+			equal(matchedCount, 3, 'calls __url event every time a property is changed');
+
+			canRoute.off('__url', updateMatchedCount);
+			mockRoute.stop();
+			QUnit.start();
+		}
+	};
+	var updateMatchedCount = function() {
 		// any time a route property is changed, not just the matched route
 		matchedCount++;
-	});
+		onMatchCall[matchedCount]();
+	};
+	canRoute.on('__url', updateMatchedCount);
 
-	setTimeout(function() {
+	setTimeout(function page_two() {
 		canRoute.data.page = 'two';
-	}, 30);
-
-	setTimeout(function() {
-		canRoute.data.section = 'a';
-	}, 60);
-
-	setTimeout(function() {
-		canRoute.data.section = 'b';
-	}, 90);
-
-	setTimeout(function(){
-		// 1st call is going from undefined to empty string
-		equal(matchedCount, 4, 'calls __url event every time a property is changed');
-
-		mockRoute.stop();
-		QUnit.start();
-	}, 200);
+	}, 50);
 
 });
