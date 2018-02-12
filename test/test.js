@@ -6,3 +6,4 @@ require("./route-observability-test");
 require("./route-observe-test");
 require("./route-define-test");
 require("./route-map-test");
+require("./route-stop-test");
