@@ -211,6 +211,11 @@ canReflect.assignMap(canRoute, {
 		clearTimeout(timer);
 	},
 
+	stop: function() {
+		this._teardown();
+		return canRoute;
+	},
+
 	currentRule: makeCompute( currentRuleObservable ),
 	register: registerRoute.register,
 	rule: function(url){
@@ -220,7 +225,6 @@ canReflect.assignMap(canRoute, {
 		}
 	}
 });
-
 
 // The functions in the following list applied to `canRoute` (e.g. `canRoute.attr('...')`) will
 // instead act on the `canRoute.data` observe.
