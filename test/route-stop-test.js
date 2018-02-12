@@ -7,6 +7,7 @@ require('can-observation');
 
 QUnit.module("can-route.stop", {
 	setup: function () {
+		mock.stop();
 		canRoute.defaultBinding = "mock";
 		this.fixture = document.getElementById("qunit-fixture");
 	}
@@ -16,6 +17,7 @@ test("Calling route.stop() tears down bindings", function(){
 	QUnit.stop();
 	mock.start();
 
+	canRoute.routes = {};
 	canRoute.register("{page}");
 	canRoute.start();
 
