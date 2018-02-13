@@ -20,7 +20,7 @@
     data,     // The bound observable.
     register, // Register routes that translate between
               // the url and the bound observable.
-    start     // Begin updating the bound observable with
+    start,    // Begin updating the bound observable with
               // url data and vice versa.
 
     deparam,  // Given url fragment, return the data for it.
@@ -28,11 +28,11 @@
 
     param,    // Given data, return a url fragment.
     url,      // Given data, return a url for it.
-    link      // Given data, return an <a> tag for it.
+    link,     // Given data, return an <a> tag for it.
 
-    isCurrent,  // Given data, return true if the current url matches
-                // the data.
-    currentRule // Return the matched rule name.
+    isCurrent,   // Given data, return true if the current url matches
+                 // the data.
+    currentRule, // Return the matched rule name.
   }
   ```
 
