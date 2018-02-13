@@ -10,7 +10,7 @@ Sets up the two-way binding between the hash and the can-route observable
 map and sets the route map to its initial values.
 
 ```js
-route("{page}", { page: "home" }));
+route("{page}", { page: "home" });
 
 route.start();
 route.data.page; // -> "home"

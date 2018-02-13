@@ -28,8 +28,8 @@ import route from "can-route";
 Component.extend({
 	tag: "my-app",
 	autoMount: true,
-	ViewModel: ...,
-	view: ...
+	ViewModel: { ... },
+	view: { ... }
 })
 
 route.data = document.querySelector("my-app");
