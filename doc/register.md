@@ -11,14 +11,14 @@ The following sets `route.data.page = "cart"` when the url is `#cart` and
 `route.data.page = "home"` when the url is `#`.
 
 ```js
-route.register("{page}", { page: "home" });
+route.register( "{page}", { page: "home" } );
 ```
 
 @param {String} rule the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces ( { } ). Identifiers wrapped in braces are interpreted as being properties on can-route’s map. Examples:
 
 ```js
-route.register("{foo}")
-route.register("foo/{bar}")
+route.register( "{foo}" );
+route.register( "foo/{bar}" );
 ```
 
 @param {Object} [defaults] An object of default values. These defaults are applied to can-route’s map when the route is matched.

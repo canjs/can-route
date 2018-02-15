@@ -9,12 +9,10 @@ Stops listening to the [can-route.data] observable and tears down any setup bind
 Stops listening to changes in the URL as well as the observable defined in [can-route.data], and removes the current binding.
 
 ```js
-route.register("{page}", { page: "home" }));
-
+route.register( "{page}", { page: "home" } );
 route.start();
 route.data.page = "home";
 route.stop();
-
 route.data.page = "cart"; // hash is still #home
 ```
 

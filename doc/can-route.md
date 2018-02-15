@@ -16,25 +16,22 @@
   the can-route export:
 
   ```js
-  {
-    data,     // The bound observable.
-    register, // Register routes that translate between
-              // the url and the bound observable.
-    start,    // Begin updating the bound observable with
-              // url data and vice versa.
-
-    deparam,  // Given url fragment, return the data for it.
-    rule,     // Given url fragment, return the routing rule
-
-    param,    // Given data, return a url fragment.
-    url,      // Given data, return a url for it.
-    link,     // Given data, return an <a> tag for it.
-
-    isCurrent,   // Given data, return true if the current url matches
-                 // the data.
-    currentRule, // Return the matched rule name.
-  }
-  ```
+{
+	data,     // The bound observable.
+	register, // Register routes that translate between
+	// the url and the bound observable.
+	start,    // Begin updating the bound observable with
+	// url data and vice versa.
+	deparam,  // Given url fragment, return the data for it.
+	rule,     // Given url fragment, return the routing rule
+	param,    // Given data, return a url fragment.
+	url,      // Given data, return a url for it.
+	link,     // Given data, return an <a> tag for it.
+	isCurrent,   // Given data, return true if the current url matches
+	// the data.
+	currentRule // Return the matched rule name.
+}
+```
 
 @body
 
@@ -85,33 +82,31 @@ import route from "can-route";
 import DefineMap from "can-define/map/map";
 import stache from "can-stache";
 import "can-stache-route-helpers";
-
-Component.extend({
-    tag: "my-app",
-    autoMount: true,
-    ViewModel: DefineMap.extend({
-        page: "string"
-    }),
-    view: stache(`
-        {{#switch(page)}}
-            {{#case("home")}}
-                <h1>Home Page</h1>
-                <a href="{{#routeUrl(page='products')}}">Products</a>
-            {{/case}}
-            {{#case("products")}}
-                <h1>Products</h1>
-                <a href="{{#routeUrl(page='home')}}">Home</a>
-            {{/case}}
-            {{#default()}}
-                <h1>Page Not Found</h1>
-                <a href="{{#routeUrl(page='home')}}">Home</a>
-            {{/default}}
-        {{/switch}}
-    `)
-});
-
-route.data = document.querySelector("my-app");
-route.register("{page}");
+Component.extend( {
+	tag: "my-app",
+	autoMount: true,
+	ViewModel: DefineMap.extend( {
+		page: "string"
+	} ),
+	view: stache( `
+{{#switch(page)}}
+{{#case("home")}}
+<h1>Home Page</h1>
+<a href="{{#routeUrl(page='products')}}">Products</a>
+{{/case}}
+{{#case("products")}}
+<h1>Products</h1>
+<a href="{{#routeUrl(page='home')}}">Home</a>
+{{/case}}
+{{#default()}}
+<h1>Page Not Found</h1>
+<a href="{{#routeUrl(page='home')}}">Home</a>
+{{/default}}
+{{/switch}}
+` )
+} );
+route.data = document.querySelector( "my-app" );
+route.register( "{page}" );
 route.start();
 ```
 
@@ -122,16 +117,14 @@ An observable can be set as `route.data` directly.  The following sets `route.da
 to an `AppViewModel` instance:
 
 ```js
-var DefineMap = require("can-define/map/map");
-var route = require("can-route");
-
-var AppViewModel = DefineMap.extend({
-    page: "string"
-});
-
-var appState = new AppViewModel();
+import DefineMap from "can-define/map/map";
+import route from "can-route";
+const AppViewModel = DefineMap.extend( {
+	page: "string"
+} );
+const appState = new AppViewModel();
 route.data = appState;
-route.register('{page}', {page: 'home'});
+route.register( "{page}", { page: "home" } );
 route.start();
 ```
 
@@ -145,20 +138,21 @@ Listen to changes in the url by listening on the underlying route data.  For exa
 your route data and rule might have a page property:
 
 ```js
-var AppViewModel = DefineMap.extend({
-    page: "string"
-});
+const AppViewModel = DefineMap.extend( {
+	page: "string"
+} );
 route.data = new AppViewModel();
-route.register("{page}");
+route.register( "{page}" );
 route.start();
 ```
 
 You can listen to when the url changes from `"#!recipes"` to `"#!settings"` with:
 
 ```js
-route.data.on('page', function(ev, newVal, oldVal) {
-	// page changed from "recipes" to "settings"
-});
+route.data.on( "page", function( ev, newVal, oldVal ) {
+
+// page changed from "recipes" to "settings"
+} );
 ```
 
 ### Updating can-route
@@ -166,13 +160,13 @@ route.data.on('page', function(ev, newVal, oldVal) {
 When using a [can-define/map/map DefineMap] to back can-route, create changes in the route data by modifying it directly:
 
 ```js
-route.data.page = 'images';
+route.data.page = "images";
 ```
 
 Or change multiple properties at once like:
 
 ```js
-route.data.update({page: 'tasks', id: 5});
+route.data.update( { page: "tasks", id: 5 } );
 ```
 
 When you make changes to can-route, they will automatically
@@ -186,9 +180,10 @@ If the change in your route data includes a `/`, the `/` will be encoded into `%
 You will see this result in the URL and `location.hash`.
 
 ```js
-route.data.type = 'image/bar';
+route.data.type = "image/bar";
+
 // OR
-route.attr('type', 'image/bar');
+route.attr( "type", "image/bar" );
 ```
 
 The URL will look like this:
@@ -208,7 +203,7 @@ In order to map to a specific properties in the url,
 prepend a colon to the name of the property like:
 
 ```js
-route.register("#!content/{type}");
+route.register( "#!content/{type}" );
 ```
 
 If no routes are added, or no route is matched,
@@ -217,6 +212,7 @@ hash.
 
 ```js
 location.hash = "#!type=videos";
+
 // route -> {type : "videos"}
 ```
 
@@ -225,18 +221,21 @@ can-route looks for matching routes and uses them
 to update can-route’s data.
 
 ```js
-route.register("#!content/{type}");
+route.register( "#!content/{type}" );
 location.hash = "#!content/images";
+
 // route -> {type : "images"}
 route.data.type = "songs";
+
 // location.hash -> "#!content/songs"
 ```
 
 Default values can be added to a route:
 
 ```js
-route.register("content/{type}",{type: "videos" });
-location.hash = "#!content/"
+route.register( "content/{type}", { type: "videos" } );
+location.hash = "#!content/";
+
 // route -> {type : "videos"}
 // location.hash -> "#!content/"
 ```
@@ -244,8 +243,9 @@ location.hash = "#!content/"
 Defaults can also be set on the root page of your app:
 
 ```js
-route.register("", { page: "index" });
+route.register( "", { page: "index" } );
 location.hash = "#!";
+
 // route -> {page : "index"}
 // location.hash -> "#!"
 ```
@@ -266,7 +266,7 @@ directly. Instead, you can change properties on can-route
 like:
 
 ```js
-route.data.type = 'videos';
+route.data.type = "videos";
 ```
 
 This will automatically look up the appropriate
@@ -277,7 +277,7 @@ the [can-route.link] and [can-route.url] helpers to make this
 easy:
 
 ```js
-route.link("Videos", {type: 'videos'});
+route.link( "Videos", { type: "videos" } );
 ```
 
 ## Finding the matched route
@@ -292,24 +292,20 @@ The matched rule is stored in the compute `route.currentRule` and is used to set
 In order for a route to be matched, all of the map properties it uses must be set. For example, in the following route, `page` and `section` must be set in order for this route to be matched:
 
 ```js
-route.register('{page}/{section}');
+route.register( "{page}/{section}" );
 route.start();
-
-route.data.page = 'contact';
-route.data.section = 'email';
-
+route.data.page = "contact";
+route.data.section = "email";
 route.currentRule(); // "{page}/{section}"
 ```
 
 If a route contains default values, these map properties must also be set to match the default value in order for the route to be matched:
 
 ```js
-route.register('{page}', { section: 'email' });
+route.register( "{page}", { section: "email" } );
 route.start();
-
-route.data.page = 'contact';
-route.data.section = 'email';
-
+route.data.page = "contact";
+route.data.section = "email";
 route.currentRule(); // "{page}"
 ```
 
@@ -318,13 +314,11 @@ route.currentRule(); // "{page}"
 If multiple routes have all of their properties set, the route with the highest number of set properties will be used:
 
 ```js
-route.register('{page}');
-route.register('{page}/{section}');
+route.register( "{page}" );
+route.register( "{page}/{section}" );
 route.start();
-
-route.data.page = 'two';
-route.data.section = 'a';
-
+route.data.page = "two";
+route.data.section = "a";
 route.currentRule(); // "{page}/{section}"
 ```
 
@@ -333,12 +327,10 @@ route.currentRule(); // "{page}/{section}"
 If multiple routes are still matched, the route that was registered first will be matched:
 
 ```js
-route.register('', { page: 'home' });
-route.register('{section}');
+route.register( "", { page: "home" } );
+route.register( "{section}" );
 route.start();
-
-route.data.page = 'home';
-route.data.section = 'a';
-
+route.data.page = "home";
+route.data.section = "a";
 route.currentRule(); // ""
 ```
