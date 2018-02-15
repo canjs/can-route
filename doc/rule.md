@@ -6,10 +6,9 @@
 @signature `route.rule(url)`
 
 ```js
-route.register("recipes/{recipeId}");
-route.register("tasks/{taskId}");
-
-route.rule("recipes/5") //-> "recipes/{recipeId}"
+route.register( "recipes/{recipeId}" );
+route.register( "tasks/{taskId}" );
+route.rule( "recipes/5" ); //-> "recipes/{recipeId}"
 ```
 
 @param {String} url A url or url fragment.
