@@ -79,32 +79,31 @@ of a `<my-app>` element already in the page as the `route.data`:
 ```js
 import Component from "can-component";
 import route from "can-route";
-import DefineMap from "can-define/map/map";
-import stache from "can-stache";
 import "can-stache-route-helpers";
-Component.extend( {
-	tag: "my-app",
-	autoMount: true,
-	ViewModel: DefineMap.extend( {
-		page: "string"
-	} ),
-	view: stache( `
-{{#switch(page)}}
-{{#case("home")}}
-<h1>Home Page</h1>
-<a href="{{#routeUrl(page='products')}}">Products</a>
-{{/case}}
-{{#case("products")}}
-<h1>Products</h1>
-<a href="{{#routeUrl(page='home')}}">Home</a>
-{{/case}}
-{{#default()}}
-<h1>Page Not Found</h1>
-<a href="{{#routeUrl(page='home')}}">Home</a>
-{{/default}}
-{{/switch}}
-` )
-} );
+
+Component.extend({
+    tag: "my-app",
+    ViewModel: {
+        page: "string"
+    },
+    view: `
+        {{#switch(page)}}
+            {{#case("home")}}
+                <h1>Home Page</h1>
+                <a href="{{#routeUrl(page='products')}}">Products</a>
+            {{/case}}
+            {{#case("products")}}
+                <h1>Products</h1>
+                <a href="{{#routeUrl(page='home')}}">Home</a>
+            {{/case}}
+            {{#default()}}
+                <h1>Page Not Found</h1>
+                <a href="{{#routeUrl(page='home')}}">Home</a>
+            {{/default}}
+        {{/switch}}
+    `
+});
+
 route.data = document.querySelector( "my-app" );
 route.register( "{page}" );
 route.start();
