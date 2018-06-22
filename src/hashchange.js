@@ -3,6 +3,7 @@ var paramsMatcher = /^(?:&[^=]+=[^&]*)+/;
 
 var LOCATION = require('can-globals/location/location');
 var canReflect = require("can-reflect");
+var canSymbol = require("can-symbol");
 
 var ObservationRecorder = require("can-observation-recorder");
 var queues = require("can-queues");
@@ -12,63 +13,65 @@ var SimpleObservable = require("can-simple-observable");
 var domEvents = require("can-dom-events");
 
 function getHash(){
-    var loc = LOCATION();
-    return loc.href.split(/#!?/)[1] || "";
+	var loc = LOCATION();
+	return loc.href.split(/#!?/)[1] || "";
 }
 
 function HashchangeObservable() {
-    var dispatchHandlers =  this.dispatchHandlers.bind(this);
-    var self = this;
-    this.handlers = new KeyTree([Object,Array],{
-        onFirst: function(){
-            self.value = getHash();
-            domEvents.addEventListener(window, 'hashchange', dispatchHandlers);
-        },
-        onEmpty: function(){
-            domEvents.removeEventListener(window, 'hashchange', dispatchHandlers);
-        }
-    });
+	var dispatchHandlers =  this.dispatchHandlers.bind(this);
+	var self = this;
+	this.handlers = new KeyTree([Object,Array],{
+		onFirst: function(){
+			self.value = getHash();
+			domEvents.addEventListener(window, 'hashchange', dispatchHandlers);
+		},
+		onEmpty: function(){
+			domEvents.removeEventListener(window, 'hashchange', dispatchHandlers);
+		}
+	});
 }
 HashchangeObservable.prototype = Object.create(SimpleObservable.prototype);
 HashchangeObservable.constructor = HashchangeObservable;
 canReflect.assign(HashchangeObservable.prototype,{
-    // STUFF NEEDED FOR can-route integration
-    paramsMatcher: paramsMatcher,
-    querySeparator: "&",
-    // don't greedily match slashes in routing rules
-    matchSlashes: false,
-    root: "#!",
-    dispatchHandlers: function() {
-        var old = this.value;
-        this.value = getHash();
-        if(old !== this.value) {
-        	if(process.env.NODE_ENV !== 'production') {
-	            queues.enqueueByQueue(this.handlers.getNode([]), this, [this.value, old]
-	                //!steal-remove-start
-	                /* jshint laxcomma: true */
-	                , null
-	                , [ canReflect.getName(this), "changed to", this.value, "from", old ]
-	                /* jshint laxcomma: false */
-	                //!steal-remove-end
-	            );
-        	} else {
-        		queues.enqueueByQueue(this.handlers.getNode([]), this, [this.value, old]);
-        	}
-        }
-    },
-    get: function(){
-        ObservationRecorder.add(this);
-        return getHash();
-    },
-    set: function(path){
-        var loc = LOCATION();
-        if(!path && !loc.path) {
+	// STUFF NEEDED FOR can-route integration
+	paramsMatcher: paramsMatcher,
+	querySeparator: "&",
+	// don't greedily match slashes in routing rules
+	matchSlashes: false,
+	root: "#!",
+	dispatchHandlers: function() {
+		var old = this.value;
+		this.value = getHash();
+		if(old !== this.value) {
+			var  reasonLog = [];
+			//!steal-remove-start
+			if(process.env.NODE_ENV !== 'production') {
+				reasonLog = [ canReflect.getName(this), "changed to", this.value, "from", old ];
+			}
+			//!steal-remove-end
+			
+			
+			queues.enqueueByQueue(this.handlers.getNode([]), this, [this.value, old]
+				/* jshint laxcomma: true */
+				, null
+				, reasonLog
+				/* jshint laxcomma: false */
+			);
+		}
+	},
+	get: function(){
+		ObservationRecorder.add(this);
+		return getHash();
+	},
+	set: function(path){
+		var loc = LOCATION();
+		if(!path && !loc.path) {
 
-        } else if(loc.hash !== "#" + path) {
-            loc.hash = "!" + path;
-        }
-        return path;
-    }
+		} else if(loc.hash !== "#" + path) {
+			loc.hash = "!" + path;
+		}
+		return path;
+	}
 });
 
 var hashchangeObservableProto = {
@@ -84,7 +87,7 @@ var hashchangeObservableProto = {
 
 //!steal-remove-start
 if(process.env.NODE_ENV !== 'production') {
-	hashchangeObservableProto["can.getName"] = function() {
+	hashchangeObservableProto[canSymbol.for("can.getName")] = function() {
 		return "HashchangeObservable<" + this.value + ">";
 	};
 }
