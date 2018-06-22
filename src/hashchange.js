@@ -42,14 +42,18 @@ canReflect.assign(HashchangeObservable.prototype,{
         var old = this.value;
         this.value = getHash();
         if(old !== this.value) {
-            queues.enqueueByQueue(this.handlers.getNode([]), this, [this.value, old]
-                //!steal-remove-start
-                /* jshint laxcomma: true */
-                , null
-                , [ canReflect.getName(this), "changed to", this.value, "from", old ]
-                /* jshint laxcomma: false */
-                //!steal-remove-end
-            );
+        	if(process.env.NODE_ENV !== 'production') {
+	            queues.enqueueByQueue(this.handlers.getNode([]), this, [this.value, old]
+	                //!steal-remove-start
+	                /* jshint laxcomma: true */
+	                , null
+	                , [ canReflect.getName(this), "changed to", this.value, "from", old ]
+	                /* jshint laxcomma: false */
+	                //!steal-remove-end
+	            );
+        	} else {
+        		queues.enqueueByQueue(this.handlers.getNode([]), this, [this.value, old]);
+        	}
         }
     },
     get: function(){
@@ -67,7 +71,7 @@ canReflect.assign(HashchangeObservable.prototype,{
     }
 });
 
-canReflect.assignSymbols(HashchangeObservable.prototype,{
+var hashchangeObservableProto = {
 	"can.getValue": HashchangeObservable.prototype.get,
 	"can.setValue": HashchangeObservable.prototype.set,
 	"can.onValue": HashchangeObservable.prototype.on,
@@ -75,12 +79,17 @@ canReflect.assignSymbols(HashchangeObservable.prototype,{
 	"can.isMapLike": false,
 	"can.valueHasDependencies": function(){
 		return true;
-	},
-	//!steal-remove-start
-	"can.getName": function() {
+	}
+};
+
+//!steal-remove-start
+if(process.env.NODE_ENV !== 'production') {
+	hashchangeObservableProto["can.getName"] = function() {
 		return "HashchangeObservable<" + this.value + ">";
-	},
-	//!steal-remove-end
-});
+	};
+}
+//!steal-remove-end
+
+canReflect.assignSymbols(HashchangeObservable.prototype, hashchangeObservableProto);
 
 module.exports = new HashchangeObservable();

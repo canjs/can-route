@@ -49,9 +49,11 @@ var RouteRegistry = {
     		matcher = regexps.colon;
 
     		//!steal-remove-start
-    		dev.warn('update route "' + url + '" to "' + url.replace(regexps.colon, function(name, key) {
-    			return '{' + key + '}';
-    		}) + '"');
+    		if(process.env.NODE_ENV !== 'production') {
+	    		dev.warn('update route "' + url + '" to "' + url.replace(regexps.colon, function(name, key) {
+	    			return '{' + key + '}';
+	    		}) + '"');
+    		}
     		//!steal-remove-end
     	} else {
     		matcher = regexps.curlies;
@@ -74,22 +76,24 @@ var RouteRegistry = {
     		.replace("\\", "");
 
     	//!steal-remove-start
-    	// warn if new route uses same map properties as an existing route
-    	canReflect.eachKey(RouteRegistry.routes, function(r) {
-    		var existingKeys = r.names.concat(Object.keys(r.defaults)).sort();
-    		var keys = names.concat(Object.keys(defaults)).sort();
-    		var sameMapKeys = !diff(existingKeys, keys).length;
-    		var sameDefaultValues = !diffObject(r.defaults, defaults).length;
-    		//the regex removes the trailing slash
-    		var matchingRoutesWithoutTrailingSlash = r.route.replace(/\/$/, "") === url.replace(/\/$/, "");
+    	if(process.env.NODE_ENV !== 'production') {
+	    	// warn if new route uses same map properties as an existing route
+	    	canReflect.eachKey(RouteRegistry.routes, function(r) {
+	    		var existingKeys = r.names.concat(Object.keys(r.defaults)).sort();
+	    		var keys = names.concat(Object.keys(defaults)).sort();
+	    		var sameMapKeys = !diff(existingKeys, keys).length;
+	    		var sameDefaultValues = !diffObject(r.defaults, defaults).length;
+	    		//the regex removes the trailing slash
+	    		var matchingRoutesWithoutTrailingSlash = r.route.replace(/\/$/, "") === url.replace(/\/$/, "");
 
-    		if (sameMapKeys && sameDefaultValues && !matchingRoutesWithoutTrailingSlash) {
-    			dev.warn('two routes were registered with matching keys:\n' +
-    				'\t(1) route("' + r.route + '", ' + JSON.stringify(r.defaults) + ')\n' +
-    				'\t(2) route("' + url + '", ' + JSON.stringify(defaults) + ')\n' +
-    				'(1) will always be chosen since it was registered first');
-    		}
-    	});
+	    		if (sameMapKeys && sameDefaultValues && !matchingRoutesWithoutTrailingSlash) {
+	    			dev.warn('two routes were registered with matching keys:\n' +
+	    				'\t(1) route("' + r.route + '", ' + JSON.stringify(r.defaults) + ')\n' +
+	    				'\t(2) route("' + url + '", ' + JSON.stringify(defaults) + ')\n' +
+	    				'(1) will always be chosen since it was registered first');
+	    		}
+	    	});
+    	}
     	//!steal-remove-end
     	// Add route in a form that can be easily figured out.
     	return RouteRegistry.routes[url] = {
