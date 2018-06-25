@@ -41,22 +41,28 @@ canReflect.assign(HashchangeObservable.prototype,{
 	root: "#!",
 	dispatchHandlers: function() {
 		var old = this.value;
+		var queuesArgs = [];
 		this.value = getHash();
 		if(old !== this.value) {
-			var  reasonLog = [];
+			queuesArgs = [
+				this.handlers.getNode([]), 
+				this, 
+				[this.value, old]
+			];
 			//!steal-remove-start
 			if(process.env.NODE_ENV !== 'production') {
-				reasonLog = [ canReflect.getName(this), "changed to", this.value, "from", old ];
+				queuesArgs = [
+					this.handlers.getNode([]), 
+					this, 
+					[this.value, old]
+					/* jshint laxcomma: true */
+					, null
+					, [ canReflect.getName(this), "changed to", this.value, "from", old ]
+					/* jshint laxcomma: false */
+				]
 			}
 			//!steal-remove-end
-			
-			
-			queues.enqueueByQueue(this.handlers.getNode([]), this, [this.value, old]
-				/* jshint laxcomma: true */
-				, null
-				, reasonLog
-				/* jshint laxcomma: false */
-			);
+			queues.enqueueByQueue.apply(queues, queuesArgs);
 		}
 	},
 	get: function(){
