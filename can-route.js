@@ -1,3 +1,4 @@
+"use strict";
 /*jshint -W079 */
 var queues = require("can-queues");
 var Observation = require('can-observation');

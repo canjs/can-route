@@ -1,3 +1,4 @@
+"use strict";
 // This file contains the function that allows the registration of routes
 var canReflect = require("can-reflect");
 

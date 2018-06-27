@@ -1,3 +1,4 @@
+"use strict";
 var bindingProxy = require("./binding-proxy");
 var routeDeparam = require("./deparam");
 var routeParam = require("./param");
