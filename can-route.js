@@ -31,7 +31,9 @@ bindingProxy.defaultBinding = "hashchange";
 
 function canRoute(url, defaults){
 	//!steal-remove-start
-	devLog.warn('Call route.register(url,defaults) instead of calling route(url, defaults)');
+	if(process.env.NODE_ENV !== 'production') {
+		devLog.warn('Call route.register(url,defaults) instead of calling route(url, defaults)');
+	}
 	//!steal-remove-end
 	registerRoute.register(url, defaults);
 	return canRoute;
@@ -70,9 +72,11 @@ function updateUrl(serializedData) {
 }
 
 //!steal-remove-start
-Object.defineProperty(updateUrl, "name", {
-	value: "can-route.updateUrl"
-});
+if(process.env.NODE_ENV !== 'production') {
+	Object.defineProperty(updateUrl, "name", {
+		value: "can-route.updateUrl"
+	});
+}
 //!steal-remove-end
 
 
@@ -96,9 +100,11 @@ function updateRouteData() {
 
 }
 //!steal-remove-start
-Object.defineProperty(updateRouteData, "name", {
-	value: "can-route.updateRouteData"
-});
+if(process.env.NODE_ENV !== 'production') {
+	Object.defineProperty(updateRouteData, "name", {
+		value: "can-route.updateRouteData"
+	});
+}
 //!steal-remove-end
 
 
@@ -154,7 +160,9 @@ canReflect.assignMap(canRoute, {
 	deparam: routeDeparam,
 	map: function(data){
 		//!steal-remove-start
-		devLog.warn('Set route.data directly instead of calling route.map');
+		if(process.env.NODE_ENV !== 'production') {
+			devLog.warn('Set route.data directly instead of calling route.map');
+		}
 		//!steal-remove-end
 		canRoute.data = data;
 	},
