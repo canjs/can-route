@@ -1,4 +1,5 @@
 /*jshint -W079 */
+var Bind = require("can-bind");
 var queues = require("can-queues");
 var Observation = require('can-observation');
 
@@ -71,15 +72,6 @@ function updateUrl(serializedData) {
 	}, 10);
 }
 
-//!steal-remove-start
-if(process.env.NODE_ENV !== 'production') {
-	Object.defineProperty(updateUrl, "name", {
-		value: "can-route.updateUrl"
-	});
-}
-//!steal-remove-end
-
-
 // Deparameterizes the portion of the hash of interest and assign the
 // values to the `route.data` removing existing values no longer in the hash.
 // updateRouteData is called typically by hashchange which fires asynchronously
@@ -99,13 +91,6 @@ function updateRouteData() {
 	queues.batch.stop();
 
 }
-//!steal-remove-start
-if(process.env.NODE_ENV !== 'production') {
-	Object.defineProperty(updateRouteData, "name", {
-		value: "can-route.updateRouteData"
-	});
-}
-//!steal-remove-end
 
 
 /**
@@ -205,15 +190,54 @@ canReflect.assignMap(canRoute, {
 	// called when the route is ready
 	_setup: function () {
 		if (!canRoute.currentBinding) {
-			bindingProxy.call("can.onValue", updateRouteData);
-			canReflect.onValue( canRoute.serializedObservation, updateUrl, "notify");
 			canRoute.currentBinding =canRoute.defaultBinding;
+
+			var bindingOptions = {
+
+				// The parent is the hashchange observable
+				parent: bindingProxy.bindings[canRoute.currentBinding],
+				setParent: updateUrl,
+
+				// The child is route.data
+				child: canRoute.serializedObservation,
+				setChild: updateRouteData,
+
+				// On init, we do not want the child set to the parent’s value; this is
+				// handled by start() for reasons mentioned there.
+				onInitDoNotUpdateChild: true,
+
+				// Cycles are allowed because updateUrl is async; if another change
+				// happens during its setTimeout, then without cycles the change would
+				// be ignored :( TODO: Can this be removed if updateUrl stops using
+				// setTimeout in a major version?
+				cycles: 1,
+
+				// Listen for changes in the notify queue
+				queue: "notify"
+
+			};
+
+			// For debugging: the names that will be assigned to the updateChild and
+			// updateParent functions within can-bind
+			//!steal-remove-start
+			if (process.env.NODE_ENV !== 'production') {
+				bindingOptions.updateChildName = "can-route.updateRouteData";
+				bindingOptions.updateParentName = "can-route.updateUrl";
+			}
+			//!steal-remove-end
+
+			// Create a new binding with can-bind
+			canRoute._canBinding = new Bind(bindingOptions);
+
+			// …and turn it on!
+			canRoute._canBinding.start();
+
 		}
 	},
 	_teardown: function () {
 		if (canRoute.currentBinding) {
-			bindingProxy.call("can.offValue", updateRouteData);
-			canReflect.offValue( canRoute.serializedObservation, updateUrl, "notify");
+			canRoute._canBinding.stop();
+			canRoute._canBinding = null;
 			canRoute.currentBinding = null;
 		}
 		clearTimeout(timer);
