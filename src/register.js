@@ -6,8 +6,8 @@ var dev = require('can-log/dev/dev');
 var bindingProxy = require("./binding-proxy");
 var regexps = require("./regexps");
 
-var diff = require('can-util/js/diff/diff');
-var diffObject = require('can-util/js/diff-object/diff-object');
+var diff = require('can-diff/list/list');
+var diffObject = require('can-diff/map/map');
 // `RegExp` used to match route variables of the type '{name}'.
 // Any word character or a period is matched.
 
