@@ -12,7 +12,8 @@ require('can-observation');
 QUnit.module("can/route with can-define/map/map", {
 	setup: function () {
 		canRoute._teardown();
-		canRoute.defaultBinding = "hashchange";
+		canRoute.urlData = canRoute.bindings.hashchange
+		//canRoute.defaultBinding = "hashchange";
 		this.fixture = document.getElementById("qunit-fixture");
 	}
 })
@@ -65,23 +66,6 @@ if (typeof steal !== 'undefined') {
 		});
 
 	});
-	//require("can-queues").log("flush");
-	/*test("initial route fires twice", function () {
-		stop();
-		expect(1);
-		window.routeTestReady = function (iCanRoute, loc) {
-			iCanRoute("", {});
-			debugger;
-			iCanRoute.matched.bind('change', function(){
-				ok(true, 'change triggered once')
-				start();
-			});
-			iCanRoute.start();
-		}
-		var iframe = document.createElement('iframe');
-		iframe.src = __dirname+"/define-testing.html?5";
-		this.fixture.appendChild(iframe);
-	});*/
 
 	test("removing things from the hash", function () {
 
@@ -114,11 +98,11 @@ if (typeof steal !== 'undefined') {
 	test("canRoute.map: conflicting route values, hash should win (canjs/canjs#979)", function(){
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
-			iCanRoute("{type}/{id}");
+			iCanRoute.register("{type}/{id}");
 			var AppState = DefineMap.extend({seal: false},{});
 			var appState = new AppState({type: "dog", id: '4'});
 
-			iCanRoute.map(appState);
+			iCanRoute.data = appState;
 
 			loc.hash = "#!cat/5";
 			iCanRoute.start();
@@ -141,17 +125,17 @@ if (typeof steal !== 'undefined') {
 		mockRoute.start();
 
 
-		canRoute("{type}/{id}");
+		canRoute.register("{type}/{id}");
 		var AppState = DefineMap.extend({seal: false},{});
 		var appState = new AppState({section: 'home'});
 
 		canRoute.data = appState;
-		mockRoute.hash.set("#!cat/5"); // type and id get added ... this will call update url to add everything
+		mockRoute.hash.value = "#!cat/5"; // type and id get added ... this will call update url to add everything
 		canRoute.start();
 
 		setTimeout(function () {
 
-			equal(mockRoute.hash.get(), "#cat/5&section=home", "same URL");
+			equal(mockRoute.hash.value, "cat/5&section=home", "same URL");
 			equal(appState.get("type"), "cat", "hash populates the appState");
 			equal(appState.get("id"), "5", "hash populates the appState");
 			equal(appState.get("section"), "home", "appState keeps its properties");
@@ -169,7 +153,7 @@ if (typeof steal !== 'undefined') {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
 			iCanRoute.start();
-			iCanRoute("{type}/{id}");
+			iCanRoute.register("{type}/{id}");
 			iCanRoute.attr({
 				type: "bar",
 				id: "\/"
@@ -191,8 +175,8 @@ if (typeof steal !== 'undefined') {
 		QUnit.stop();
 
 		mockRoute.start();
-		canRoute("active");
-		canRoute("");
+		canRoute.register("active");
+		canRoute.register("");
 
 		mockRoute.hash.set("#active");
 		canRoute.start()
@@ -200,7 +184,7 @@ if (typeof steal !== 'undefined') {
 		setTimeout(function () {
 
 			var after = mockRoute.hash.get();
-			equal(after, "#active");
+			equal(after, "active");
 			mockRoute.stop();
 			QUnit.start();
 
@@ -210,8 +194,8 @@ if (typeof steal !== 'undefined') {
 	test("unsticky routes", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 			iCanRoute.start();
-			iCanRoute("{type}");
-			iCanRoute("{type}/{id}");
+			iCanRoute.register("{type}");
+			iCanRoute.register("{type}/{id}");
 			iCanRoute.attr({
 				type: "bar"
 			});
@@ -315,7 +299,7 @@ if (typeof steal !== 'undefined') {
 			var MyMap = DefineMap.extend({seal: false},{'*': "stringOrObservable"});
 			var appVM = new MyMap();
 
-			route.map(appVM);
+			route.data = appVM;
 			route.start();
 
 			appVM.bind('action', function(ev, newVal) {
@@ -339,7 +323,7 @@ if (typeof steal !== 'undefined') {
 				action: {serialize: false, type: "*"}
 			}))();
 
-			route.map(appVM);
+			route.data = appVM;
 			route.start();
 
 			appVM.bind('action', function(ev, newVal) {
@@ -360,7 +344,7 @@ if (typeof steal !== 'undefined') {
 		window.routeTestReady = function (iCanRoute, loc) {
 
 			iCanRoute.start();
-			iCanRoute("{path}");
+			iCanRoute.register("{path}");
 
 			iCanRoute.attr('path', 'foo');
 			setTimeout(function() {
@@ -398,7 +382,7 @@ if (typeof steal !== 'undefined') {
 test("escaping periods", function () {
 
 	canRoute.routes = {};
-	canRoute("{page}\\.html", {
+	canRoute.register("{page}\\.html", {
 		page: "index"
 	});
 
@@ -469,7 +453,7 @@ if (typeof require === 'undefined') {
 			});
 
 			route.routes = {};
-			route("{type}/{id}");
+			route.register("{type}/{id}");
 
 			route.attr({
 				type: 'page',
@@ -514,7 +498,7 @@ test("two way binding canRoute.map with DefineMap instance", function(){
 
 
 
-	canRoute.map(appState);
+	canRoute.data = appState;
 	canRoute.start();
 
 	canRoute.serializedCompute.bind('change', function(){
@@ -524,7 +508,7 @@ test("two way binding canRoute.map with DefineMap instance", function(){
 		appState.name = undefined;
 
 		setTimeout(function(){
-			equal( mockRoute.hash.get(), "#");
+			equal( mockRoute.hash.get(), "");
 			mockRoute.stop();
 			start();
 		},20);
@@ -540,7 +524,7 @@ test(".url with merge=true", function(){
 	var appState = new AppState({});
 
 
-	canRoute.map(appState);
+	canRoute.data = appState;
 	canRoute.start();
 
 	QUnit.stop();
@@ -566,7 +550,7 @@ test(".url with merge=true", function(){
 
 test("param with whitespace in interpolated string (#45)", function () {
 	canRoute.routes = {};
-	canRoute("{ page }", {
+	canRoute.register("{ page }", {
 		page: "index"
 	})
 
@@ -575,7 +559,7 @@ test("param with whitespace in interpolated string (#45)", function () {
 	});
 	equal(res, "")
 
-	canRoute("pages/{ p1 }/{    p2   }/{	p3	}", {
+	canRoute.register("pages/{ p1 }/{    p2   }/{	p3	}", {
 		p1: "index",
 		p2: "foo",
 		p3: "bar"
@@ -604,8 +588,8 @@ test("triggers __url event anytime a there's a change to individual properties",
 	var appState = new AppState({});
 
 	canRoute.data = appState;
-	canRoute('{page}');
-	canRoute('{page}/{section}');
+	canRoute.register('{page}');
+	canRoute.register('{page}/{section}');
 
 	QUnit.stop();
 	canRoute.start();

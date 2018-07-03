@@ -10,7 +10,7 @@ var Counter = DefineMap.extend("Counter",{
     }
 });
 
-route("",{count: 0});
+route.register("",{count: 0});
 
 window.myCounter = new Counter();
 route.data = myCounter;

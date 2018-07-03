@@ -88,8 +88,8 @@ var RouteRegistry = {
 
 	    		if (sameMapKeys && sameDefaultValues && !matchingRoutesWithoutTrailingSlash) {
 	    			dev.warn('two routes were registered with matching keys:\n' +
-	    				'\t(1) route("' + r.route + '", ' + JSON.stringify(r.defaults) + ')\n' +
-	    				'\t(2) route("' + url + '", ' + JSON.stringify(defaults) + ')\n' +
+	    				'\t(1) route.register("' + r.route + '", ' + JSON.stringify(r.defaults) + ')\n' +
+	    				'\t(2) route.register("' + url + '", ' + JSON.stringify(defaults) + ')\n' +
 	    				'(1) will always be chosen since it was registered first');
 	    		}
 	    	});

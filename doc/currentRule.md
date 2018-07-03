@@ -12,8 +12,8 @@
 Use `route.currentRule()` to find the current route rule.
 
 ```js
-route( "{type}", { type: "foo" } );
-route( "{type}/{subtype}" );
+route.register( "{type}", { type: "foo" } );
+route.register( "{type}/{subtype}" );
 route.currentRule(); // "{type}"
 route.data.subtype = "foo";
 route.currentRule(); // "{type}/{subtype}"
