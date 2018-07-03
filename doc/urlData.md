@@ -4,35 +4,29 @@
 Specifies an observable value that represents the URL. Useful for changing
 what URL [can-route route] is cross-bound to.
 
+@type {ValueObservable} `urlData` is an observable value that represents the part of the URL cross
+  bound to the [can-route.data] state object.  It can be set to other observable urls like [can-route-pushstate]
+  or [can-route-mock]. It defaults to [can-route-hash].
 
-@type {ValueObservable} `urlData` is an observable value that represents the part of the URL cross bound to the
-[can-route.data] state object.  It can be set to other observable urls like [can-route-pushstate]
-or [can-route-mock]. It defaults to [can-route-hash].
+  The following shows setting `urlData` to another observable.
 
-The following shows setting `urlData` to another observable.
+  ```js
+  import {route, RouteMock, DefineMap} from "can";
 
-```js
-import {route, RouteMock, DefineMap} from "can";
+  // route.data will update routeMock and be updated by changes in
+  // routeMock.
+  var routeMock = route.urlData = new RouteMock();
+  var routeData = route.data = new DefineMap({},false);
 
-// route.data will update routeMock and be updated by changes in
-// routeMock.
-var routeMock = route.urlData = new RouteMock();
-var routeData = route.data = new DefineMap({},false);
+  // begin binding
+  route.start()
 
-// begin binding
-route.start()
+  // simulate setting the URL
+  routeMock.value = "foo=bar";
 
-// simulate setting the URL
-routeMock.value = "foo=bar";
-
-routeData.foo //-> "bar";
-```
-@codepen
-
-
-
-
-
+  routeData.foo //-> "bar";
+  ```
+  @codepen
 
 @body
 
