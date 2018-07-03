@@ -52,4 +52,6 @@ Besides implementing the standard `ValueObservable` symbols:
 
 The `ValueObservable` should include the following properties:
 
-- `paramsMatcher` - A regular expression used to test if the URL is formatted correctly for [can-route.deparam]
+- `paramsMatcher` - A regular expression used to test if the URL is formatted correctly for [can-route.deparam].
+- `querySeparator` - A string that separates when arbitrary key-value pairs begin in the url (Example: `"?"`).
+- `root` - A string value used to identify the part of the url where routing begins.  For example, [can-route-hash] defaults to `"#!"`
