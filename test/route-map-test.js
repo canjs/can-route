@@ -96,11 +96,11 @@ if (typeof steal !== 'undefined') {
 	test("canRoute.map: conflicting route values, hash should win", function(){
 		setupRouteTest(function (iframe, iCanRoute, loc, win) {
 
-			iCanRoute("{type}/{id}");
+			iCanRoute.register("{type}/{id}");
 			var AppState = win.CanMap.extend();
 			var appState = new AppState({type: "dog", id: '4'});
 
-			iCanRoute.map(appState);
+			iCanRoute.data = appState;
 
 			loc.hash = "#!cat/5";
 			iCanRoute.start();
@@ -121,11 +121,11 @@ if (typeof steal !== 'undefined') {
 	test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(){
 		setupRouteTest(function (iframe, iCanRoute, loc, win) {
 
-			iCanRoute("{type}/{id}");
+			iCanRoute.register("{type}/{id}");
 			var AppState = win.CanMap.extend();
 			var appState = new AppState({section: 'home'});
 
-			iCanRoute.map(appState);
+			iCanRoute.data = appState;
 			loc.hash = "#!cat/5";
 			iCanRoute.start();
 
@@ -150,7 +150,7 @@ if (typeof steal !== 'undefined') {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
 			iCanRoute.start();
-			iCanRoute("{type}/{id}");
+			iCanRoute.register("{type}/{id}");
 			iCanRoute.attr({
 				type: "bar",
 				id: "\/"
@@ -172,8 +172,8 @@ if (typeof steal !== 'undefined') {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
 			iCanRoute.start()
-			iCanRoute("active");
-			iCanRoute("");
+			iCanRoute.register("active");
+			iCanRoute.register("");
 
 			loc.hash = "#!active";
 
@@ -191,8 +191,8 @@ if (typeof steal !== 'undefined') {
 	test("unsticky routes", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 			iCanRoute.start();
-			iCanRoute("{type}");
-			iCanRoute("{type}/{id}");
+			iCanRoute.register("{type}");
+			iCanRoute.register("{type}/{id}");
 			iCanRoute.attr({
 				type: "bar"
 			});
@@ -268,7 +268,7 @@ if (typeof steal !== 'undefined') {
 		setupRouteTest(function (iframe, route, loc, win) {
 			var appVM =  new win.CanMap();
 
-			route.map(appVM);
+			route.data = appVM;
 			route.start();
 
 			appVM.bind('action', function(ev, newVal) {
@@ -284,36 +284,12 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	/*test("updating unserialized prop on bound can.Map causes single update without a coerced string value", function() {
-		expect(1);
-
-		setupRouteTest(function (iframe, route) {
-			var appVM = new (Map.extend({define: {
-				action: {serialize: false}
-			}}))();
-
-			route.map(appVM);
-			route.start();
-
-			appVM.bind('action', function(ev, newVal) {
-				equal(typeof newVal, 'function');
-			});
-
-			appVM.attr('action', function() {});
-
-			// check after 30ms to see that we only have a single call
-			setTimeout(function() {
-				teardownRouteTest();
-			}, 5);
-		});
-	});*/
-
 	test("hash doesn't update to itself with a !", function() {
 		stop();
 		window.routeTestReady = function (iCanRoute, loc) {
 
 			iCanRoute.start();
-			iCanRoute("{path}");
+			iCanRoute.register("{path}");
 
 			iCanRoute.attr('path', 'foo');
 			setTimeout(function() {
@@ -351,7 +327,7 @@ if (typeof steal !== 'undefined') {
 test("escaping periods", function () {
 
 	canRoute.routes = {};
-	canRoute("{page}\\.html", {
+	canRoute.register("{page}\\.html", {
 		page: "index"
 	});
 
@@ -422,7 +398,7 @@ if (typeof require === 'undefined') {
 			});
 
 			route.routes = {};
-			route("{type}/{id}");
+			route.register("{type}/{id}");
 
 			route.attr({
 				type: 'page',

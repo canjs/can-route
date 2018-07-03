@@ -15,15 +15,16 @@ var urlHelpers = require("./src/url-helpers");
 var routeParam = require("./src/param");
 var routeDeparam = require("./src/deparam");
 var bindingProxy = require("./src/binding-proxy");
-var hashchange = require("./src/hashchange");
+var Hashchange = require("can-route-hash");
 
 var isWebWorker =  require('can-globals/is-web-worker/is-web-worker');
 var isBrowserWindow =  require('can-globals/is-browser-window/is-browser-window');
 
-
-
-bindingProxy.bindings.hashchange = hashchange;
+var hashchangeObservable = new Hashchange();
+bindingProxy.bindings.hashchange = hashchangeObservable;
 bindingProxy.defaultBinding = "hashchange";
+bindingProxy.urlDataObservable.value = hashchangeObservable;
+
 
 // ## route.js
 // `can-route`
@@ -129,14 +130,19 @@ Object.defineProperty(canRoute,"defaultBinding",{
 	},
 	set: function(newVal){
 		bindingProxy.defaultBinding = newVal;
+		var observable = bindingProxy.bindings[bindingProxy.defaultBinding];
+		if(observable) {
+			bindingProxy.urlDataObservable.value = observable;
+		}
 	}
 });
-Object.defineProperty(canRoute,"currentBinding",{
+Object.defineProperty(canRoute,"urlData",{
  	get: function(){
-		return bindingProxy.currentBinding;
+		return bindingProxy.urlDataObservable.value;
 	},
 	set: function(newVal){
-		bindingProxy.currentBinding = newVal;
+		canRoute._teardown();
+		bindingProxy.urlDataObservable.value = newVal;
 	}
 });
 
@@ -189,13 +195,12 @@ canReflect.assignMap(canRoute, {
 
 	// called when the route is ready
 	_setup: function () {
-		if (!canRoute.currentBinding) {
-			canRoute.currentBinding =canRoute.defaultBinding;
+		if (!canRoute._canBinding) {
 
 			var bindingOptions = {
 
 				// The parent is the hashchange observable
-				parent: bindingProxy.bindings[canRoute.currentBinding],
+				parent: bindingProxy.urlDataObservable.value,
 				setParent: updateUrl,
 
 				// The child is route.data
@@ -235,10 +240,9 @@ canReflect.assignMap(canRoute, {
 		}
 	},
 	_teardown: function () {
-		if (canRoute.currentBinding) {
+		if (canRoute._canBinding) {
 			canRoute._canBinding.stop();
 			canRoute._canBinding = null;
-			canRoute.currentBinding = null;
 		}
 		clearTimeout(timer);
 	},

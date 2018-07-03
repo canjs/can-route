@@ -10,7 +10,7 @@ QUnit.module("can-route .linkTo",{
 
 QUnit.test("linkTo", function () {
 	canRoute.routes = {};
-	canRoute("{foo}");
+	canRoute.register("{foo}");
 	var res = canRoute.link("Hello", {
 		foo: "bar",
 		baz: 'foo'

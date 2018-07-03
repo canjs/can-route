@@ -17,18 +17,20 @@
 
   ```js
 {
-	data,     // The bound observable.
+	data,     // The bound key-value observable.
+    urlData,  // The observable that represents the
+              // hash. Defaults to RouteHash.
 	register, // Register routes that translate between
-	// the url and the bound observable.
+	          // the url and the bound observable.
 	start,    // Begin updating the bound observable with
-	// url data and vice versa.
+	          // url data and vice versa.
 	deparam,  // Given url fragment, return the data for it.
 	rule,     // Given url fragment, return the routing rule
 	param,    // Given data, return a url fragment.
 	url,      // Given data, return a url for it.
 	link,     // Given data, return an <a> tag for it.
 	isCurrent,   // Given data, return true if the current url matches
-	// the data.
+	             // the data.
 	currentRule // Return the matched rule name.
 }
 ```

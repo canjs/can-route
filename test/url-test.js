@@ -3,6 +3,8 @@ var QUnit = require('steal-qunit');
 var DefineMap = require("can-define/map/");
 
 var mockRoute = require("./mock-route-binding");
+var RouteMock = require("can-route-mock");
+var canReflect = require("can-reflect");
 
 QUnit.module("can-route .url",{
     setup: function(){
@@ -12,20 +14,18 @@ QUnit.module("can-route .url",{
 
 test(".url with merge=true (#16)", function(){
     QUnit.stop();
-	mockRoute.start();
-
+    var oldUsing = canRoute.urlData;
+    var mock = canRoute.urlData = new RouteMock();
 	var AppState = DefineMap.extend({seal: false},{"*": "stringOrObservable"});
 	var appState = new AppState({});
 
 
-	canRoute.map(appState);
+	canRoute.data = appState;
 	canRoute.start();
 
+	appState.update({'foo': 'bar',page: "recipe", id: 5});
 
-
-	appState.set({'foo': 'bar',page: "recipe", id: 5});
-
-    mockRoute.hash.on(function(){
+    canReflect.onValue(mock,function(){
         QUnit.equal(canRoute.url({}, true), "#!&foo=bar&page=recipe&id=5", "empty");
         QUnit.ok(canRoute.url({page: "recipe"}, true), "page:recipe is true");
 
@@ -33,7 +33,7 @@ test(".url with merge=true (#16)", function(){
         QUnit.ok(canRoute.url({page: "recipe", id: 6}, true), "not all equal");
 
         setTimeout(function(){
-            mockRoute.stop();
+            canRoute.urlData = oldUsing;
             QUnit.start();
         },20);
 

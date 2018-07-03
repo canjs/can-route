@@ -518,8 +518,8 @@ if (dev) {
 		expect(1);
 		var oldlog = dev.warn;
 		var expectedWarningText = 'two routes were registered with matching keys:\n' +
-				'\t(1) route("login", {"page":"auth"})\n' +
-				'\t(2) route("signup", {"page":"auth"})\n' +
+				'\t(1) route.register("login", {"page":"auth"})\n' +
+				'\t(2) route.register("signup", {"page":"auth"})\n' +
 				'(1) will always be chosen since it was registered first';
 
 		dev.warn = function(text) {

@@ -25,7 +25,7 @@ test("Calling route.stop() tears down bindings", function(){
 
 	var hash = mock.hash;
 	setTimeout(function(){
-		QUnit.equal(hash.get(), "#home", "set to home");
+		QUnit.equal(hash.get(), "home", "set to home");
 
 		canRoute.stop();
 		canRoute.data = new SimpleMap({page: "home"});
@@ -34,7 +34,7 @@ test("Calling route.stop() tears down bindings", function(){
 		canRoute.data.set("page", "cart");
 
 		setTimeout(function(){
-			QUnit.equal(hash.get(), "#cart", "now it is the cart");
+			QUnit.equal(hash.get(), "cart", "now it is the cart");
 			QUnit.start();
 		}, 30);
 	}, 30);

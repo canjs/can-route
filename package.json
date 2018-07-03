@@ -1,6 +1,6 @@
 {
   "name": "can-route",
-  "version": "4.1.2",
+  "version": "4.2.0-pre.1",
   "description": "Observable front-end application routing for CanJS.",
   "homepage": "https://canjs.com/doc/can-route.html",
   "license": "MIT",
@@ -49,12 +49,14 @@
     "can-simple-map": "^4.0.0",
     "can-simple-observable": "^2.0.0",
     "can-symbol": "^1.0.0",
-    "can-util": "^3.9.0"
+    "can-util": "^3.9.0",
+    "can-route-hash": "<2.0.0"
   },
   "devDependencies": {
     "can-define": "^2.0.0",
     "can-map": "^4.0.0",
     "can-observe": "^2.0.0",
+    "can-route-mock": "<2.0.0",
     "can-stache-key": "^1.0.0",
     "detect-cyclic-packages": "^1.1.0",
     "done-serve": "^1.5.0",
