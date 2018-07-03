@@ -45,12 +45,12 @@
     "can-observation-recorder": "<2.0.0",
     "can-param": "^1.0.1",
     "can-queues": "<2.0.0",
-    "can-reflect": "^1.6.0",
+    "can-reflect": "^1.16.7",
+    "can-route-hash": "<2.0.0",
     "can-simple-map": "^4.0.0",
     "can-simple-observable": "^2.0.0",
-    "can-symbol": "^1.0.0",
-    "can-util": "^3.9.0",
-    "can-route-hash": "<2.0.0"
+    "can-string": "0.0.5",
+    "can-symbol": "^1.0.0"
   },
   "devDependencies": {
     "can-define": "^2.0.0",
