@@ -209,13 +209,13 @@ if (typeof steal !== 'undefined') {
 				});
 
 				// check for 1 second
-				var time = new Date()
+				var time = new Date();
 				setTimeout(function innerTimer() {
 					var after = loc.href.substr(loc.href.indexOf("#"));
 					var isMatch = after === "#!bar/" + encodeURIComponent("\/");
 					var isWaitingTooLong = new Date() - time > 2000;
 					if (isMatch || isWaitingTooLong) {
-						equal(after, "#!bar/" + encodeURIComponent("\/"), "should go to type/id");
+						equal(after, "#!bar/" + encodeURIComponent("\/"), "should go to type/id "+ (new Date() - time));
 						teardownRouteTest();
 					} else {
 						setTimeout(innerTimer, 30);
