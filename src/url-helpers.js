@@ -2,7 +2,7 @@ var bindingProxy = require("./binding-proxy");
 var routeDeparam = require("./deparam");
 var routeParam = require("./param");
 var canReflect = require("can-reflect");
-var string = require('can-util/js/string/string');
+var string = require('can-string');
 
 
 var makeProps = function (props) {
