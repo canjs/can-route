@@ -35,6 +35,7 @@
   "dependencies": {
     "can-bind": "<2.0.0",
     "can-deparam": "^1.0.1",
+    "can-diff": "^1.0.4",
     "can-dom-events": "^1.1.0",
     "can-event-queue": "<2.0.0",
     "can-globals": "<2.0.0",
@@ -49,7 +50,7 @@
     "can-route-hash": "<2.0.0",
     "can-simple-map": "^4.0.0",
     "can-simple-observable": "^2.0.0",
-    "can-string": "0.0.5",
+    "can-string": "<2.0.0",
     "can-symbol": "^1.0.0"
   },
   "devDependencies": {
