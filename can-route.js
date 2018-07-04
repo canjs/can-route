@@ -1,5 +1,6 @@
 "use strict";
 /*jshint -W079 */
+var Bind = require("can-bind");
 var queues = require("can-queues");
 var Observation = require('can-observation');
 
@@ -15,15 +16,16 @@ var urlHelpers = require("./src/url-helpers");
 var routeParam = require("./src/param");
 var routeDeparam = require("./src/deparam");
 var bindingProxy = require("./src/binding-proxy");
-var hashchange = require("./src/hashchange");
+var Hashchange = require("can-route-hash");
 
 var isWebWorker =  require('can-globals/is-web-worker/is-web-worker');
 var isBrowserWindow =  require('can-globals/is-browser-window/is-browser-window');
 
-
-
-bindingProxy.bindings.hashchange = hashchange;
+var hashchangeObservable = new Hashchange();
+bindingProxy.bindings.hashchange = hashchangeObservable;
 bindingProxy.defaultBinding = "hashchange";
+bindingProxy.urlDataObservable.value = hashchangeObservable;
+
 
 // ## route.js
 // `can-route`
@@ -32,7 +34,9 @@ bindingProxy.defaultBinding = "hashchange";
 
 function canRoute(url, defaults){
 	//!steal-remove-start
-	devLog.warn('Call route.register(url,defaults) instead of calling route(url, defaults)');
+	if(process.env.NODE_ENV !== 'production') {
+		devLog.warn('Call route.register(url,defaults) instead of calling route(url, defaults)');
+	}
 	//!steal-remove-end
 	registerRoute.register(url, defaults);
 	return canRoute;
@@ -70,13 +74,6 @@ function updateUrl(serializedData) {
 	}, 10);
 }
 
-//!steal-remove-start
-Object.defineProperty(updateUrl, "name", {
-	value: "can-route.updateUrl"
-});
-//!steal-remove-end
-
-
 // Deparameterizes the portion of the hash of interest and assign the
 // values to the `route.data` removing existing values no longer in the hash.
 // updateRouteData is called typically by hashchange which fires asynchronously
@@ -96,11 +93,6 @@ function updateRouteData() {
 	queues.batch.stop();
 
 }
-//!steal-remove-start
-Object.defineProperty(updateRouteData, "name", {
-	value: "can-route.updateRouteData"
-});
-//!steal-remove-end
 
 
 /**
@@ -139,14 +131,19 @@ Object.defineProperty(canRoute,"defaultBinding",{
 	},
 	set: function(newVal){
 		bindingProxy.defaultBinding = newVal;
+		var observable = bindingProxy.bindings[bindingProxy.defaultBinding];
+		if(observable) {
+			bindingProxy.urlDataObservable.value = observable;
+		}
 	}
 });
-Object.defineProperty(canRoute,"currentBinding",{
+Object.defineProperty(canRoute,"urlData",{
  	get: function(){
-		return bindingProxy.currentBinding;
+		return bindingProxy.urlDataObservable.value;
 	},
 	set: function(newVal){
-		bindingProxy.currentBinding = newVal;
+		canRoute._teardown();
+		bindingProxy.urlDataObservable.value = newVal;
 	}
 });
 
@@ -155,7 +152,9 @@ canReflect.assignMap(canRoute, {
 	deparam: routeDeparam,
 	map: function(data){
 		//!steal-remove-start
-		devLog.warn('Set route.data directly instead of calling route.map');
+		if(process.env.NODE_ENV !== 'production') {
+			devLog.warn('Set route.data directly instead of calling route.map');
+		}
 		//!steal-remove-end
 		canRoute.data = data;
 	},
@@ -197,17 +196,54 @@ canReflect.assignMap(canRoute, {
 
 	// called when the route is ready
 	_setup: function () {
-		if (!canRoute.currentBinding) {
-			bindingProxy.call("can.onValue", updateRouteData);
-			canReflect.onValue( canRoute.serializedObservation, updateUrl, "notify");
-			canRoute.currentBinding =canRoute.defaultBinding;
+		if (!canRoute._canBinding) {
+
+			var bindingOptions = {
+
+				// The parent is the hashchange observable
+				parent: bindingProxy.urlDataObservable.value,
+				setParent: updateUrl,
+
+				// The child is route.data
+				child: canRoute.serializedObservation,
+				setChild: updateRouteData,
+
+				// On init, we do not want the child set to the parent’s value; this is
+				// handled by start() for reasons mentioned there.
+				onInitDoNotUpdateChild: true,
+
+				// Cycles are allowed because updateUrl is async; if another change
+				// happens during its setTimeout, then without cycles the change would
+				// be ignored :( TODO: Can this be removed if updateUrl stops using
+				// setTimeout in a major version?
+				cycles: 1,
+
+				// Listen for changes in the notify queue
+				queue: "notify"
+
+			};
+
+			// For debugging: the names that will be assigned to the updateChild and
+			// updateParent functions within can-bind
+			//!steal-remove-start
+			if (process.env.NODE_ENV !== 'production') {
+				bindingOptions.updateChildName = "can-route.updateRouteData";
+				bindingOptions.updateParentName = "can-route.updateUrl";
+			}
+			//!steal-remove-end
+
+			// Create a new binding with can-bind
+			canRoute._canBinding = new Bind(bindingOptions);
+
+			// …and turn it on!
+			canRoute._canBinding.start();
+
 		}
 	},
 	_teardown: function () {
-		if (canRoute.currentBinding) {
-			bindingProxy.call("can.offValue", updateRouteData);
-			canReflect.offValue( canRoute.serializedObservation, updateUrl, "notify");
-			canRoute.currentBinding = null;
+		if (canRoute._canBinding) {
+			canRoute._canBinding.stop();
+			canRoute._canBinding = null;
 		}
 		clearTimeout(timer);
 	},

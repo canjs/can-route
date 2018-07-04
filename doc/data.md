@@ -1,7 +1,7 @@
 @property {Object|HTMLElement} can-route.data data
 @parent can-route.static
 
-This is the internal observable object underlying [can-route]. It can be set in order to cross-bind a top level state object (Application ViewModel) to can-route.
+An observable key-value object used to cross bind to the url observable [can-route.urlData]. Set it to cross-bind a top level state object (Application ViewModel) to [can-route].
 
 @type {Object} If `route.data` is set to a [can-reflect]ed observable object of
 key-value pairs, once [can-route.start] is called, changes in `route.data`'s

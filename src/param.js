@@ -133,7 +133,7 @@ function paramFromRoute(route, data) {
  * URL as &amp; separated key/value parameters.
  *
  * ```js
- * route("{type}/{id}");
+ * route.register("{type}/{id}");
  *
  * route.param({ type: "video", id: 5 }) // -> "video/5"
  * route.param({ type: "video", id: 5, isNew: false })

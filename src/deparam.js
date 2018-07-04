@@ -52,7 +52,7 @@ function canRoute_getRule(url){
  * Extract data from a url, creating an object representing its values.
  *
  * ```js
- * route("{page}");
+ * route.register("{page}");
  *
  * var result = route.deparam("page=home");
  * console.log(result.page); // -> "home"
@@ -89,7 +89,7 @@ function canRoute_getRule(url){
  * data object.
  *
  * ```js
- * route("{type}/{id}");
+ * route.register("{type}/{id}");
  *
  * route.deparam("videos/5");
  *   // -> { id: 5, route: "{type}/{id}", type: "videos" }

@@ -3,6 +3,9 @@ var QUnit = require('steal-qunit');
 var observe = require("can-observe");
 var mockRoute = require("./mock-route-binding");
 var queues = require("can-queues");
+var canReflect = require("can-reflect");
+
+
 QUnit.module("can-route observe",{
     setup: function(){
         canRoute.routes = {};
@@ -21,12 +24,12 @@ QUnit.test("two way binding canRoute.map with a can-observe instance", function(
 	canRoute.data = appState;
 	canRoute.start();
 
-    mockRoute.hash.on(function handler1(newVal){
+    canReflect.onValue( mockRoute.hash, function handler1(newVal){
         QUnit.equal(newVal, "#&name=Brian", "updated hash");
-        mockRoute.hash.off(handler1);
+        canReflect.offValue( mockRoute.hash, handler1);
         QUnit.equal(canRoute.data.name, 'Brian', 'appState is bound to canRoute');
 
-        mockRoute.hash.on(function handler2(newVal){
+        canReflect.onValue( mockRoute.hash, function handler2(newVal){
         	equal( newVal, "#");
             mockRoute.stop();
             start();

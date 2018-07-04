@@ -3,7 +3,7 @@ var bindingProxy = require("./binding-proxy");
 var routeDeparam = require("./deparam");
 var routeParam = require("./param");
 var canReflect = require("can-reflect");
-var string = require('can-util/js/string/string');
+var string = require('can-string');
 
 
 var makeProps = function (props) {
@@ -71,7 +71,7 @@ module.exports = {
      * key/value parameters.
      *
      * ```js
-     * route("{type}/{id}");
+     * route.register("{type}/{id}");
      *
      * route.url( { type: "videos", id: 5 } ) // -> "#!videos/5"
      * route.url( { type: "video", id: 5, isNew: false } )
