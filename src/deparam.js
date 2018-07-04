@@ -1,3 +1,4 @@
+"use strict";
 var deparam = require('can-deparam');
 var canReflect = require("can-reflect");
 

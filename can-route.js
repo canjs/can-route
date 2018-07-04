@@ -1,3 +1,4 @@
+"use strict";
 /*jshint -W079 */
 var Bind = require("can-bind");
 var queues = require("can-queues");
