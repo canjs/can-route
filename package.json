@@ -35,7 +35,7 @@
   "dependencies": {
     "can-bind": "<2.0.0",
     "can-deparam": "^1.0.1",
-    "can-diff": "^1.0.4",
+    "can-diff": "^1.4.1",
     "can-dom-events": "^1.1.0",
     "can-event-queue": "<2.0.0",
     "can-globals": "<2.0.0",
