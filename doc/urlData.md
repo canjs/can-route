@@ -5,7 +5,7 @@ Specifies an observable value that represents the URL. Useful for changing
 what URL [can-route route] is cross-bound to.
 
 @type {ValueObservable} `urlData` is an observable value that represents the part of the URL cross
-  bound to the [can-route.data] state object.  It can be set to other observable urls like [can-route-pushstate]
+  bound to the [can-route.data] state object.  It can be set to other observable urls like __can-route-pushstate__
   or [can-route-mock]. It defaults to [can-route-hash].
 
   The following shows setting `urlData` to another observable.

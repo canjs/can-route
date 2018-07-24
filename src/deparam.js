@@ -54,7 +54,7 @@ function canRoute_getRule(url){
  * ```js
  * route.register("{page}");
  *
- * var result = route.deparam("page=home");
+ * const result = route.deparam("page=home");
  * console.log(result.page); // -> "home"
  * ```
  *
