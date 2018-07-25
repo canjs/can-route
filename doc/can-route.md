@@ -49,7 +49,7 @@ without changing the page.
 
 This provides the basics needed to
 create history enabled single-page apps.  However,
-`route` addresses several other needs such as:
+`route` addresses several other needs aswell, such as:
 
   - Pretty urls.
   - Keeping routes independent of application code.
@@ -72,7 +72,7 @@ can-route keeps the state of the hash in-sync with the [can-route.data] containe
 
 ## data
 
-Underlying `can-route` is an observable map: [can-route.data can-route.data]. Depending on what type of map your application uses this could be a [can-define/map/map], [can-observe.Object] or maybe even a [can-simple-map].
+Underlying `can-route` is an observable map: [can-route.data can-route.data]. Depending on what type of map your application uses this could be a [can-define/map/map], an [can-observe.Object] or maybe even a [can-simple-map].
 
 Typically, the map is the view-model of the top-level [can-component] in your
 application.  For example, the following defines `<my-app>`, and uses the view-model
@@ -111,7 +111,7 @@ route.register( "{page}" );
 route.start();
 ```
 
-> NOTE: The `route.data = document.querySelector("my-app")` statement is what
+> __Note__: The `route.data = document.querySelector("my-app")` statement is what
 > sets `route.data` to `<my-app>`'s view-model.
 
 An observable can be set as `route.data` directly.  The following sets `route.data`
@@ -120,6 +120,7 @@ to an `AppViewModel` instance:
 ```js
 import DefineMap from "can-define/map/map";
 import route from "can-route";
+
 const AppViewModel = DefineMap.extend( {
 	page: "string"
 } );
@@ -135,7 +136,7 @@ You can listen to changes in a map with `on(eventName, handler(ev, args...))` an
 
 ### Listening to changes in state
 
-Listen to changes in the url by listening on the underlying route data.  For example,
+You can listen to changes in the url by listening on the underlying route data.  For example,
 your route data and rule might have a page property:
 
 ```js
@@ -151,8 +152,7 @@ You can listen to when the url changes from `"#!recipes"` to `"#!settings"` with
 
 ```js
 route.data.on( "page", function( ev, newVal, oldVal ) {
-
-// page changed from "recipes" to "settings"
+    // page changed from "recipes" to "settings"
 } );
 ```
 
@@ -182,7 +182,6 @@ You will see this result in the URL and `location.hash`.
 
 ```js
 route.data.type = "image/bar";
-
 // OR
 route.attr( "type", "image/bar" );
 ```
@@ -200,7 +199,7 @@ The location hash will look like this:
 Use `route.register(url, defaults)` to create a
 routing rule. A rule is a mapping from a url to
 an object (that is the route’s data).
-In order to map to a specific properties in the url,
+In order to map to specific properties in the url,
 prepend a colon to the name of the property like:
 
 ```js
@@ -284,9 +283,9 @@ route.link( "Videos", { type: "videos" } );
 ## Finding the matched route
 
 The matched rule is stored in the compute `route.currentRule` and is used to set the `window.location.hash`. The process can-route uses to find the matched rule is:
-  - Find all routes with all of their map properties set
-  - If multiple routes are matched, find the route with the highest number of set properties
-  - If multiple routes are still matched, use the route that was registered first
+  1. Find all routes with all of their map properties set
+  2. If multiple routes are matched, find the route with the highest number of set properties
+  3. If multiple routes are still matched, use the route that was registered first
 
 ### Find all routes with all of their map properties set
 

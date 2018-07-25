@@ -10,6 +10,7 @@ properties will update the hash and vice-versa.
 ```js
 import DefineMap from "can-define/map/map";
 import route from "can-route";
+
 route.data = new DefineMap( { page: "" } );
 route.register( "{page}" );
 route.start();
@@ -23,6 +24,7 @@ to the browser's hash.
 ```js
 import Component from "can-component";
 import route from "can-route";
+
 Component.extend( {
 	tag: "my-app",
 	autoMount: true,
@@ -89,7 +91,7 @@ The following shows creating an Application ViewModel that loads data at page lo
 
 The following example shows loading some metadata on page load, which must be loaded as part of the Application ViewModel before the components can be initialized
 
-It also shows an example of a "virtual" property on the AppViewModel, locationIds, which is the serialized version of a non-serializeable can.List, locations.  A setter is defined on locationIds, which will translate changes in locationIds back to the locations can.List.
+It also shows an example of a "virtual" property on the AppViewModel called locationIds, which is the serialized version of a non-serializeable can.List called  locations.  A setter is defined on locationIds, which will translate changes in locationIds back to the locations can.List.
 
 ```js
 const Location = DefineMap.extend( {

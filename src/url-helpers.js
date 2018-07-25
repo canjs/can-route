@@ -86,7 +86,7 @@ module.exports = {
      * data and the registered routes.
      * @signature `route.link(innerText, data, props [, merge])`
      *
-     * Make an anchor tag (`<A>`) that when clicked on will update can-route's
+     * Make an anchor tag (`<a>`) that when clicked on will update can-route's
      * properties to match those in `data`.
      *
      * @param {Object} innerText The text inside the link.
@@ -146,7 +146,7 @@ module.exports = {
      * Compares `data` to the current route. Used to verify if an object is
      * representative of the current route.
      *
-     * ```
+     * ```js
      * route.data.set({page: "recipes", id: '5'});
      *
      * route.isCurrent({page: "recipes"});       //-> false
