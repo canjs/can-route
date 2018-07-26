@@ -1,6 +1,5 @@
 var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
-var dev = require('can-log/dev/dev');
 
 QUnit.module("can-route .param and .deparam",{
     setup: function(){
@@ -470,76 +469,3 @@ test("dashes in routes", function () {
 		bar: "def"
 	});
 });
-
-
-//!steal-remove-start
-if (dev) {
-	test("should warn when two routes have same map properties", function () {
-		var oldlog = dev.warn;
-
-		dev.warn = function(text) {
-			equal(text.split(":")[0], "two routes were registered with matching keys");
-		};
-
-		canRoute.register("{page}/{subpage}");
-		canRoute.register("foo/{page}/{subpage}");
-
-		dev.warn = oldlog;
-	});
-
-	test("should warn when two routes have same map properties - including defaults", function () {
-		var oldlog = dev.warn;
-
-		dev.warn = function(text) {
-			equal(text.split(":")[0], "two routes were registered with matching keys");
-		};
-
-		canRoute.register("foo/{page}/{subpage}");
-		canRoute.register("{page}/{subpage}");
-
-		dev.warn = oldlog;
-	});
-
-	test("should not warn when two routes have same map properties - but different defaults(#36)", function () {
-		expect(0);
-		var oldlog = dev.warn;
-
-		dev.warn = function(text) {
-			ok(false, text);
-		};
-
-		canRoute.register("login", { "page": "auth", "subpage": "login" });
-		canRoute.register("signup", { "page": "auth", "subpage": "signup" });
-
-		dev.warn = oldlog;
-	});
-
-	test("should not be display warning for matching keys when the routes do not match (#99)", function () {
-		expect(1);
-		var oldlog = dev.warn;
-		var expectedWarningText = 'two routes were registered with matching keys:\n' +
-				'\t(1) route.register("login", {"page":"auth"})\n' +
-				'\t(2) route.register("signup", {"page":"auth"})\n' +
-				'(1) will always be chosen since it was registered first';
-
-		dev.warn = function(text) {
-			ok(text === expectedWarningText, text)
-		};
-
-		//should warn
-		canRoute.register("login", { "page":"auth" });
-		canRoute.register("signup", { "page":"auth" });
-
-		//should not warn
-		canRoute.register("login2/", { "page":"auth2" });
-		canRoute.register("login2", { "page":"auth2" });
-
-		//should not warn
-		canRoute.register("login3", { "page":"auth3" });
-		canRoute.register("login3", { "page":"auth3" });
-
-		dev.warn = oldlog;
-	});
-
-}
-//!steal-remove-end
