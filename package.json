@@ -61,7 +61,7 @@
     "can-stache-key": "^1.0.0",
     "detect-cyclic-packages": "^1.1.0",
     "done-serve": "^2.0.0",
-    "jshint": "^2.9.1",
+    "jshint": "^2.9.6",
     "steal": "^1.2.9",
     "steal-qunit": "^1.0.1",
     "steal-tools": "^1.1.2",
