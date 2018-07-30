@@ -71,6 +71,11 @@ function updateUrl(serializedData) {
 			path = routeParam.paramFromRoute(route, serialized);
 
 		bindingProxy.call("can.setValue", path);
+
+		if (canRoute._onStartComplete) {
+			canRoute._onStartComplete();
+			canRoute._onStartComplete = undefined;
+		}
 	}, 10);
 }
 
