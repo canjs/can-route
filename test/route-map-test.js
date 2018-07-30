@@ -57,7 +57,7 @@ if (typeof steal !== 'undefined') {
 			setTimeout(function () {
 
 				iframe.src = iframe.src + '#!bla=blu';
-			}, 10);
+			}, 50);
 		});
 
 	});
