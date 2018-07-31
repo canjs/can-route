@@ -58,20 +58,18 @@ if (typeof steal !== 'undefined') {
 				teardownRouteTest();
 			})
 
-			iCanRoute.start();
-
-			setTimeout(function () {
+			iCanRoute._onStartComplete = function () {
 				iframe.src = iframe.src + '#!bla=blu';
-			}, 10);
-		});
+			};
 
+			iCanRoute.start();
+		});
 	});
 
 	test("removing things from the hash", function () {
 
 		setupRouteTest(function (iframe, iCanRoute, loc, win) {
 			iCanRoute.serializedCompute.bind('change', function outerChange() {
-
 				equal(iCanRoute.attr('foo'), 'bar', 'expected value for foo');
 				iCanRoute.serializedCompute.unbind('change');
 				iCanRoute.serializedCompute.bind('change', function innerChange(){
@@ -82,41 +80,39 @@ if (typeof steal !== 'undefined') {
 
 					teardownRouteTest();
 				});
+
 				setTimeout(function () {
 					iframe.contentWindow.location.hash = '#!personId=3';
 				}, 100);
 
 			});
-			iCanRoute.start();
-			setTimeout(function () {
 
+			iCanRoute._onStartComplete = function () {
 				iframe.contentWindow.location.hash = '#!foo=bar';
-			}, 100);
+			};
+
+			iCanRoute.start();
 		});
 	});
 
 	test("canRoute.map: conflicting route values, hash should win (canjs/canjs#979)", function(){
 		setupRouteTest(function (iframe, iCanRoute, loc) {
-
 			iCanRoute.register("{type}/{id}");
 			var AppState = DefineMap.extend({seal: false},{});
 			var appState = new AppState({type: "dog", id: '4'});
 
 			iCanRoute.data = appState;
 
-			loc.hash = "#!cat/5";
-			iCanRoute.start();
-
-			setTimeout(function () {
-
+			iCanRoute._onStartComplete = function () {
 				var after = loc.href.substr(loc.href.indexOf("#"));
 				equal(after, "#!cat/5", "same URL");
 				equal(appState.get("type"), "cat", "conflicts should be won by the URL");
 				equal(appState.get("id"), "5", "conflicts should be won by the URL");
 				teardownRouteTest();
+			};
 
-			}, 30);
-
+			loc.hash = "#!cat/5";
+			iCanRoute.start();
 		});
 	});
 
@@ -124,34 +120,29 @@ if (typeof steal !== 'undefined') {
 		QUnit.stop();
 		mockRoute.start();
 
-
 		canRoute.register("{type}/{id}");
 		var AppState = DefineMap.extend({seal: false},{});
 		var appState = new AppState({section: 'home'});
 
 		canRoute.data = appState;
-		mockRoute.hash.value = "#!cat/5"; // type and id get added ... this will call update url to add everything
-		canRoute.start();
 
-		setTimeout(function () {
-
+		canRoute._onStartComplete = function () {
 			equal(mockRoute.hash.value, "cat/5&section=home", "same URL");
 			equal(appState.get("type"), "cat", "hash populates the appState");
 			equal(appState.get("id"), "5", "hash populates the appState");
 			equal(appState.get("section"), "home", "appState keeps its properties");
 			ok(canRoute.data === appState, "canRoute.data is the same as appState");
 
-
 			mockRoute.stop();
 			QUnit.start();
-		}, 30);
+		};
 
-
+		mockRoute.hash.value = "#!cat/5"; // type and id get added ... this will call update url to add everything
+		canRoute.start();
 	});
 
 	test("updating the hash", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
-
 			iCanRoute.start();
 			iCanRoute.register("{type}/{id}");
 			iCanRoute.attr({
@@ -160,12 +151,10 @@ if (typeof steal !== 'undefined') {
 			});
 
 			setTimeout(function () {
-
 				var after = loc.href.substr(loc.href.indexOf("#"));
 				equal(after, "#!bar/" + encodeURIComponent("\/"));
 
 				teardownRouteTest();
-
 			}, 30);
 		});
 	});

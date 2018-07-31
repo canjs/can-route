@@ -47,17 +47,15 @@ if (typeof steal !== 'undefined') {
 			ok(!iCanRoute.attr('bla'), 'Value not set yet');
 
 			iCanRoute.bind('change', function () {
-
 				equal(iCanRoute.attr('bla'), 'blu', 'Got route change event and value is as expected');
 				teardownRouteTest();
 			});
 
-			iCanRoute.start();
-
-			setTimeout(function () {
-
+			iCanRoute._onStartComplete = function () {
 				iframe.src = iframe.src + '#!bla=blu';
-			}, 50);
+			};
+
+			iCanRoute.start();
 		});
 
 	});
@@ -85,11 +83,12 @@ if (typeof steal !== 'undefined') {
 				}, 100);
 
 			});
-			iCanRoute.start();
-			setTimeout(function () {
 
+			iCanRoute._onStartComplete = function () {
 				iframe.contentWindow.location.hash = '#!foo=bar';
-			}, 100);
+			};
+
+			iCanRoute.start();
 		});
 	});
 
@@ -102,19 +101,16 @@ if (typeof steal !== 'undefined') {
 
 			iCanRoute.data = appState;
 
-			loc.hash = "#!cat/5";
-			iCanRoute.start();
-
-			setTimeout(function () {
-
+			iCanRoute._onStartComplete = function () {
 				var after = loc.href.substr(loc.href.indexOf("#"));
 				equal(after, "#!cat/5", "same URL");
 				equal(appState.attr("type"), "cat", "conflicts should be won by the URL");
 				equal(appState.attr("id"), "5", "conflicts should be won by the URL");
 				teardownRouteTest();
+			};
 
-			}, 30);
-
+			loc.hash = "#!cat/5";
+			iCanRoute.start();
 		});
 	});
 
@@ -126,11 +122,8 @@ if (typeof steal !== 'undefined') {
 			var appState = new AppState({section: 'home'});
 
 			iCanRoute.data = appState;
-			loc.hash = "#!cat/5";
-			iCanRoute.start();
 
-			setTimeout(function () {
-
+			iCanRoute._onStartComplete = function () {
 				var after = loc.href.substr(loc.href.indexOf("#"));
 				equal(after, "#!cat/5&section=home", "same URL");
 				equal(appState.attr("type"), "cat", "hash populates the appState");
@@ -140,9 +133,10 @@ if (typeof steal !== 'undefined') {
 
 
 				teardownRouteTest();
+			};
 
-			}, 30);
-
+			loc.hash = "#!cat/5";
+			iCanRoute.start();
 		});
 	});
 
