@@ -142,6 +142,12 @@ if (typeof steal !== 'undefined') {
 
 	test("updating the hash", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
+			iCanRoute._onStartComplete = function () {
+				var after = loc.href.substr(loc.href.indexOf("#"));
+				equal(after, "#!bar/" + encodeURIComponent("\/"));
+
+				teardownRouteTest();
+			};
 
 			iCanRoute.start();
 			iCanRoute.register("{type}/{id}");
@@ -149,15 +155,6 @@ if (typeof steal !== 'undefined') {
 				type: "bar",
 				id: "\/"
 			});
-
-			setTimeout(function () {
-
-				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!bar/" + encodeURIComponent("\/"));
-
-				teardownRouteTest();
-
-			}, 30);
 		});
 	});
 
@@ -225,6 +222,13 @@ if (typeof steal !== 'undefined') {
 	test("routes should deep clean", function() {
 		expect(2);
 		setupRouteTest(function (iframe, iCanRoute, loc) {
+			iCanRoute._onStartComplete = function() {
+				equal(iCanRoute.attr("panelA.id"), 20, "id should change");
+				equal(iCanRoute.attr("panelA.show"), undefined, "show should be removed");
+
+				teardownRouteTest();
+			};
+
 			iCanRoute.start();
 			var hash1 = canRoute.url({
 				panelA: {
@@ -241,18 +245,9 @@ if (typeof steal !== 'undefined') {
 				}
 			});
 
-
 			loc.hash = hash1;
 
 			loc.hash = hash2;
-
-			setTimeout(function() {
-				equal(iCanRoute.attr("panelA.id"), 20, "id should change");
-				equal(iCanRoute.attr("panelA.show"), undefined, "show should be removed");
-
-				teardownRouteTest();
-			}, 30);
-
 		});
 	});
 

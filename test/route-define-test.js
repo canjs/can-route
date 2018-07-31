@@ -143,6 +143,13 @@ if (typeof steal !== 'undefined') {
 
 	test("updating the hash", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
+			iCanRoute._onStartComplete = function () {
+				var after = loc.href.substr(loc.href.indexOf("#"));
+				equal(after, "#!bar/" + encodeURIComponent("\/"));
+
+				teardownRouteTest();
+			};
+
 			iCanRoute.start();
 			iCanRoute.register("{type}/{id}");
 			iCanRoute.attr({
@@ -150,12 +157,6 @@ if (typeof steal !== 'undefined') {
 				id: "\/"
 			});
 
-			setTimeout(function () {
-				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!bar/" + encodeURIComponent("\/"));
-
-				teardownRouteTest();
-			}, 30);
 		});
 	});
 
@@ -250,7 +251,6 @@ if (typeof steal !== 'undefined') {
 	test("routes should deep clean", function() {
 		expect(2);
 		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute.start();
 			var hash1 = canRoute.url({
 				panelA: {
 					name: "fruit",
@@ -271,13 +271,14 @@ if (typeof steal !== 'undefined') {
 
 			loc.hash = hash2;
 
-			setTimeout(function() {
+			iCanRoute._onStartComplete = function() {
 				equal(iCanRoute.data.get('panelA').id, 20, "id should change");
 				equal(iCanRoute.data.get('panelA').show, undefined, "show should be removed");
 
 				teardownRouteTest();
-			}, 30);
+			};
 
+			iCanRoute.start();
 		});
 	});
 

@@ -28,6 +28,17 @@
         window.DefineMap = modules[3];
         window.queues = modules[4];
         window.canReflect = modules[5];
+        /*
+        // delay start to find tests that may fail in CI
+        var origStart = route.start;
+        route.start = function() {
+        	var r = this;
+        	var args = arguments;
+        	setTimeout(function() {
+        		origStart.apply(r, args);
+        	}, 50);
+        };
+        */
         setTimeout(function () {
           window.parent.routeTestReady && window.parent.routeTestReady(route, window.location, window)
         }, 30);
