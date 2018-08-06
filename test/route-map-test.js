@@ -407,5 +407,32 @@ if (typeof require === 'undefined') {
 
 }
 
+test("Calling attr with an object should not stringify object (#197)", function () {
+	setupRouteTest(function (iframe, iCanRoute, loc, win) {
+		var app = new win.CanMap({});
+		app.define = { foo: { serialize: false } };
+
+		app.attr('foo', true);
+		equal(app.attr('foo'), true, 'not route data - .attr("foo", ...) works');
+
+		app.attr({
+			foo: false
+		});
+		equal(app.attr('foo'), false, 'not route data - .attr({"foo": ...}) works');
+
+		iCanRoute.data = app;
+
+		app.attr('foo', true);
+		equal(app.attr('foo'), true, 'route data - .attr("foo", ...) works');
+
+		app.attr({
+			foo: false
+		});
+		equal(app.attr('foo'), false, 'route data - .attr({"foo": ...}) works');
+
+		teardownRouteTest();
+	});
+});
+
 
 }
