@@ -353,7 +353,8 @@ var stringCoercingMapDecorator = function(map) {
 		var attrSuper = map.attr;
 
 		map.attr = function(prop, val) {
-			var serializable = this.define === undefined || this.define[prop] === undefined || !!this.define[prop].serialize,
+			var serializable = typeof prop === "string" &&
+				(this.define === undefined || this.define[prop] === undefined || !!this.define[prop].serialize),
 				args;
 
 			if (serializable) { // if setting non-str non-num attr
