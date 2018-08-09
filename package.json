@@ -59,6 +59,7 @@
     "can-observe": "^2.0.0",
     "can-route-mock": "<2.0.0",
     "can-stache-key": "^1.0.0",
+    "can-test-helpers": "^1.1.2",
     "detect-cyclic-packages": "^1.1.0",
     "done-serve": "^2.0.0",
     "jshint": "^2.9.1",
