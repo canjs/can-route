@@ -2,9 +2,7 @@ var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
 var observe = require("can-observe");
 var mockRoute = require("./mock-route-binding");
-var queues = require("can-queues");
 var canReflect = require("can-reflect");
-
 
 QUnit.module("can-route observe",{
     setup: function(){
@@ -16,7 +14,7 @@ QUnit.test("two way binding canRoute.map with a can-observe instance", function(
 
 	expect(3);
 	stop();
-	mockRoute.start()
+	mockRoute.start();
 
 	var AppState = observe.Object.extend("AppState",{},{});
 	var appState = new AppState();

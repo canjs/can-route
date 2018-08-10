@@ -2,9 +2,18 @@ var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
 
 function getMsg(routes, input, method, output) {
-	return "[ " + routes.map(route => route[0]).join(" | ") + " ] - " +
-		JSON.stringify(input) + method + " " + JSON.stringify(output);
-};
+	var msg = "[ ";
+
+	msg += routes.map(function(route) {
+		return	route[0];
+	}).join(" | ");
+
+	msg += " ] - ";
+
+	msg += JSON.stringify(input) + method + " " + JSON.stringify(output);
+
+	return msg;
+}
 
 QUnit.module("can-route .param and .deparam",{
 	setup: function(){

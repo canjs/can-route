@@ -2,7 +2,6 @@ var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
 var DefineMap = require("can-define/map/");
 
-var mockRoute = require("./mock-route-binding");
 var RouteMock = require("can-route-mock");
 var canReflect = require("can-reflect");
 
