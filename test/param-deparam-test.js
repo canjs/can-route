@@ -2,9 +2,18 @@ var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
 
 function getMsg(routes, input, method, output) {
-	return "[ " + routes.map(route => route[0]).join(" | ") + " ] - " +
-		JSON.stringify(input) + method + " " + JSON.stringify(output);
-};
+	var msg = "[ ";
+
+	msg += routes.map(function(route) {
+		return	route[0];
+	}).join(" | ");
+
+	msg += " ] - ";
+
+	msg += JSON.stringify(input) + method + " " + JSON.stringify(output);
+
+	return msg;
+}
 
 QUnit.module("can-route .param and .deparam",{
 	setup: function(){
@@ -305,17 +314,98 @@ test("param / deparam / rule", function () {
 				}
 			]
 		},
-		// better matching precedent
 		{
 			routes: [
 				[ "{page}", { page: "index" } ],
 				[ "{page}/{section}" ]
 			],
 			assertions: [
+				// better matching precedent
 				{
 					method: "param",
 					input: { page: "foo", section: "bar" },
 					output: "foo/bar"
+				},
+				// handles falsey values
+				// handles ""
+				{
+					method: "param",
+					input: { page: "home", section: "" },
+					output: "home/"
+				},
+				{
+					method: "deparam",
+					input: "home/",
+					output: {}
+				},
+				{
+					method: "rule",
+					input: "home/",
+					output: undefined
+				},
+				// handles false
+				{
+					method: "param",
+					input: { page: "home", section: false },
+					output: "home/false"
+				},
+				{
+					method: "deparam",
+					input: "home/false",
+					output: { page: "home", section: "false" }
+				},
+				{
+					method: "rule",
+					input: "home/false",
+					output: "{page}/{section}"
+				},
+				// handles null
+				{
+					method: "param",
+					input: { page: "home", section: null },
+					output: "home/null"
+				},
+				{
+					method: "deparam",
+					input: "home/null",
+					output: { page: "home", section: "null" }
+				},
+				{
+					method: "rule",
+					input: "home/null",
+					output: "{page}/{section}"
+				},
+				// handles undefined
+				{
+					method: "param",
+					input: { page: "home", section: undefined },
+					output: "home/"
+				},
+				{
+					method: "deparam",
+					input: "home/undefined",
+					output: { page: "home", section: "undefined" }
+				},
+				{
+					method: "rule",
+					input: "home/undefined",
+					output: "{page}/{section}"
+				},
+				// handles 0
+				{
+					method: "param",
+					input: { page: "home", section: 0 },
+					output: "home/0"
+				},
+				{
+					method: "deparam",
+					input: "home/0",
+					output: { page: "home", section: "0" }
+				},
+				{
+					method: "rule",
+					input: "home/0",
+					output: "{page}/{section}"
 				}
 			]
 		},

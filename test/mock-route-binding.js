@@ -1,6 +1,5 @@
 var canRoute = require("can-route");
 var SimpleMap = require("can-simple-map");
-var canReflect = require("can-reflect");
 
 var RouteMock = require("can-route-mock");
 
