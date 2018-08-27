@@ -111,7 +111,7 @@ if (typeof steal !== 'undefined') {
 				// Then remove those old props and add new ones
 				setTimeout(function () {
 					iframe.contentWindow.location.hash = '#!personId=3';
-				}, 1);
+				}, 150);
 
 			});
 
