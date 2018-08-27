@@ -290,18 +290,21 @@ if (typeof steal !== 'undefined') {
 			var appVM = new MyMap();
 
 			route.data = appVM;
+
+			route._onStartComplete = function(){
+				appVM.bind('action', function(ev, newVal) {
+					strictEqual(newVal, '10');
+				});
+
+				appVM.set('action', 10);
+
+				// check after 30ms to see that we only have a single call
+				setTimeout(function() {
+					teardownRouteTest();
+				}, 5);
+			};
+
 			route.start();
-
-			appVM.bind('action', function(ev, newVal) {
-				strictEqual(newVal, '10');
-			});
-
-			appVM.set('action', 10);
-
-			// check after 30ms to see that we only have a single call
-			setTimeout(function() {
-				teardownRouteTest();
-			}, 5);
 		});
 	});
 
