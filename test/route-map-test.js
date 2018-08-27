@@ -73,7 +73,7 @@ if (typeof steal !== 'undefined') {
 					QUnit.ok(outerChangeCalled, "no outer change called");
 					teardownRouteTest();
 				}
-			},5000);
+			},60000);
 
 			iCanRoute.bind('change', function change1() {
 				outerChangeCalled = true;
@@ -106,7 +106,7 @@ if (typeof steal !== 'undefined') {
 						QUnit.ok(false, "no personId change");
 						teardownRouteTest();
 					}
-				},5000);
+				},60000);
 
 				// Then remove those old props and add new ones
 				setTimeout(function () {
