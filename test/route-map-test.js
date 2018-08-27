@@ -64,26 +64,58 @@ if (typeof steal !== 'undefined') {
 	test("removing things from the hash", function () {
 
 		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute.bind('change', function change1() {
+			// CanJS's build was failing on this test.
+			// This code is to make sure we can more information on why the build
+			// failed.
+			var outerChangeCalled = false;
+			setTimeout(function(){
+				if(outerChangeCalled === false) {
+					QUnit.ok(outerChangeCalled, "no outer change called");
+					teardownRouteTest();
+				}
+			},5000);
 
+			iCanRoute.bind('change', function change1() {
+				outerChangeCalled = true;
 				equal(iCanRoute.attr('foo'), 'bar', 'expected value');
 				iCanRoute.unbind('change');
 
+				var changeFired = false,
+					tearDown = false;
+
 				iCanRoute.bind('change', function change2(ev, prop){
+					changeFired = true;
 					equal(iCanRoute.attr('personId'), '3', 'personId');
 					equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
 					iCanRoute.unbind('change');
 
 					if (prop === 'personId') {
+						tearDown = true;
 						teardownRouteTest();
+					} else {
+						QUnit.equal(prop, "foo", "removed foo");
 					}
 				});
+
+				// CanJS's build was failing on this test.
+				// This code is to make sure we can more information on why the build
+				// failed.
+				setTimeout(function(){
+					if(tearDown === false) {
+						QUnit.ok(changeFired, "changed was fired");
+						QUnit.ok(false, "no personId change");
+						teardownRouteTest();
+					}
+				},5000);
+
+				// Then remove those old props and add new ones
 				setTimeout(function () {
 					iframe.contentWindow.location.hash = '#!personId=3';
-				}, 100);
+				}, 1);
 
 			});
 
+			// Update the hash to have some properties and values
 			iCanRoute._onStartComplete = function () {
 				iframe.contentWindow.location.hash = '#!foo=bar';
 			};
