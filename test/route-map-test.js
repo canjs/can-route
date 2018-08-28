@@ -189,46 +189,6 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("unsticky routes", function () {
-		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute.start();
-			iCanRoute.register("{type}");
-			iCanRoute.register("{type}/{id}");
-			iCanRoute.attr({
-				type: "bar"
-			});
-
-			setTimeout(function () {
-				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!bar");
-				iCanRoute.attr({
-					type: "bar",
-					id: "\/"
-				});
-
-				// check for 1 second
-				var time = new Date()
-				setTimeout(function innerTimer() {
-					var after = loc.href.substr(loc.href.indexOf("#"));
-					if (after === "#!bar/" + encodeURIComponent("\/")) {
-						equal(after, "#!bar/" + encodeURIComponent("\/"), "should go to type/id");
-
-						teardownRouteTest();
-					} else if (new Date() - time > 2000) {
-						ok(false, "hash is " + after);
-						can.remove(can.$(iframe))
-					} else {
-						setTimeout(innerTimer, 30)
-					}
-
-				}, 100);
-
-			}, 100);
-
-		});
-	});
-
-
 	test("updating bound SimpleMap causes single update with a coerced string value", function() {
 		expect(1);
 

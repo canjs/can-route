@@ -80,35 +80,40 @@ if (("onhashchange" in window)) {
 
 		test("unsticky routes", function () {
 			setupRouteTest(function (iframe, iCanRoute, loc) {
-				iCanRoute.start();
+
 				iCanRoute.register("{type}");
 				iCanRoute.register("{type}/{id}");
-				iCanRoute.attr({
-					type: "bar"
-				});
 
-				setTimeout(function () {
-					var after = loc.href.substr(loc.href.indexOf("#"));
-					equal(after, "#!bar");
+
+				iCanRoute._onStartComplete = function () {
 					iCanRoute.attr({
-						type: "bar",
-						id: "\/"
+						type: "bar"
 					});
 
-					// check for 1 second
-					var time = new Date();
-					setTimeout(function innerTimer() {
+					setTimeout(function () {
 						var after = loc.href.substr(loc.href.indexOf("#"));
-						var isMatch = after === "#!bar/" + encodeURIComponent("\/");
-						var isWaitingTooLong = new Date() - time > 2000;
-						if (isMatch || isWaitingTooLong) {
-							equal(after, "#!bar/" + encodeURIComponent("\/"), "should go to type/id "+ (new Date() - time));
-							teardownRouteTest();
-						} else {
-							setTimeout(innerTimer, 30);
-						}
-					}, 100);
-				}, 100);
+						equal(after, "#!bar");
+						iCanRoute.attr({
+							type: "bar",
+							id: "\/"
+						});
+
+						// check for 1 second
+						var time = new Date();
+						setTimeout(function innerTimer() {
+							var after = loc.href.substr(loc.href.indexOf("#"));
+							var isMatch = after === "#!bar/" + encodeURIComponent("\/");
+							var isWaitingTooLong = new Date() - time > 5000;
+							if (isMatch || isWaitingTooLong) {
+								equal(after, "#!bar/" + encodeURIComponent("\/"), "should go to type/id "+ (new Date() - time));
+								teardownRouteTest();
+							} else {
+								setTimeout(innerTimer, 30);
+							}
+						}, 30);
+					}, 150);
+				};
+				iCanRoute.start();
 
 			});
 		});
