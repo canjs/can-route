@@ -1,12 +1,11 @@
 var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
-var DefineMap = require('can-define/map/map');
 var canReflect = require('can-reflect');
 
 QUnit.module("can-route with can-define/map/map in an iframe", {
 	setup: function () {
 		canRoute._teardown();
-		canRoute.urlData = canRoute.bindings.hashchange
+		canRoute.urlData = canRoute.bindings.hashchange;
 		//canRoute.defaultBinding = "hashchange";
 		this.fixture = document.getElementById("qunit-fixture");
 	}
@@ -23,7 +22,7 @@ if (("onhashchange" in window)) {
 		var iframe = document.createElement('iframe');
 		stop();
 		window.routeTestReady = function(){
-			var args = canReflect.toArray(arguments)
+			var args = canReflect.toArray(arguments);
 			args.unshift(iframe);
 			callback.apply(null, args);
 		};
@@ -50,7 +49,7 @@ if (("onhashchange" in window)) {
 				iCanRoute.bind('bla', function(){
 					equal(iCanRoute.data.get("bla"), 'blu', 'Got route change event and value is as expected');
 					teardownRouteTest();
-				})
+				});
 
 				iCanRoute._onStartComplete = function () {
 					iframe.src = iframe.src + '#!bla=blu';
