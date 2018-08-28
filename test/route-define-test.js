@@ -1,5 +1,6 @@
 /* jshint asi:true */
 /* jshint -W079 */
+require("./route-define-iframe-test");
 var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
 var DefineMap = require('can-define/map/map');
@@ -18,84 +19,12 @@ QUnit.module("can/route with can-define/map/map", {
 		//canRoute.defaultBinding = "hashchange";
 		this.fixture = document.getElementById("qunit-fixture");
 	}
-})
+});
 
 if (("onhashchange" in window)) {
 
 
-
-var teardownRouteTest;
-var setupRouteTest = function(callback){
-
-	var testarea = document.getElementById('qunit-fixture');
-	var iframe = document.createElement('iframe');
-	stop();
-	window.routeTestReady = function(){
-		var args = canReflect.toArray(arguments)
-		args.unshift(iframe);
-		callback.apply(null, args);
-	};
-	iframe.src = __dirname + "/define-testing.html?"+Math.random();
-	testarea.appendChild(iframe);
-	teardownRouteTest = function(){
-		setTimeout(function(){
-			testarea.removeChild(iframe);
-			setTimeout(function(){
-				start();
-			},10);
-		},1);
-	};
-};
-
-
 if (typeof steal !== 'undefined') {
-	test("listening to hashchange (#216, #124)", function () {
-
-		setupRouteTest(function (iframe, iCanRoute) {
-
-			ok(!iCanRoute.data.bla, 'Value not set yet');
-
-			iCanRoute.bind('bla', function(){
-				equal(iCanRoute.data.get("bla"), 'blu', 'Got route change event and value is as expected');
-				teardownRouteTest();
-			})
-
-			iCanRoute._onStartComplete = function () {
-				iframe.src = iframe.src + '#!bla=blu';
-			};
-
-			iCanRoute.start();
-		});
-	});
-
-	test("removing things from the hash", function () {
-
-		setupRouteTest(function (iframe, iCanRoute, loc, win) {
-			iCanRoute.serializedCompute.bind('change', function outerChange() {
-				equal(iCanRoute.attr('foo'), 'bar', 'expected value for foo');
-				iCanRoute.serializedCompute.unbind('change');
-				iCanRoute.serializedCompute.bind('change', function innerChange(){
-
-					equal(iCanRoute.attr('personId'), '3', 'personId');
-					equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
-					iCanRoute.unbind('change');
-
-					teardownRouteTest();
-				});
-
-				setTimeout(function () {
-					iframe.contentWindow.location.hash = '#!personId=3';
-				}, 100);
-
-			});
-
-			iCanRoute._onStartComplete = function () {
-				iframe.contentWindow.location.hash = '#!foo=bar';
-			};
-
-			iCanRoute.start();
-		});
-	});
 
 	QUnit.asyncTest("canRoute.map: conflicting route values, hash should win (canjs/canjs#979)", function(){
 		mockRoute.start();
@@ -120,7 +49,7 @@ if (typeof steal !== 'undefined') {
 		canRoute.start();
 	});
 
-	test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data (canjs/canjs#979)", function(){
+	QUnit.test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data (canjs/canjs#979)", function(){
 		QUnit.stop();
 		mockRoute.start();
 
@@ -145,25 +74,6 @@ if (typeof steal !== 'undefined') {
 		canRoute.start();
 	});
 
-	test("updating the hash", function () {
-		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute._onStartComplete = function () {
-				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!bar/" + encodeURIComponent("\/"));
-
-				teardownRouteTest();
-			};
-
-			iCanRoute.start();
-			iCanRoute.register("{type}/{id}");
-			iCanRoute.attr({
-				type: "bar",
-				id: "\/"
-			});
-
-		});
-	});
-
 	test("sticky enough routes (canjs#36)", function () {
 
 		QUnit.stop();
@@ -183,41 +93,6 @@ if (typeof steal !== 'undefined') {
 			QUnit.start();
 
 		}, 30);
-	});
-
-	test("unsticky routes", function () {
-		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute.start();
-			iCanRoute.register("{type}");
-			iCanRoute.register("{type}/{id}");
-			iCanRoute.attr({
-				type: "bar"
-			});
-
-			setTimeout(function () {
-				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!bar");
-				iCanRoute.attr({
-					type: "bar",
-					id: "\/"
-				});
-
-				// check for 1 second
-				var time = new Date();
-				setTimeout(function innerTimer() {
-					var after = loc.href.substr(loc.href.indexOf("#"));
-					var isMatch = after === "#!bar/" + encodeURIComponent("\/");
-					var isWaitingTooLong = new Date() - time > 2000;
-					if (isMatch || isWaitingTooLong) {
-						equal(after, "#!bar/" + encodeURIComponent("\/"), "should go to type/id "+ (new Date() - time));
-						teardownRouteTest();
-					} else {
-						setTimeout(innerTimer, 30);
-					}
-				}, 100);
-			}, 100);
-
-		});
 	});
 
 	QUnit.asyncTest("canRoute.current is live-bindable (#1156)", function () {
@@ -311,30 +186,6 @@ if (typeof steal !== 'undefined') {
 			}, 5);
 		};
 		canRoute.start();
-	});
-
-	test("updating unserialized prop on bound DefineMap causes single update without a coerced string value", function() {
-		expect(1);
-
-		setupRouteTest(function (iframe, route) {
-			var appVM = new (DefineMap.extend({
-				action: {serialize: false, type: "*"}
-			}))();
-
-			route.data = appVM;
-			route.start();
-
-			appVM.bind('action', function(ev, newVal) {
-				equal(typeof newVal, 'function');
-			});
-
-			appVM.set('action', function() {});
-
-			// check after 30ms to see that we only have a single call
-			setTimeout(function() {
-				teardownRouteTest();
-			}, 5);
-		});
 	});
 
 	test("hash doesn't update to itself with a !", function() {
@@ -607,4 +458,30 @@ test("triggers __url event anytime a there's a change to individual properties",
 		canRoute.data.page = 'two';
 	}, 50);
 
+});
+
+
+QUnit.asyncTest("updating unserialized prop on bound DefineMap causes single update without a coerced string value", function() {
+	expect(1);
+	canRoute.routes = {};
+	mockRoute.start();
+
+	var appVM = new (DefineMap.extend({
+		action: {serialize: false, type: "*"}
+	}))();
+
+	canRoute.data = appVM;
+	canRoute.start();
+
+	appVM.bind('action', function(ev, newVal) {
+		equal(typeof newVal, 'function');
+	});
+
+	appVM.set('action', function() {});
+
+	// check after 30ms to see that we only have a single call
+	setTimeout(function() {
+		mockRoute.stop();
+		QUnit.start();
+	}, 5);
 });
