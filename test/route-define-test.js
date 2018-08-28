@@ -4,6 +4,8 @@ var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
 var DefineMap = require('can-define/map/map');
 var canReflect = require('can-reflect');
+var stacheKey = require("can-stache-key");
+var Observation = require("can-observation");
 
 var mockRoute = require("./mock-route-binding");
 
@@ -95,25 +97,27 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("canRoute.map: conflicting route values, hash should win (canjs/canjs#979)", function(){
-		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute.register("{type}/{id}");
-			var AppState = DefineMap.extend({seal: false},{});
-			var appState = new AppState({type: "dog", id: '4'});
+	QUnit.asyncTest("canRoute.map: conflicting route values, hash should win (canjs/canjs#979)", function(){
+		mockRoute.start();
 
-			iCanRoute.data = appState;
 
-			iCanRoute._onStartComplete = function () {
-				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!cat/5", "same URL");
-				equal(appState.get("type"), "cat", "conflicts should be won by the URL");
-				equal(appState.get("id"), "5", "conflicts should be won by the URL");
-				teardownRouteTest();
-			};
+		canRoute.register("{type}/{id}");
+		var AppState = DefineMap.extend({seal: false},{});
+		var appState = new AppState({type: "dog", id: '4'});
 
-			loc.hash = "#!cat/5";
-			iCanRoute.start();
-		});
+		canRoute.data = appState;
+
+		canRoute._onStartComplete = function () {
+			var after = mockRoute.hash.get();
+			equal(after, "cat/5", "same URL");
+			equal(appState.get("type"), "cat", "conflicts should be won by the URL");
+			equal(appState.get("id"), "5", "conflicts should be won by the URL");
+			QUnit.start();
+			mockRoute.stop();
+		};
+
+		mockRoute.hash.value = "#!cat/5";
+		canRoute.start();
 	});
 
 	test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data (canjs/canjs#979)", function(){
@@ -216,96 +220,97 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("canRoute.current is live-bindable (#1156)", function () {
-		setupRouteTest(function (iframe, iCanRoute, loc, win) {
-			iCanRoute.start();
-			var isOnTestPage = new win.Observation(function(){
-				return iCanRoute.isCurrent({page: "test"});
-			});
+	QUnit.asyncTest("canRoute.current is live-bindable (#1156)", function () {
+		mockRoute.start();
 
-			win.canReflect.onValue(isOnTestPage, function(){
-				teardownRouteTest();
-			});
 
-			equal(iCanRoute.isCurrent({page: "test"}), false, "initially not on test page")
-			setTimeout(function(){
-				iCanRoute.attr("page","test");
-			},20);
+		canRoute.start();
+		var isOnTestPage = new Observation(function(){
+			return canRoute.isCurrent({page: "test"});
 		});
+
+		canReflect.onValue(isOnTestPage, function(){
+			mockRoute.stop();
+			QUnit.start();
+		});
+
+		equal(canRoute.isCurrent({page: "test"}), false, "initially not on test page")
+		setTimeout(function(){
+			canRoute.attr("page","test");
+		},20);
 	});
 
-	test("can.compute.read should not call canRoute (#1154)", function () {
-		setupRouteTest(function (iframe, iCanRoute, loc, win) {
-			iCanRoute.attr("page","test");
-			iCanRoute.start();
+	QUnit.asyncTest("can.compute.read should not call canRoute (#1154)", function () {
+		mockRoute.start();
+		canRoute.attr("page","test");
+		canRoute.start();
 
-			var val = win.observeReader.read({route: iCanRoute},win.observeReader.reads("route")).value;
+		var val = stacheKey.read({route: canRoute},stacheKey.reads("route")).value;
 
-			setTimeout(function(){
-				equal(val,iCanRoute,"read correctly");
-				teardownRouteTest();
-			},1);
-		});
+		setTimeout(function(){
+			equal(val,canRoute,"read correctly");
+			mockRoute.stop();
+			QUnit.start();
+		},1);
 	});
 
-	test("routes should deep clean", function() {
+
+	QUnit.asyncTest("routes should deep clean", function() {
 		expect(2);
-		setupRouteTest(function (iframe, iCanRoute, loc) {
-			var hash1 = canRoute.url({
-				panelA: {
-					name: "fruit",
-					id: 15,
-					show: true
-				}
-			});
-			var hash2 = canRoute.url({
-				panelA: {
-					name: "fruit",
-					id: 20,
-					read: false
-				}
-			});
 
+		mockRoute.start();
 
-			loc.hash = hash1;
-
-			loc.hash = hash2;
-
-			iCanRoute._onStartComplete = function() {
-				equal(iCanRoute.data.get('panelA').id, 20, "id should change");
-				equal(iCanRoute.data.get('panelA').show, undefined, "show should be removed");
-
-				teardownRouteTest();
-			};
-
-			iCanRoute.start();
+		var hash1 = canRoute.url({
+			panelA: {
+				name: "fruit",
+				id: 15,
+				show: true
+			}
 		});
+		var hash2 = canRoute.url({
+			panelA: {
+				name: "fruit",
+				id: 20,
+				read: false
+			}
+		});
+		mockRoute.hash.value = hash1;
+		mockRoute.hash.value = hash2;
+
+
+		canRoute._onStartComplete = function() {
+			equal(canRoute.data.get('panelA').id, 20, "id should change");
+			equal(canRoute.data.get('panelA').show, undefined, "show should be removed");
+			mockRoute.stop();
+			QUnit.start();
+		};
+
+		canRoute.start();
 	});
 
-	test("updating bound DefineMap causes single update with a coerced string value", function() {
+	QUnit.asyncTest("updating bound DefineMap causes single update with a coerced string value", function() {
 		expect(1);
 
-		setupRouteTest(function (iframe, route) {
-			var MyMap = DefineMap.extend({seal: false},{'*': "stringOrObservable"});
-			var appVM = new MyMap();
+		canRoute.start();
+		var MyMap = DefineMap.extend({seal: false},{'*': "stringOrObservable"});
+		var appVM = new MyMap();
 
-			route.data = appVM;
+		canRoute.data = appVM;
 
-			route._onStartComplete = function(){
-				appVM.bind('action', function(ev, newVal) {
-					strictEqual(newVal, '10');
-				});
+		canRoute._onStartComplete = function(){
+			appVM.on('action', function(ev, newVal) {
+				strictEqual(newVal, '10');
+			});
 
-				appVM.set('action', 10);
+			appVM.set('action', 10);
 
-				// check after 30ms to see that we only have a single call
-				setTimeout(function() {
-					teardownRouteTest();
-				}, 5);
-			};
-
-			route.start();
-		});
+			// check after 30ms to see that we only have a single call
+			setTimeout(function() {
+				mockRoute.stop();
+				QUnit.start();
+			}, 5);
+		};
+		canRoute.start();
 	});
 
 	test("updating unserialized prop on bound DefineMap causes single update without a coerced string value", function() {
@@ -390,78 +395,67 @@ test("escaping periods", function () {
 
 });
 
-if (typeof require === 'undefined') {
+if (typeof require !== 'undefined') {
 
 	test("correct stringing", function () {
-		setupRouteTest(function(iframe, route) {
-			route.routes = {};
+		mockRoute.start();
 
-			route.attr('number', 1);
-			propEqual(route.attr(), {
-				'number': "1"
-			});
+		canRoute.routes = {};
 
-			route.attr({
-				bool: true
-			}, true);
-
-			propEqual(route.attr(), {
-				'bool': "true"
-			});
-
-			route.attr({
-				string: "hello"
-			}, true);
-			propEqual(route.attr(), {
-				'string': "hello"
-			});
-
-			route.attr({
-				array: [1, true, "hello"]
-			}, true);
-			propEqual(route.attr(), {
-				'array': ["1", "true", "hello"]
-			});
-
-			route.attr({
-				number: 1,
-				bool: true,
-				string: "hello",
-				array: [2, false, "world"],
-				obj: {
-					number: 3,
-					array: [4, true]
-				}
-			}, true);
-
-			propEqual(route.attr(), {
-				number: "1",
-				bool: "true",
-				string: "hello",
-				array: ["2", "false", "world"],
-				obj: {
-					number: "3",
-					array: ["4", "true"]
-				}
-			});
-
-			route.routes = {};
-			route.register("{type}/{id}");
-
-			route.attr({
-				type: 'page',
-				id: 10,
-				sort_by_name: true
-			}, true);
-
-			propEqual(route.attr(), {
-				type: "page",
-				id: "10",
-				sort_by_name: "true"
-			});
-
-			teardownRouteTest();
+		canRoute.attr({
+			number: 1,
+			bool: true,
+			string: "hello",
+			array: [1, true, "hello"]
 		});
+
+		QUnit.deepEqual(canRoute.attr(),{
+			number: "1",
+			bool: "true",
+			string: "hello",
+			array: ["1", "true", "hello"]
+		});
+		canReflect.update(canRoute.data, {});
+
+		canRoute.attr({
+			number: 1,
+			bool: true,
+			string: "hello",
+			array: [2, false, "world"],
+			obj: {
+				number: 3,
+				array: [4, true]
+			}
+		});
+
+		QUnit.deepEqual(canRoute.attr(), {
+			number: "1",
+			bool: "true",
+			string: "hello",
+			array: ["2", "false", "world"],
+			obj: {
+				number: "3",
+				array: ["4", "true"]
+			}
+		}, "nested object");
+
+		canRoute.routes = {};
+		canRoute.register("{type}/{id}");
+
+		canReflect.update(canRoute.data, {});
+
+		canRoute.attr({
+			type: 'page',
+			id: 10,
+			sort_by_name: true
+		});
+
+		propEqual(canRoute.attr(), {
+			type: "page",
+			id: "10",
+			sort_by_name: "true"
+		});
+
 	});
 
 }

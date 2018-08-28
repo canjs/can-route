@@ -124,28 +124,6 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-	test("canRoute.map: conflicting route values, hash should win", function(){
-		setupRouteTest(function (iframe, iCanRoute, loc, win) {
-
-			iCanRoute.register("{type}/{id}");
-			var AppState = win.CanMap.extend();
-			var appState = new AppState({type: "dog", id: '4'});
-
-			iCanRoute.data = appState;
-
-			iCanRoute._onStartComplete = function () {
-				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!cat/5", "same URL");
-				equal(appState.attr("type"), "cat", "conflicts should be won by the URL");
-				equal(appState.attr("id"), "5", "conflicts should be won by the URL");
-				teardownRouteTest();
-			};
-
-			loc.hash = "#!cat/5";
-			iCanRoute.start();
-		});
-	});
-
 	test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(){
 		setupRouteTest(function (iframe, iCanRoute, loc, win) {
 
@@ -250,38 +228,6 @@ if (typeof steal !== 'undefined') {
 		});
 	});
 
-
-	test("routes should deep clean", function() {
-		expect(2);
-		setupRouteTest(function (iframe, iCanRoute, loc) {
-			iCanRoute._onStartComplete = function() {
-				equal(iCanRoute.attr("panelA.id"), 20, "id should change");
-				equal(iCanRoute.attr("panelA.show"), undefined, "show should be removed");
-
-				teardownRouteTest();
-			};
-
-			iCanRoute.start();
-			var hash1 = canRoute.url({
-				panelA: {
-					name: "fruit",
-					id: 15,
-					show: true
-				}
-			});
-			var hash2 = canRoute.url({
-				panelA: {
-					name: "fruit",
-					id: 20,
-					read: false
-				}
-			});
-
-			loc.hash = hash1;
-
-			loc.hash = hash2;
-		});
-	});
 
 	test("updating bound SimpleMap causes single update with a coerced string value", function() {
 		expect(1);
