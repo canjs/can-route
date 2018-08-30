@@ -14,11 +14,13 @@
     "url": "http://bitovi.com"
   },
   "scripts": {
+    "ci": "npm run test && node test/test-saucelabs.js",
     "preversion": "npm test",
     "postpublish": "git push --tags && git push",
     "testee": "testee test/test.html --browsers firefox",
     "test": "npm run detect-cycle && npm run jshint && npm run testee",
     "jshint": "jshint ./*.js src/*.js test/*.js --config",
+    "http-server": "http-server -p 3000 --silent",
     "release:pre": "npm version prerelease && npm publish --tag pre",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
@@ -62,10 +64,12 @@
     "can-test-helpers": "^1.1.2",
     "detect-cyclic-packages": "^1.1.0",
     "done-serve": "^2.0.0",
+    "http-server": "^0.11.1",
     "jshint": "^2.9.1",
     "steal": "^2.0.0",
     "steal-qunit": "^1.0.1",
     "steal-tools": "^1.1.2",
+    "test-saucelabs": "0.0.6",
     "testee": "^0.8.0"
   }
 }

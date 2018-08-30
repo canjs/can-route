@@ -5,3 +5,9 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
 addons:
   firefox: "51.0"
+before_script:
+  - npm run http-server &
+  - sleep 2
+script: npm run ci
+addons:
+    sauce_connect: true
