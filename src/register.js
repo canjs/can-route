@@ -101,8 +101,15 @@ var RouteRegistry = {
 			if(this.data instanceof RouteData) {
 				var routeData = this.data;
 				canReflect.eachIndex(names, function(name) {
+					var type = "string";
+					var typeOf = typeof defaults[name];
+
+					if(typeOf !== "undefined") {
+						type = typeOf;
+					}
+
 					canReflect.defineInstanceKey(routeData.constructor, name, {
-						type: "string"
+						type: type
 					});
 				});
 			}
