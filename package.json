@@ -1,6 +1,6 @@
 {
   "name": "can-route",
-  "version": "4.3.12",
+  "version": "4.4.0",
   "description": "Observable front-end application routing for CanJS.",
   "homepage": "https://canjs.com/doc/can-route.html",
   "license": "MIT",
