@@ -102,9 +102,10 @@ var RouteRegistry = {
 				var routeData = this.data;
 				canReflect.eachIndex(names, function(name) {
 					var type = "string";
-					var typeOf = typeof defaults[name];
+					var defaultValue = defaults[name];
+					var typeOf = typeof defaultValue;
 
-					if(typeOf !== "undefined") {
+					if(defaultValue != null) {
 						type = typeOf;
 					}
 

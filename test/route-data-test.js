@@ -49,17 +49,18 @@ QUnit.asyncTest("Default map registers properties", function(){
 QUnit.asyncTest("Property defaults influence the Type", function(){
 	mockRoute.start();
 
-	canRoute.register("{type}/{id}", { type: "dog", "id": 14});
+	canRoute.register("{type}/{id}/{more}", { type: "dog", "id": 14, more: null });
 
 	canRoute._onStartComplete = function () {
 		var after = mockRoute.hash.get();
-		equal(after, "cat/7", "same URL");
+		equal(after, "cat/7/stuff", "same URL");
 		equal(canRoute.data.type, "cat", "conflicts should be won by the URL");
 		deepEqual(canRoute.data.id, 7, "conflicts should be won by the URL");
+		deepEqual(canRoute.data.more, "stuff", "null defaults are converted");
 		QUnit.start();
 		mockRoute.stop();
 	};
 
-	mockRoute.hash.value = "#!cat/7";
+	mockRoute.hash.value = "#!cat/7/stuff";
 	canRoute.start();
 });
