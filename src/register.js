@@ -9,6 +9,7 @@ var regexps = require("./regexps");
 
 var diff = require('can-diff/list/list');
 var diffObject = require('can-diff/map/map');
+var RouteData = require("./routedata");
 // `RegExp` used to match route variables of the type '{name}'.
 // Any word character or a period is matched.
 
@@ -95,6 +96,25 @@ var RouteRegistry = {
 	    		}
 	    	});
     	}
+
+			// Assign to the instance props
+			if(this.data instanceof RouteData) {
+				var routeData = this.data;
+				canReflect.eachIndex(names, function(name) {
+					var type = "string";
+					var defaultValue = defaults[name];
+					var typeOf = typeof defaultValue;
+
+					if(defaultValue != null) {
+						type = typeOf;
+					}
+
+					canReflect.defineInstanceKey(routeData.constructor, name, {
+						type: type
+					});
+				});
+			}
+
     	//!steal-remove-end
     	// Add route in a form that can be easily figured out.
     	return RouteRegistry.routes[url] = {

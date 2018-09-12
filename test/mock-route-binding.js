@@ -1,5 +1,5 @@
 var canRoute = require("can-route");
-var SimpleMap = require("can-simple-map");
+var RouteData = require("../src/routedata");
 
 var RouteMock = require("can-route-mock");
 
@@ -13,7 +13,7 @@ module.exports = {
         canRoute.urlData = this.hash;
 
 		this.hash.value = "";
-		canRoute.data = new SimpleMap();
+		canRoute.data = new RouteData();
 		//canRoute._setup();
 	},
 	stop: function(){
@@ -21,7 +21,7 @@ module.exports = {
         canRoute.urlData = oldDefault;
 
 		this.hash = new RouteMock();
-		canRoute.data = new SimpleMap();
+		canRoute.data = new RouteData();
 		//canRoute.bindings.mock.unbind();
 		//canRoute._setup();
 	}
