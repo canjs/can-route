@@ -36,6 +36,7 @@
   ],
   "dependencies": {
     "can-bind": "<2.0.0",
+    "can-define": "^2.6.0",
     "can-deparam": "^1.0.1",
     "can-diff": "^1.0.4",
     "can-dom-events": "^1.1.0",
@@ -55,7 +56,6 @@
     "can-symbol": "^1.0.0"
   },
   "devDependencies": {
-    "can-define": "^2.6.0",
     "can-map": "^4.0.0",
     "can-observe": "^2.0.0",
     "can-route-mock": "<2.0.0",
