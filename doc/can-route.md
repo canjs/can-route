@@ -108,7 +108,7 @@ Component.extend({
 
 route.data = document.querySelector( "my-app" );
 route.register( "{page}" );
-route.start();
+route.start(); // Do not add with DoneJS
 ```
 
 > __Note__: The `route.data = document.querySelector("my-app")` statement is what
@@ -127,7 +127,7 @@ const AppViewModel = DefineMap.extend( {
 const appState = new AppViewModel();
 route.data = appState;
 route.register( "{page}", { page: "home" } );
-route.start();
+route.start(); // Do not add with DoneJS
 ```
 
 Understanding how maps work is essential to understanding `can-route`.
@@ -145,7 +145,7 @@ const AppViewModel = DefineMap.extend( {
 } );
 route.data = new AppViewModel();
 route.register( "{page}" );
-route.start();
+route.start(); // Do not add with DoneJS
 ```
 
 You can listen to when the url changes from `"#!recipes"` to `"#!settings"` with:
@@ -183,7 +183,7 @@ You will see this result in the URL and `location.hash`.
 ```js
 route.data.type = "image/bar";
 // OR
-route.attr( "type", "image/bar" );
+route.attr( "type", "image/bar" ); // Deprecated 
 ```
 
 The URL will look like this:
@@ -256,7 +256,7 @@ After your application has created all of its routes, call [can-route.start]
 to set can-route’s data to match the current hash:
 
 ```js
-route.start();
+route.start(); // Do not add with DoneJS
 ```
 
 ## Changing the route
@@ -293,7 +293,7 @@ In order for a route to be matched, all of the map properties it uses must be se
 
 ```js
 route.register( "{page}/{section}" );
-route.start();
+route.start(); // Do not add with DoneJS
 route.data.page = "contact";
 route.data.section = "email";
 route.currentRule(); // "{page}/{section}"
@@ -303,7 +303,7 @@ If a route contains default values, these map properties must also be set to mat
 
 ```js
 route.register( "{page}", { section: "email" } );
-route.start();
+route.start(); // Do not add with DoneJS
 route.data.page = "contact";
 route.data.section = "email";
 route.currentRule(); // "{page}"
@@ -316,7 +316,7 @@ If multiple routes have all of their properties set, the route with the highest 
 ```js
 route.register( "{page}" );
 route.register( "{page}/{section}" );
-route.start();
+route.start(); // Do not add with DoneJS
 route.data.page = "two";
 route.data.section = "a";
 route.currentRule(); // "{page}/{section}"
@@ -329,7 +329,7 @@ If multiple routes are still matched, the route that was registered first will b
 ```js
 route.register( "", { page: "home" } );
 route.register( "{section}" );
-route.start();
+route.start(); // Do not add with DoneJS
 route.data.page = "home";
 route.data.section = "a";
 route.currentRule(); // ""
