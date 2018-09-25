@@ -7,7 +7,8 @@ var DefineMap = require('can-define/map/map');
 var canReflect = require('can-reflect');
 var stacheKey = require("can-stache-key");
 var Observation = require("can-observation");
-
+var queues = require("can-queues");
+window.queues = queues;
 var mockRoute = require("./mock-route-binding");
 
 require('can-observation');
@@ -100,18 +101,20 @@ if (typeof steal !== 'undefined') {
 
 
 		canRoute.start();
-		var isOnTestPage = new Observation(function(){
+		var isOnTestPage = new Observation(function isCurrent(){
 			return canRoute.isCurrent({page: "test"});
 		});
 
-		canReflect.onValue(isOnTestPage, function(){
+		canReflect.onValue(isOnTestPage, function isCurrentChanged(){
+			// unbind now because isCurrent depends on urlData
+			isOnTestPage.off();
 			mockRoute.stop();
 			QUnit.start();
 		});
 
 		equal(canRoute.isCurrent({page: "test"}), false, "initially not on test page")
 		setTimeout(function(){
-			canRoute.attr("page","test");
+			canRoute.data.set("page","test");
 		},20);
 	});
 

@@ -5,6 +5,7 @@ var SimpleObservable = require("can-simple-observable");
 
 var urlDataObservable = new SimpleObservable(null);
 
+canReflect.setName(urlDataObservable,"route.urlData");
 var bindingProxy = {
     defaultBinding: null,
     urlDataObservable: urlDataObservable,
