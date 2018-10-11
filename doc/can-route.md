@@ -16,24 +16,24 @@
   the can-route export:
 
   ```js
-{
-	data,     // The bound key-value observable.
-    urlData,  // The observable that represents the
+  {
+      data,     // The bound key-value observable.
+      urlData,  // The observable that represents the
               // hash. Defaults to RouteHash.
-	register, // Register routes that translate between
-	          // the url and the bound observable.
-	start,    // Begin updating the bound observable with
-	          // url data and vice versa.
-	deparam,  // Given url fragment, return the data for it.
-	rule,     // Given url fragment, return the routing rule
-	param,    // Given data, return a url fragment.
-	url,      // Given data, return a url for it.
-	link,     // Given data, return an <a> tag for it.
-	isCurrent,   // Given data, return true if the current url matches
-	             // the data.
-	currentRule // Return the matched rule name.
-}
-```
+      register, // Register routes that translate between
+              // the url and the bound observable.
+      start,    // Begin updating the bound observable with
+              // url data and vice versa.
+      deparam,  // Given url fragment, return the data for it.
+      rule,     // Given url fragment, return the routing rule
+      param,    // Given data, return a url fragment.
+      url,      // Given data, return a url for it.
+      link,     // Given data, return an <a> tag for it.
+      isCurrent,   // Given data, return true if the current url matches
+                  // the data.
+      currentRule // Return the matched rule name.
+  }
+  ```
 
 @body
 
@@ -49,7 +49,7 @@ without changing the page.
 
 This provides the basics needed to
 create history enabled single-page apps.  However,
-`route` addresses several other needs aswell, such as:
+`route` addresses several other needs as well, such as:
 
   - Pretty urls.
   - Keeping routes independent of application code.
@@ -78,38 +78,47 @@ Typically, the map is the view-model of the top-level [can-component] in your
 application.  For example, the following defines `<my-app>`, and uses the view-model
 of a `<my-app>` element already in the page as the `route.data`:
 
-```js
-import Component from "can-component";
-import route from "can-route";
-import "can-stache-route-helpers";
+```html
+<mock-url>
+<my-app>
+<script>
+  import {DefineMap, Component, route, stacheRouteHelpers} from "can";
+  // import {PageHome} from "//unpkg.com/route-mini-app@^5.0.0/components.mjs";
+  import "//unpkg.com/mock-url@^5.0.0/mock-url.mjs";
 
-Component.extend({
+  const PageHome = Component.extend({
+    tag: "page-home",
+    view: `<h1>home page</h1>`,
+    ViewModel: {},
+  });
+
+  Component.extend({
     tag: "my-app",
     ViewModel: {
-        page: "string"
+      routeData: {
+        default() {
+          const observableRouteData = new DefineMap();
+          route.data = observableRouteData;
+          route.register("{page}", { page: "home" });
+          route.start();
+          return observableRouteData;
+        }
+      },
+      get componentToShow() {
+        switch(this.routeData.page) {
+          case "home":
+            return new PageHome();
+        }
+      },
+      page: "string"
     },
     view: `
-        {{#switch(page)}}
-            {{#case("home")}}
-                <h1>Home Page</h1>
-                <a href="{{#routeUrl(page='products')}}">Products</a>
-            {{/case}}
-            {{#case("products")}}
-                <h1>Products</h1>
-                <a href="{{#routeUrl(page='home')}}">Home</a>
-            {{/case}}
-            {{#default()}}
-                <h1>Page Not Found</h1>
-                <a href="{{#routeUrl(page='home')}}">Home</a>
-            {{/default}}
-        {{/switch}}
+      {{componentToShow}}
     `
-});
-
-route.data = document.querySelector( "my-app" );
-route.register( "{page}" );
-route.start();
+  });
+</script>
 ```
+@codepen
 
 > __Note__: The `route.data = document.querySelector("my-app")` statement is what
 > sets `route.data` to `<my-app>`'s view-model.
@@ -118,8 +127,7 @@ An observable can be set as `route.data` directly.  The following sets `route.da
 to an `AppViewModel` instance:
 
 ```js
-import DefineMap from "can-define/map/map";
-import route from "can-route";
+import {DefineMap, route} from "can";
 
 const AppViewModel = DefineMap.extend( {
 	page: "string"

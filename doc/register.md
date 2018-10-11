@@ -5,23 +5,44 @@
 
 @signature `route.register(rule [, defaults])`
 
-Create a url matching rule. Optionally provide defaults that will be applied to the underlying [can-route.data] when the rule matches.
+  Create a url matching rule. Optionally provide defaults that will be applied to the underlying [can-route.data] when the rule matches.
 
-The following sets `route.data.page = "cart"` when the url is `#cart` and
-`route.data.page = "home"` when the url is `#`.
+  The following sets `route.data.page = "cart"` when the url is `#cart` and `route.data.page = "home"` when the url is `#`.
 
-```js
-route.register( "{page}", { page: "home" } );
-```
+  ```html
+  <mock-url></mock-url>
+  <script type="module">
+  import "//unpkg.com/mock-url@^5.0.0";
+  import {route} from "can";
 
-@param {String} rule the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces ( { } ). Identifiers wrapped in braces are interpreted as being properties on can-route’s map. Examples:
+  route.register( "{page}" );
+  route.data.page = "home";
+  
+  route.start();
+  console.log( route.data.page ); // -> "home"
+  route.data.page = "cart";
+  </script>
+  ```
+  @codepen
 
-```js
-route.register( "{foo}" );
-route.register( "foo/{bar}" );
-```
+  @param {String} rule the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces ( { } ). Identifiers wrapped in braces are interpreted as being properties on can-route’s map. Examples:
 
-@param {Object} [defaults] An object of default values. These defaults are applied to can-route’s map when the route is matched.
+   ```html
+   <mock-url></mock-url>
+   <script type="module">
+   import "//unpkg.com/mock-url@^5.0.0";
+   import {route} from "can";
+  
+   route.register( "{foo}" );
+   route.register( "foo/{bar}" );
+   console.log( route.data ); //-> {foo: undefined, bar: undefined}
+   
+   route.start();
+   route.data.bar = "fie"; // Url hash changes to #!foo/fie
+   </script>
+   ```
+   @codepen
 
-@return {Object} The internal route object.  Use values on this object with caution. It is
- subject to change.
+  @param {Object} [defaults] An object of default values. These defaults are applied to can-route’s map when the route is matched.
+
+  @return {Object} The internal route object.  Use values on this object with caution. It is subject to change.
