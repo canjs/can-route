@@ -6,8 +6,7 @@
 
 @signature `route.start()`
 
-  Sets up the two-way binding between the hash and the can-route observable
-  map and sets the route map to its initial values.
+  Sets up the two-way binding between the hash and the can-route observable map and sets the route map to its initial values.
 
   ```html
   <mock-url></mock-url>
