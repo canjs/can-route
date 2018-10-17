@@ -30,11 +30,11 @@ console.log( result ); //-> { id: 5, type: "videos" }
 ```
 @codepen
 
-It's important to make sure the hash or exclamation point is not passed to `route.deparam` otherwise it will be included in the first property's name.
+It's important to make sure the hash or exclamation point is not passed to `route.deparam` otherwise it will be included as a property.
 
 ```html
 <mock-url></mock-url>
-<script>
+<script type="module">
 import "//unpkg.com/mock-url@^5.0.0";
 import {route} from "//unpkg.com/can@5/core.mjs";
 
@@ -48,7 +48,7 @@ route.start();
 // setting datatype is synchronous
 setTimeout(() => {
   const result = route.deparam(location.hash);
-  console.log( result ); //-> { id: 5, type: "videos" }
+  console.log( result ); //-> { #!: "", id: "5", type: "videos" }
 }, 300);
 </script>
 ```
