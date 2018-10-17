@@ -5,47 +5,63 @@
 
 @signature `route.deparam(url)`
 
-Extract data from a url, creating an object representing its values.
+  Extract data from a url, creating an object representing its values.
 
-```js
-route.register("{page}");
+  ```js
+  import {route} from "can";
 
-const result = route.deparam("page=home");
-console.log(result.page); // -> "home"
-```
+  const result = route.deparam("page=home");
+  console.log( result.page ); //-> "home"
+  ```
+  @codepen
 
-@param {String} url A route fragment to extract data from.
-@return {Object} An object containing the extracted data.
+  @param {String} url A route fragment to extract data from.
+  @return {Object} An object containing the extracted data.
 
 @body
 
-Creates a data object based on the query string passed into it. This is
-useful to create an object based on the `location.hash`.
+Creates a data object based on the query string passed into it. This is useful to create an object based on the `location.hash`.
 
 ```js
-route.deparam("id=5&type=videos");
-  // -> { id: 5, type: "videos" }
+import {route} from "can";
+
+const result = route.deparam("id=5&type=videos"); 
+console.log( result ); //-> { id: 5, type: "videos" }
 ```
+@codepen
 
-It's important to make sure the hash or exclamation point is not passed
-to `route.deparam` otherwise it will be included in the first property's
-name.
+It's important to make sure the hash or exclamation point is not passed to `route.deparam` otherwise it will be included in the first property's name.
 
-```js
-route.data.id = 5 // location.hash -> #!id=5
-route.data.type = "videos"
-  // location.hash -> #!id=5&type=videos
-route.deparam(location.hash);
-  // -> { #!id: 5, type: "videos" }
+```html
+<mock-url></mock-url>
+<script>
+import "//unpkg.com/mock-url@^5.0.0";
+import {route} from "//unpkg.com/can@5/core.mjs";
+
+route.data = {};
+route.register("")
+route.data.id = 5;  // location.hash -> #!id=5
+route.data.type = "videos"; // location.hash -> #!&id=5&type=videos
+
+route.start();
+
+// setting datatype is synchronous
+setTimeout(() => {
+  const result = route.deparam(location.hash);
+  console.log( result ); //-> { id: 5, type: "videos" }
+}, 300);
+</script>
 ```
+@codepen
 
-`route.deparam` will try and find a matching route and, if it does,
-will deconstruct the URL and parse out the key/value parameters into the
-data object.
+`route.deparam` will try and find a matching route and, if it does, will deconstruct the URL and parse out the key/value parameters into the data object.
 
 ```js
+import {route} from "can";
+
 route.register("{type}/{id}");
 
-route.deparam("videos/5");
-  // -> { id: 5, route: "{type}/{id}", type: "videos" }
+const result = route.deparam("videos/5");
+console.log( result ); //-> { id: 5, type: "videos" }
 ```
+@codepen

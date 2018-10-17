@@ -7,9 +7,13 @@
 
   ```js
   import {route} from "can";
-  route.register( "{type}", { type: "foo" } );
+
+  route.register( "{type}" );
   route.register( "{type}/{subtype}" );
+
+  route.data.type = "foo";
   console.log( route.currentRule() ); //-> "{type}"
+
   route.data.subtype = "bar";
   console.log( route.currentRule() ); //-> "{type}/{subtype}"
   ```
