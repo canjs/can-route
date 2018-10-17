@@ -11,7 +11,7 @@
   ```js
   import {route} from "//unpkg.com/can@5/core.mjs";
 
-  route.data =  {page: "recipes", id: "5"};
+  route.data =  {page: "recipes", id: "5"}; // location.hash -> "#!&page=recipes&id=5"
   route.start();
 
   setTimeout(() => {
@@ -54,12 +54,12 @@ setTimeout(() => {
   const checkFullRoute = route.isCurrent( {id: 5, type: "videos"} );
   console.log(checkFullRoute); // -> false
   
-  route.data.type = "videos";
+  route.data.type = "videos"; // location.hash -> "#!&id=5&type=videos"
   route.start();
 }, 100);
 
 setTimeout(() => {
-  const checkFullRoute = route.isCurrent( {id: 5, type: "videos" } );
+  const checkFullRoute = route.isCurrent( {id: 5, type: "videos"} );
   console.log( checkFullRoute ); //-> true
 }, 200);
 

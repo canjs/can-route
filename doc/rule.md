@@ -3,7 +3,9 @@
 
 @description Get the routing rule that matches a url.
 
-@signature `route.rule(url)`
+@signature `route.rule( url )`
+
+  Returns a string that best matches the provided url.
 
   ```js
   import {route} from "can";

@@ -46,6 +46,7 @@ import {route} from "can";
 
 route.register("{page}", { page: "" });
 route.start();
+
 route.stop();
 route.data.page = "home"; // doesn't goto home
 

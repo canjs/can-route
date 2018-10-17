@@ -5,13 +5,13 @@
 
 @signature `route.link(innerText, data, props [, merge])`
 
-  Make an anchor tag (`<a>`) that when clicked on will update can-route's properties to match those in `data`. Creates and returns an anchor tag with an href of the route attributes passed into it, as well as any properties desired for the tag.
+  Make an anchor tag (`<a>`) that when clicked on will update can-route's properties to match those in `data`. Creates and returns an anchor tag with a href of the route attributes passed into it, as well as any properties desired for the tag.
 
   ```js
   import {route} from "can";
 
   const link = route.link( "My videos", { type: "videos" }, {}, false );
-  console.log( link ); //-> '<a href="#!&type=videos">My Videos</a>'
+  console.log( link ); //-> '<a href="#!&type=videos">My videos</a>'
   ```
   @codepen
 
@@ -30,7 +30,7 @@
      { className: "new" },
      false
    );
-   console.log( link ); //-> '<a href="#!&type=videos" class="new">My Videos</a>'
+   console.log( link ); //-> '<a href="#!&type=videos" class="new">My videos</a>'
    ```
    @codepen
 

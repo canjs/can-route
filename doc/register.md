@@ -15,8 +15,7 @@
   import "//unpkg.com/mock-url@^5.0.0";
   import {route} from "can";
 
-  route.register( "{page}" );
-  route.data.page = "home";
+  route.register( "{page}", {page: "home"} );
   
   route.start();
   console.log( route.data.page ); // -> "home"
@@ -25,7 +24,7 @@
   ```
   @codepen
 
-  @param {String} rule the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces ( { } ). Identifiers wrapped in braces are interpreted as being properties on can-route’s map. Examples:
+  @param {String} rule the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces `( { } )`. Identifiers wrapped in braces are interpreted as being properties on can-route’s map. Examples:
 
    ```html
    <mock-url></mock-url>

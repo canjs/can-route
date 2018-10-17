@@ -10,12 +10,18 @@
 
   route.register( "{type}" );
   route.register( "{type}/{subtype}" );
+  route.start();
 
   route.data.type = "foo";
-  console.log( route.currentRule() ); //-> "{type}"
+  setTimeout(() => {
+    console.log( route.currentRule() ); //-> "{type}"
+    
+    route.data.subtype = "bar";
+  }, 100);
 
-  route.data.subtype = "bar";
-  console.log( route.currentRule() ); //-> "{type}/{subtype}"
+  setTimeout(() => {
+    console.log( route.currentRule() ); //-> "{type}/{subtype}"
+  }, 200);
   ```
   @codepen
 
