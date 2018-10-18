@@ -7,7 +7,7 @@
 @link ../docco/route/route.html docco
 @package ../package.json
 
-@description Manage browser history and client state by synchronizing the `window.location.hash` with an observable.
+@description Manage browser history and client state by synchronizing the `window.location.hash` with an observable. See the [guides/routing Routing] for in depth examples.
 
 @type {Object}
 
@@ -19,17 +19,17 @@
   {
       data,     // The bound key-value observable.
       urlData,  // The observable that represents the
-              // hash. Defaults to RouteHash.
+                // hash. Defaults to RouteHash.
       register, // Register routes that translate between
-              // the url and the bound observable.
+                // the url and the bound observable.
       start,    // Begin updating the bound observable with
-              // url data and vice versa.
+                // url data and vice versa.
       deparam,  // Given url fragment, return the data for it.
       rule,     // Given url fragment, return the routing rule
       param,    // Given data, return a url fragment.
       url,      // Given data, return a url for it.
       link,     // Given data, return an <a> tag for it.
-      isCurrent,   // Given data, return true if the current url matches
+      isCurrent,  // Given data, return true if the current url matches
                   // the data.
       currentRule // Return the matched rule name.
   }
@@ -74,54 +74,57 @@ can-route keeps the state of the hash in-sync with the [can-route.data] containe
 
 Underlying `can-route` is an observable map: [can-route.data can-route.data]. Depending on what type of map your application uses this could be a [can-define/map/map], an [can-observe.Object] or maybe even a [can-simple-map].
 
-Typically, the map is the view-model of the top-level [can-component] in your
-application.  For example, the following defines `<my-app>`, and uses the view-model
-of a `<my-app>` element already in the page as the `route.data`:
-
 ```html
-<mock-url>
 <my-app>
-<script>
-  import {DefineMap, Component, route, stacheRouteHelpers} from "can";
-  // import {PageHome} from "//unpkg.com/route-mini-app@^5.0.0/components.mjs";
-  import "//unpkg.com/mock-url@^5.0.0/mock-url.mjs";
+<mock-url>
 
-  const PageHome = Component.extend({
-    tag: "page-home",
-    view: `<h1>home page</h1>`,
-    ViewModel: {},
-  });
+<script type="module">
+import {DefineMap, Component, route} from "can";
+import "//unpkg.com/mock-url@^5.0.0/mock-url.mjs";
 
-  Component.extend({
-    tag: "my-app",
-    ViewModel: {
-      routeData: {
-        default() {
-          const observableRouteData = new DefineMap();
-          route.data = observableRouteData;
-          route.register("{page}", { page: "home" });
-          route.start();
-          return observableRouteData;
-        }
-      },
-      get componentToShow() {
-        switch(this.routeData.page) {
-          case "home":
-            return new PageHome();
-        }
-      },
-      page: "string"
+const PageHome = Component.extend({
+  tag: "page-home",
+  view: `<h1>home page</h1>
+    ${route.link( "Go to another page", { page: "other" }, {}, false )}`,
+  ViewModel: {},
+});
+
+const PageOther = Component.extend({
+  tag: "page-other",
+  view: `<h1>Other page</h1>
+    ${route.link( "Go home", { page: "home" }, {}, false )}`,
+  ViewModel: {},
+});
+
+Component.extend({
+  tag: "my-app",
+  ViewModel: {
+    routeData: {
+      default() {
+        const observableRouteData = new DefineMap();
+        route.data = observableRouteData;
+        route.register("{page}", { page: "home" });
+        route.start();
+        return observableRouteData;
+      }
     },
-    view: `
-      {{componentToShow}}
-    `
-  });
+    get componentToShow() {
+      switch(this.routeData.page) {
+        case "home":
+          return new PageHome();
+        case "other":
+          return new PageOther();
+      }
+    },
+    page: "string"
+  },
+  view: `
+    {{componentToShow}}
+  `
+});
 </script>
 ```
 @codepen
-
-> __Note__: The `route.data = document.querySelector("my-app")` statement is what
-> sets `route.data` to `<my-app>`'s view-model.
 
 An observable can be set as `route.data` directly.  The following sets `route.data`
 to an `AppViewModel` instance:
@@ -136,7 +139,9 @@ const appState = new AppViewModel();
 route.data = appState;
 route.register( "{page}", { page: "home" } );
 route.start();
+console.log( route.data.page ) //-> "home"
 ```
+@codepen
 
 Understanding how maps work is essential to understanding `can-route`.
 
@@ -148,21 +153,24 @@ You can listen to changes in the url by listening on the underlying route data. 
 your route data and rule might have a page property:
 
 ```js
+import {DefineMap, route} from "can";
 const AppViewModel = DefineMap.extend( {
 	page: "string"
 } );
 route.data = new AppViewModel();
-route.register( "{page}" );
+route.register( "{page}", {page: "recipes"} );
 route.start();
-```
 
-You can listen to when the url changes from `"#!recipes"` to `"#!settings"` with:
+// You can listen when the url changes from `"#!recipes"` to `"#!settings"` with:
 
-```js
-route.data.on( "page", function( ev, newVal, oldVal ) {
-    // page changed from "recipes" to "settings"
+route.data.on( "page", ( ev, newVal, oldVal ) => {
+  console.log(oldVal); //-> "recipes"
+  console.log(newVal); //-> "settings"
 } );
+
+route.data.page = "settings";
 ```
+@codepen
 
 ### Updating can-route
 
@@ -181,82 +189,119 @@ route.data.update( { page: "tasks", id: 5 } );
 When you make changes to can-route, they will automatically
 change the <code>hash</code>.
 
-If using [can-map] or [can-simple-map] to back your route, update `route.data` using `attr`.
-
 ### Encoded `/`
 
 If the change in your route data includes a `/`, the `/` will be encoded into `%2F`.
 You will see this result in the URL and `location.hash`.
 
-```js
-route.data.type = "image/bar";
-// OR
-route.attr( "type", "image/bar" );
+```html
+<mock-url></mock-url>
+<script type="module">
+import "//unpkg.com/mock-url@^5.0.0";
+import {DefineMap, route} from "can";
+
+route.data = new DefineMap( {type: "image/bar"} ); // location.hash -> #!&type=image%2Fbar
+route.start();
+</script>
 ```
-
-The URL will look like this:
-
-    https://example.com/#!type=image%2Fbar
-
-The location hash will look like this:
-
-    #!type=image%2Fbar
+@codepen
 
 ## Creating a route
 
-Use `route.register(url, defaults)` to create a
+Use [`route.register(url, defaults)`](can-route.register) to create a
 routing rule. A rule is a mapping from a url to
 an object (that is the route’s data).
 In order to map to specific properties in the url,
 prepend a colon to the name of the property like:
 
-```js
-route.register( "#!content/{type}" );
+```html
+<mock-url></mock-url>
+<script type="module">
+import "//unpkg.com/mock-url@^5.0.0";
+import {route} from "can";
+
+route.register( "content/{type}" );
+route.data.type = "example"; // location.hash -> #!content/example
+route.start();
+</script>
 ```
+@codepen
 
 If no routes are added, or no route is matched,
-can-route’s data is updated with the [can-route.deparam deparamed]
+can-route’s data is updated with the [can-route.deparam deparam]ed
 hash.
 
-```js
-location.hash = "#!type=videos";
+```html
+<mock-url></mock-url>
+<script type="module">
+import "//unpkg.com/mock-url@^5.0.0";
+import {route} from "can";
 
-// route -> {type : "videos"}
+location.hash = "#!&type=videos";
+route.start();
+
+console.log(route.data); //-> {type : "videos"}
+</script>
 ```
+@codepen
 
 Once routes are added and the hash changes,
 can-route looks for matching routes and uses them
 to update can-route’s data.
 
-```js
-route.register( "#!content/{type}" );
+```html
+<mock-url></mock-url>
+<script type="module">
+import "//unpkg.com/mock-url@^5.0.0";
+import {route} from "can";
+
+route.register( "content/{type}" );
 location.hash = "#!content/images";
+route.start();
 
-// route -> {type : "images"}
-route.data.type = "songs";
-
-// location.hash -> "#!content/songs"
+console.log( route.data ) //-> {type : "images"}
+route.data.type = "songs"; // location.hash -> "#!content/songs"
+</script>
 ```
+@codepen
 
 Default values can be added to a route:
 
-```js
-route.register( "content/{type}", { type: "videos" } );
+```html
+<mock-url></mock-url>
+<script type="module">
+import "//unpkg.com/mock-url@^5.0.0";
+import {route} from "can";
+
+route.register( "content/{type}", {type: "videos"} );
 location.hash = "#!content/";
 
-// route -> {type : "videos"}
+route.start();
+
+console.log( route.data ); //-> {type: "videos"}
 // location.hash -> "#!content/"
+</script>
 ```
+@codepen
 
 Defaults can also be set on the root page of your app:
 
-```js
-route.register( "", { page: "index" } );
+```html
+<mock-url></mock-url>
+<script type="module">
+import "//unpkg.com/mock-url@^5.0.0";
+import {route} from "can";
+
+route.register( "", {page: "index"} );
 location.hash = "#!";
 
-// route -> {page : "index"}
+route.start()
+
+console.log( route.data ); //-> {page : "index"}
 // location.hash -> "#!"
+</script>
 ```
+@codepen
 
 ## Initializing can-route
 
@@ -269,8 +314,8 @@ route.start();
 
 ## Changing the route
 
-Typically, you don’t set `location.hash`
-directly. Instead, you can change properties on can-route
+Typically, you don’t set `location.hash` directly.
+Instead, you can change properties on can-route
 like:
 
 ```js
@@ -295,50 +340,84 @@ The matched rule is stored in the compute `route.currentRule` and is used to set
   2. If multiple routes are matched, find the route with the highest number of set properties
   3. If multiple routes are still matched, use the route that was registered first
 
+
 ### Find all routes with all of their map properties set
 
 In order for a route to be matched, all of the map properties it uses must be set. For example, in the following route, `page` and `section` must be set in order for this route to be matched:
 
 ```js
+import {route} from "can";
+
 route.register( "{page}/{section}" );
 route.start();
+
 route.data.page = "contact";
 route.data.section = "email";
-route.currentRule(); // "{page}/{section}"
+
+setTimeout(() => {
+  const result = route.currentRule();
+  console.log( result ); //-> "{page}/{section}"
+}, 100);
 ```
+@codepen
 
 If a route contains default values, these map properties must also be set to match the default value in order for the route to be matched:
 
 ```js
+import {route} from "can";
+
 route.register( "{page}", { section: "email" } );
 route.start();
+
 route.data.page = "contact";
 route.data.section = "email";
-route.currentRule(); // "{page}"
+
+setTimeout(() => {
+  const result = route.currentRule();
+  console.log( result ); //-> "{page}"
+}, 100);
 ```
+@codepen
+
 
 ### Find the route with the highest number of set properties
 
 If multiple routes have all of their properties set, the route with the highest number of set properties will be used:
 
 ```js
+import {route} from "can";
+
 route.register( "{page}" );
 route.register( "{page}/{section}" );
 route.start();
+
 route.data.page = "two";
 route.data.section = "a";
-route.currentRule(); // "{page}/{section}"
+
+setTimeout(() => {
+  const result = route.currentRule();
+  console.log( result ) //-> "{page}/{section}"
+}, 100);
 ```
+@codepen
 
 ### Find the route that was registered first
 
 If multiple routes are still matched, the route that was registered first will be matched:
 
 ```js
+import {route} from "can";
+
 route.register( "", { page: "home" } );
 route.register( "{section}" );
 route.start();
+
 route.data.page = "home";
 route.data.section = "a";
-route.currentRule(); // ""
+
+setTimeout(() => {
+  const result = route.currentRule();
+  console.log(result); //-> ""
+}, 100);
 ```
+@codepen

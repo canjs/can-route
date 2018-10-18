@@ -49,10 +49,10 @@ import {route} from "can";
 
 location.hash = "#!type=videos";
 const videoLink = route.link( "The zoo", { id: 5 }, {}, true );
-console.log( videoLink ); // -> <a href="#!&type=videos&id=5">The zoo</a>
+console.log( videoLink ); //-> <a href="#!&type=videos&id=5">The zoo</a>
 
 location.hash = "#!type=pictures";
 const pictureLink = route.link( "The zoo", { id: 5 }, {}, true );
-console.log( pictureLink ); // -> <a href="#!&type=pictures&id=5">The zoo</a>
+console.log( pictureLink ); //-> <a href="#!&type=pictures&id=5">The zoo</a>
 ```
 @codepen

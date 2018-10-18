@@ -7,36 +7,42 @@ An observable key-value object used to cross bind to the url observable [can-rou
 key-value pairs, once [can-route.start] is called, changes in `route.data`'s
 properties will update the hash and vice-versa.
 
-```js
-import DefineMap from "can-define/map/map";
-import route from "can-route";
+  ```html
+  <mock-url></mock-url>
+  <script type="module">
+  import {DefineMap, route} from "can";
+  import "//unpkg.com/mock-url@^5.0.0/mock-url.mjs";
 
-route.data = new DefineMap( { page: "" } );
-route.register( "{page}" );
-route.start();
-```
+  route.data = new DefineMap( {page: ""} );
+  route.register( "{page}" );
+  route.start();
+
+  location.hash = "#!example";
+
+  setTimeout(()=> {
+    console.log( route.data ); //-> {page: "example"}
+  }, 100);
+  </script>
+  ```
+  @codepen
 
 
 @type {HTMLElement} If `route.data` is set to an element, its
 observable [can-view-model] will be used as the observable connected
-to the browser's hash.  
+to the browser's hash.
 
-```js
-import Component from "can-component";
-import route from "can-route";
-
-Component.extend( {
-	tag: "my-app",
-	autoMount: true,
-	ViewModel: { /* ... */ },
-	view: { /* ... */ }
-} );
-route.data = document.querySelector( "my-app" );
-route.register( "{page}" );
-route.start();
-```
+  <section class="warnings">
+    <div class="deprecated warning">
+    <h3>Deprecated</h3>
+    <div class="signature-wrapper">
+    <p>Assigning an [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) to `route.data` has been deprecated in favor of setting it to an observable. If you have any further questions please refer to the [guides/routing Routing] guide.
+    </div>
+    </div>
+  </section>
 
 @body
+
+For in-depth examples see the the [guides/routing Routing] guide.
 
 ## Background
 
@@ -49,31 +55,38 @@ An elegant way to solve this problem is using the [Observer Pattern](http://en.w
 Setting `route.data` is an easy way to cross-bind your Application ViewModel object to `route`. This will serialize your Application ViewModel into the hash (or pushstate URLs).
 
 ```js
+import {DefineMap} from "can";
+
 const ViewModel = DefineMap.extend( {
-	petType: "string",
-	storeId: "number"
+  petType: "string",
+  storeId: "number"
 } );
+
 const viewModel = new ViewModel( {
-	petType: "string",
-	storeId: "number"
+  petType: "string",
+  storeId: "number"
 } );
+
 route.data = viewModel;
 ```
 
 `route.data` can also be set to a constructor function. A new instance will be created and bound to:
 
 ```js
+import {DefineMap, route} from "can";
+
 const ViewModel = DefineMap.extend( {
-	page: {
-		type: "string",
-		set: function( page ) {
-			if ( page === "user" ) {
-				this.verifyLoggedIn();
-			}
-			return page;
-		}
-	}
+  page: {
+    type: "string",
+    set( page ) {
+      if ( page === "user" ) {
+        this.verifyLoggedIn();
+      }
+      return page;
+    }
+  }
 } );
+
 route.data = ViewModel;
 ```
 
@@ -86,81 +99,6 @@ Set `route.data` at the  start of the application lifecycle, before any calls to
 The following shows creating an Application ViewModel that loads data at page load, has a virtual property 'locationIds' which serializes an array, and synchronizes the viewModel to can-route:
 
 @demo demos/can-route/data.html
-
-## Complete example
-
-The following example shows loading some metadata on page load, which must be loaded as part of the Application ViewModel before the components can be initialized
-
-It also shows an example of a "virtual" property on the AppViewModel called locationIds, which is the serialized version of a non-serializeable can.List called  locations.  A setter is defined on locationIds, which will translate changes in locationIds back to the locations can.List.
-
-```js
-const Location = DefineMap.extend( {
-	selected: "boolean",
-	id: "any"
-} );
-const LocationList = DefineList.extend( {
-	"*": Location
-} );
-const AppViewModel = DefineMap.extend( {
-	locations: {
-		type: "any",
-
-		// don't serialize this property at all in the route
-		serialize: false
-	},
-
-	// virtual property that contains a comma separated list of ids
-	// based on locations that are selected
-	locationIds: {
-
-		// comma separated list of ids
-		serialize: function() {
-			const selected = thislocations.filter(
-				function( location ) {
-					return location.selected;
-				} );
-			const ids = [];
-			selected.each( function( item ) {
-				ids.push( item.id );
-			} );
-			return selected.join( "," );
-		},
-
-		// toggle selected from a comma separated list of ids
-		set: function( val ) {
-			let arr = val;
-			if ( typeof val === "string" ) {
-				arr = val.split( "," );
-			}
-
-			// for each id, toggle any matched location
-			this.locations.forEach( function( location ) {
-				if ( arr.indexOf( location.id ) !== -1 ) {
-					location.selected = true;
-				} else {
-					location.selected = false;
-				}
-			} );
-		}
-	}
-} );
-
-// initialize and set route.data first, so anything binding to can-route
-// will work correctly
-const viewModel = new AppViewModel();
-route.data = appViewModel;
-
-// GET /locations
-const locations = new Location.List( {} );
-
-// when the data is ready, set the locations property
-locations.done( function() {
-	viewModel.locations = locations;
-
-	// call start after the AppViewModel is fully initialized
-	route.start();
-} );
-```
 
 ## Why
 

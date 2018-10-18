@@ -25,6 +25,7 @@ Similar to [can-route.link], but instead of creating an anchor tag, `route.url` 
 
 ```js
 import {route} from "can";
+
 const url = route.url( { type: "videos", id: 5 } );
 console.log( url ); //-> "#!&type=videos&id=5"
 ```
