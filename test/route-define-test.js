@@ -46,8 +46,8 @@ if (typeof steal !== 'undefined') {
 			mockRoute.stop();
 		};
 
-		mockRoute.hash.value = "#!cat/5";
 		canRoute.start();
+		mockRoute.hash.value = "#!cat/5";
 	});
 
 	QUnit.test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data (canjs/canjs#979)", function(){
