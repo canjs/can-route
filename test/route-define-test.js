@@ -46,8 +46,8 @@ if (typeof steal !== 'undefined') {
 			mockRoute.stop();
 		};
 
-		canRoute.start();
 		mockRoute.hash.value = "#!cat/5";
+		canRoute.start();
 	});
 
 	QUnit.test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data (canjs/canjs#979)", function(){
@@ -61,14 +61,16 @@ if (typeof steal !== 'undefined') {
 		canRoute.data = appState;
 
 		canRoute._onStartComplete = function () {
-			equal(mockRoute.hash.value, "cat/5&section=home", "same URL");
-			equal(appState.get("type"), "cat", "hash populates the appState");
-			equal(appState.get("id"), "5", "hash populates the appState");
-			equal(appState.get("section"), "home", "appState keeps its properties");
-			ok(canRoute.data === appState, "canRoute.data is the same as appState");
-
-			mockRoute.stop();
-			QUnit.start();
+			setTimeout(function(){
+				equal(mockRoute.hash.value, "cat/5&section=home", "same URL");
+				equal(appState.get("type"), "cat", "hash populates the appState");
+				equal(appState.get("id"), "5", "hash populates the appState");
+				equal(appState.get("section"), "home", "appState keeps its properties");
+				ok(canRoute.data === appState, "canRoute.data is the same as appState");
+	
+				mockRoute.stop();
+				QUnit.start();
+			},0.5);
 		};
 
 		mockRoute.hash.value = "#!cat/5"; // type and id get added ... this will call update url to add everything
