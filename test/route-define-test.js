@@ -27,7 +27,8 @@ if (("onhashchange" in window)) {
 
 if (typeof steal !== 'undefined') {
 
-	QUnit.asyncTest("canRoute.map: conflicting route values, hash should win (canjs/canjs#979)", function(){
+	QUnit.test("canRoute.map: conflicting route values, hash should win (canjs/canjs#979)", function(){
+		QUnit.stop();
 		mockRoute.start();
 
 
@@ -61,16 +62,14 @@ if (typeof steal !== 'undefined') {
 		canRoute.data = appState;
 
 		canRoute._onStartComplete = function () {
-			setTimeout(function(){
-				equal(mockRoute.hash.value, "cat/5&section=home", "same URL");
-				equal(appState.get("type"), "cat", "hash populates the appState");
-				equal(appState.get("id"), "5", "hash populates the appState");
-				equal(appState.get("section"), "home", "appState keeps its properties");
-				ok(canRoute.data === appState, "canRoute.data is the same as appState");
+			equal(mockRoute.hash.value, "cat/5&section=home", "same URL");
+			equal(appState.get("type"), "cat", "hash populates the appState");
+			equal(appState.get("id"), "5", "hash populates the appState");
+			equal(appState.get("section"), "home", "appState keeps its properties");
+			ok(canRoute.data === appState, "canRoute.data is the same as appState");
 	
-				mockRoute.stop();
-				QUnit.start();
-			},0.5);
+			mockRoute.stop();
+			QUnit.start();
 		};
 
 		mockRoute.hash.value = "#!cat/5"; // type and id get added ... this will call update url to add everything
