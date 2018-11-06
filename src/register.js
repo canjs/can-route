@@ -96,6 +96,7 @@ var RouteRegistry = {
 	    		}
 	    	});
     	}
+			//!steal-remove-end
 
 			// Assign to the instance props
 			if(this.data instanceof RouteData) {
@@ -115,7 +116,6 @@ var RouteRegistry = {
 				});
 			}
 
-    	//!steal-remove-end
     	// Add route in a form that can be easily figured out.
     	return RouteRegistry.routes[url] = {
     		// A regular expression that will match the route when variable values
