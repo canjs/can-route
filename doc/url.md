@@ -16,14 +16,27 @@
   @codepen
 
   @param {Object} data The data to populate the route with.
-  @param {Boolean} [merge] Whether the given options should be merged into the current state of the route.
+  @param {Boolean} merge Whether the given options should be merged into the current state of the route.
+   ```js
+   import {route} from "can";
+
+   route.data.update( {type: "items", id: 5} );
+   route.start();
+ 
+   setTimeout(() => {
+     const url = route.url( { page: "home" }, true );
+     console.log( url ); //-> ""#!&type=test&id=5&page=home""
+   }, 100);
+   ```
+   @codepen
+
   @return {String} The route URL and query string.
 
 @body
 
 ## Use
 
-Similar to [can-route.link], but instead of creating an anchor tag, `route.url` creates only the URL based on the route options passed into it.
+`route.url` creates only the URL based on the route options passed into it.
 
 ```js
 import {route} from "can";

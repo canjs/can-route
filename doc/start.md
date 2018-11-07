@@ -6,7 +6,7 @@
 
 @signature `route.start()`
 
-  Sets up the two-way binding between the hash and the [can-route.data can-route.data] and sets the route.data to its initial values.
+  Sets up the two-way binding between the hash and the [can-route.data can-route.data] and sets the route.data to its initial values. If URL data and route.data set at the same time the URL data will take precedence.
 
   ```html
   <mock-url></mock-url>

@@ -24,7 +24,7 @@
   ```
   @codepen
 
-  @param {String} rule the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces ( `{ }` ). Identifiers wrapped in braces are interpreted as being properties on can-route’s [can-route.data]. Examples:
+  @param {String} rule the fragment identifier to match. The fragment identifier shouldn't contain characters that have special meaning: `/`, `{`, `}`, `?`, `#`, `!`, `=`, `[`, `]`, `&`), for example: `route.register("_||${foo}@^")` is a valid fragment. Identifiers wrapped in braces ( `{ }` ) are interpreted as being properties on can-route’s [can-route.data], these can contain (a-Z), typical property identifiers (`_`, `$`), and numbers after the first character. Examples:
 
    ```html
    <mock-url></mock-url>
