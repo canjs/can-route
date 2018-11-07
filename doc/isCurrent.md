@@ -8,8 +8,10 @@
   Compares `data` to the current route. Used to verify if an object is
   representative of the current route.
 
+  The following example calls `route.isCurrent` with a single matching parameter when `route.data` has two properties. If `subsetMatch` is `false` or left default `route.isCurrent` won't try and match subsets.
+
   ```js
-  import {route} from "//unpkg.com/can@5/core.mjs";
+  import {route} from "can";
 
   route.data =  {page: "recipes", id: "5"}; // location.hash -> "#!&page=recipes&id=5"
   route.start();
@@ -30,38 +32,3 @@
   the route data has additional properties that are not matched.  Defaults to `false`
   where every property needs to be present.
   @return {Boolean} Whether the data matches the current URL.
-
-@body
-
-## Use
-
-Checks the page's current URL to see if the route represents the options
-passed into the function.
-
-Returns true if the options represent the current URL.
-
-```js
-import {route} from "//unpkg.com/can@5/core.mjs";
-
-route.data = {};
-route.data.id = 5; // location.hash -> "#!&id=5"
-route.start();
-
-setTimeout(() => {
-  const currentId = route.isCurrent( { id: "5" } );
-  console.log(currentId); // -> true
-
-  const checkFullRoute = route.isCurrent( {id: 5, type: "videos"} );
-  console.log(checkFullRoute); // -> false
-  
-  route.data.type = "videos"; // location.hash -> "#!&id=5&type=videos"
-  route.start();
-}, 100);
-
-setTimeout(() => {
-  const checkFullRoute = route.isCurrent( {id: 5, type: "videos"} );
-  console.log( checkFullRoute ); //-> true
-}, 200);
-
-```
-@codepen

@@ -24,7 +24,7 @@
   ```
   @codepen
 
-  @param {String} rule the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces `( { } )`. Identifiers wrapped in braces are interpreted as being properties on can-route’s map. Examples:
+  @param {String} rule the fragment identifier to match.  The fragment identifier should contain characters (a-Z), optionally wrapped in braces ( `{ }` ). Identifiers wrapped in braces are interpreted as being properties on can-route’s [can-route.data]. Examples:
 
    ```html
    <mock-url></mock-url>
@@ -42,6 +42,15 @@
    ```
    @codepen
 
-  @param {Object} [defaults] An object of default values. These defaults are applied to can-route’s map when the route is matched.
+  @param {Object} [defaults] An object of default values. These defaults are applied to can-route’s [can-route.data] when the route is matched.
 
-  @return {Object} The internal route object.  Use values on this object with caution. It is subject to change.
+  @return {Object} The internal route object. 
+    Since `route.register` returns the route object, register calls can me chained.
+
+    ```js
+    route.register("todos/{todoId}")
+      .register("users/{userId}");
+    ```
+
+
+

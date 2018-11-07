@@ -2,11 +2,11 @@
 @parent can-route.static
 @release 3.3
 
-@description Initializes can-route.
+@description Initializes the two way relationship between the url and route.data.
 
 @signature `route.start()`
 
-  Sets up the two-way binding between the hash and the can-route observable map and sets the route map to its initial values.
+  Sets up the two-way binding between the hash and the [can-route.data can-route.data] and sets the route.data to its initial values.
 
   ```html
   <mock-url></mock-url>

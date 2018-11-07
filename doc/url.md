@@ -21,6 +21,8 @@
 
 @body
 
+## Use
+
 Similar to [can-route.link], but instead of creating an anchor tag, `route.url` creates only the URL based on the route options passed into it.
 
 ```js

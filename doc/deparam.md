@@ -5,7 +5,7 @@
 
 @signature `route.deparam(url)`
 
-  Extract data from a url, creating an object representing its values.
+  Extract data from a url fragment, creating an object representing its values. The url fragment could be a [location.hash](https://developer.mozilla.org/en-US/docs/Web/API/HTMLHyperlinkElementUtils/hash) or [location.search](https://developer.mozilla.org/en-US/docs/Web/API/HTMLHyperlinkElementUtils/search).
 
   ```js
   import {route} from "can";
@@ -20,7 +20,9 @@
 
 @body
 
-Creates a data object based on the query string passed into it. This is useful to create an object based on the `location.hash`.
+## Use
+
+`route.deparam` creates a data object based on the query string passed into it. This is useful to create an object based on the `location.hash`.
 
 ```js
 import {route} from "can";
@@ -36,7 +38,7 @@ It's important to make sure the hash or exclamation point is not passed to `rout
 <mock-url></mock-url>
 <script type="module">
 import "//unpkg.com/mock-url@^5.0.0";
-import {route} from "//unpkg.com/can@5/core.mjs";
+import {route} from "can";
 
 route.data = {};
 route.register("")

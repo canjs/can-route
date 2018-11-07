@@ -9,13 +9,12 @@ what URL [can-route route] is cross-bound to.
   The following shows setting `urlData` to another observable.
 
   ```js
-  import {route, DefineMap} from "can";
-  import {RouteMock} from "//unpkg.com/can@5/everything.mjs";
+  import {route, RouteMock} from "can/everything";
 
   // route.data will update routeMock and be updated by changes in
   // routeMock.
   const routeMock = route.urlData = new RouteMock();
-  const routeData = route.data = new DefineMap({},false);
+  const routeData = route.data;
 
   // begin binding
   route.start()
