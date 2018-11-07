@@ -20,3 +20,9 @@
 
   @return {String|undefined} Returns the [can-route.register registered] routing rule
   that best matches the provided url.  If no rule matches, `undefined` is returned.
+
+@body
+
+## Use
+
+`route.rule` is used internally by [can-stache-route-helpers].
