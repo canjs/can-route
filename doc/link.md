@@ -1,7 +1,16 @@
 @function can-route.link link
-@parent can-route.static
+@parent can-route.deprecated
 
 @description Creates a string representation of an anchor link using data and the registered routes.
+
+<section class="warnings">
+  <div class="deprecated warning">
+  <h3>Deprecated 4.4.1</h3>
+  <div class="signature-wrapper">
+  <p><code>route.link</code> has been deprecated in favor of <a href="can-stache-route-helpers.routeUrl.html" title="Returns a url using route.url.">can-stache-route-helpers.routeCurrent</a>.
+  </div>
+  </div>
+</section>
 
 @signature `route.link(innerText, data, props [, merge])`
 
@@ -38,6 +47,8 @@
   @return {String} A string with an anchor tag that points to the populated route.
 
 @body
+
+## Use
 
 It is possible to utilize the current route options when making anchor
 tags in order to make your code more reusable. If merge is set to true,
