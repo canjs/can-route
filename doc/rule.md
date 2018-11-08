@@ -16,7 +16,7 @@
   ```
   @codepen
 
-  @param {String} url A url or url fragment.
+  @param {String} url A url fragment.
 
   @return {String|undefined} Returns the [can-route.register registered] routing rule
   that best matches the provided url.  If no rule matches, `undefined` is returned.

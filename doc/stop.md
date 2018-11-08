@@ -64,7 +64,6 @@ Component.extend({
   ViewModel: {
     routeData: {
       default() {
-        route.data = new DefineMap();
         route.register("{page}");
         route.data.page = "admin";
         route.start();

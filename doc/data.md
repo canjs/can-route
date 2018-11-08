@@ -35,7 +35,7 @@ to the browser's hash.
     <div class="deprecated warning">
     <h3>Deprecated</h3>
     <div class="signature-wrapper">
-    <p>Assigning an [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) to `route.data` has been deprecated in favor of setting it to an observable. If you have any further questions please refer to the [guides/routing Routing] guide.
+    <p>Assigning an <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement">HTMLElement</a> to <code>route.data</code> has been deprecated in favor of setting it to an observable. If you have any further questions please refer to the [guides/routing Routing] guide.
     </div>
     </div>
   </section>

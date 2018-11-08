@@ -21,6 +21,6 @@
   @codepen
 
   @param {data} object The data to populate the route with.
-  @param {String} [currentRouteName] The current route name.  If provided, this can be used to "stick" the url to a previous route. By "stick", we mean that if there are multiple registered routes that match the `object`, the the `currentRouteName` will be used.
+  @param {String} [currentRouteName] The current route name.  If provided, this can be used to "stick" the url to a previous route. By "stick", we mean that if there are multiple registered routes that match the `object`, the `currentRouteName` will be used.
 
   @return {String} The route, with the data populated in it.
