@@ -17,7 +17,7 @@ var platforms = [/*{
 }, */{
 	browserName: 'safari',
 	platform: 'OS X 10.13',
-	version: 'latest',
+	version: '11',
 	maxDuration: maxDuration,
 	commandTimeout: commandTimeout,
 	idleTimeout: idleTimeout
