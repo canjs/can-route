@@ -258,7 +258,7 @@ to set can-route’s data to match the current hash:
 ```js
 route.start();
 ```
-
+ 
 ## Changing the route
 
 Typically, you don’t set `location.hash`
