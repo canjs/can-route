@@ -27,7 +27,8 @@ if (("onhashchange" in window)) {
 
 if (typeof steal !== 'undefined') {
 
-	QUnit.asyncTest("canRoute.map: conflicting route values, hash should win (canjs/canjs#979)", function(){
+	QUnit.test("canRoute.map: conflicting route values, hash should win (canjs/canjs#979)", function(){
+		QUnit.stop();
 		mockRoute.start();
 
 
@@ -66,7 +67,7 @@ if (typeof steal !== 'undefined') {
 			equal(appState.get("id"), "5", "hash populates the appState");
 			equal(appState.get("section"), "home", "appState keeps its properties");
 			ok(canRoute.data === appState, "canRoute.data is the same as appState");
-
+	
 			mockRoute.stop();
 			QUnit.start();
 		};

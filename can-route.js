@@ -35,7 +35,7 @@ bindingProxy.urlDataObservable.value = hashchangeObservable;
 
 function canRoute(url, defaults){
 	//!steal-remove-start
-	if(process.env.NODE_ENV !== 'production') {
+	if(typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
 		devLog.warn('Call route.register(url,defaults) instead of calling route(url, defaults)');
 	}
 	//!steal-remove-end
@@ -158,7 +158,7 @@ canReflect.assignMap(canRoute, {
 	deparam: routeDeparam,
 	map: function(data){
 		//!steal-remove-start
-		if(process.env.NODE_ENV !== 'production') {
+		if(typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
 			devLog.warn('Set route.data directly instead of calling route.map');
 		}
 		//!steal-remove-end
@@ -232,7 +232,7 @@ canReflect.assignMap(canRoute, {
 			// For debugging: the names that will be assigned to the updateChild and
 			// updateParent functions within can-bind
 			//!steal-remove-start
-			if (process.env.NODE_ENV !== 'production') {
+			if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
 				bindingOptions.updateChildName = "can-route.updateRouteData";
 				bindingOptions.updateParentName = "can-route.updateUrl";
 			}
