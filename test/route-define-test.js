@@ -15,6 +15,7 @@ require('can-observation');
 
 QUnit.module("can/route with can-define/map/map", {
 	setup: function () {
+		canRoute.routes = {};
 		canRoute._teardown();
 		canRoute.urlData = canRoute.bindings.hashchange
 		//canRoute.defaultBinding = "hashchange";
