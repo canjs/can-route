@@ -7,14 +7,14 @@ var commandTimeout = 600; // seconds, default 300, max 600
 var idleTimeout = 1000; // seconds, default 90, max 1000
 
 // https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
-var platforms = [/*{
+var platforms = [{
 	browserName: 'internet explorer',
 	platform: 'Windows 10',
 	version: '11.0',
 	maxDuration: maxDuration,
 	commandTimeout: commandTimeout,
 	idleTimeout: idleTimeout
-}, */{
+}, {
 	browserName: 'safari',
 	platform: 'OS X 10.13',
 	version: '11',
