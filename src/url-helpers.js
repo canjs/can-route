@@ -5,16 +5,15 @@ var routeParam = require("./param");
 var canReflect = require("can-reflect");
 var string = require('can-string');
 
-
-var makeProps = function (props) {
+function makeProps(props) {
 	var tags = [];
 	canReflect.eachKey(props, function (val, name) {
 		tags.push((name === 'className' ? 'class' : name) + '="' +
 			(name === "href" ? val : string.esc(val)) + '"');
 	});
 	return tags.join(" ");
-};
-var matchCheck = function(source, matcher){
+}
+function matchCheck(source, matcher) {
 	/*jshint eqeqeq:false*/
 	for(var prop in source) {
 		var s = source[prop],
@@ -27,7 +26,7 @@ var matchCheck = function(source, matcher){
 		}
 	}
 	return true;
-};
+}
 
 function canRoute_url(options, merge) {
 
