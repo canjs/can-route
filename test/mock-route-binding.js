@@ -10,7 +10,7 @@ module.exports = {
 		// discard old hash
 		this.hash = new RouteMock();
 		oldDefault = canRoute.urlData;
-        canRoute.urlData = this.hash;
+		canRoute.urlData = this.hash;
 
 		this.hash.value = "";
 		canRoute.data = new RouteData();
@@ -18,7 +18,7 @@ module.exports = {
 	},
 	stop: function(){
 		canRoute._teardown();
-        canRoute.urlData = oldDefault;
+		canRoute.urlData = oldDefault;
 
 		this.hash = new RouteMock();
 		canRoute.data = new RouteData();

@@ -1,26 +1,26 @@
-var canRoute = require('can-route');
-var QUnit = require('steal-qunit');
+var canRoute = require("can-route");
+var QUnit = require("steal-qunit");
 var mockRoute = require("./mock-route-binding");
 var DefineMap = require("can-define/map/");
 
 QUnit.module("can-route observablility",{
-    setup: function(){
-        canRoute.routes = {};
-    }
+	setup: function(){
+		canRoute.routes = {};
+	}
 });
 
 QUnit.test("on/off binding", function () {
 	canRoute.routes = {};
 	expect(1);
-	canRoute.on('foo', function () {
+	canRoute.on("foo", function () {
 		ok(true, "foo called");
 
-		canRoute.off('foo');
+		canRoute.off("foo");
 
-		canRoute.attr('foo', 'baz');
+		canRoute.attr("foo", "baz");
 	});
 
-	canRoute.attr('foo', 'bar');
+	canRoute.attr("foo", "bar");
 });
 
 //var queues = require("can-queues");

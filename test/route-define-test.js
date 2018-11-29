@@ -1,17 +1,17 @@
 /* jshint asi:true */
 /* jshint -W079 */
 require("./route-define-iframe-test");
-var canRoute = require('can-route');
-var QUnit = require('steal-qunit');
-var DefineMap = require('can-define/map/map');
-var canReflect = require('can-reflect');
+var canRoute = require("can-route");
+var QUnit = require("steal-qunit");
+var DefineMap = require("can-define/map/map");
+var canReflect = require("can-reflect");
 var stacheKey = require("can-stache-key");
 var Observation = require("can-observation");
 var queues = require("can-queues");
 window.queues = queues;
 var mockRoute = require("./mock-route-binding");
 
-require('can-observation');
+require("can-observation");
 
 QUnit.module("can/route with can-define/map/map", {
 	setup: function () {
@@ -26,7 +26,7 @@ QUnit.module("can/route with can-define/map/map", {
 if (("onhashchange" in window)) {
 
 
-if (typeof steal !== 'undefined') {
+if (typeof steal !== "undefined") {
 
 	QUnit.test("canRoute.map: conflicting route values, hash should win (canjs/canjs#979)", function(){
 		QUnit.stop();
@@ -35,7 +35,7 @@ if (typeof steal !== 'undefined') {
 
 		canRoute.register("{type}/{id}");
 		var AppState = DefineMap.extend({seal: false},{});
-		var appState = new AppState({type: "dog", id: '4'});
+		var appState = new AppState({type: "dog", id: "4"});
 
 		canRoute.data = appState;
 
@@ -58,7 +58,7 @@ if (typeof steal !== 'undefined') {
 
 		canRoute.register("{type}/{id}");
 		var AppState = DefineMap.extend({seal: false},{});
-		var appState = new AppState({section: 'home'});
+		var appState = new AppState({section: "home"});
 
 		canRoute.data = appState;
 
@@ -159,8 +159,8 @@ if (typeof steal !== 'undefined') {
 
 
 		canRoute._onStartComplete = function() {
-			equal(canRoute.data.get('panelA').id, 20, "id should change");
-			equal(canRoute.data.get('panelA').show, undefined, "show should be removed");
+			equal(canRoute.data.get("panelA").id, 20, "id should change");
+			equal(canRoute.data.get("panelA").show, undefined, "show should be removed");
 			mockRoute.stop();
 			QUnit.start();
 		};
@@ -172,17 +172,17 @@ if (typeof steal !== 'undefined') {
 		expect(1);
 
 		canRoute.start();
-		var MyMap = DefineMap.extend({seal: false},{'*': "stringOrObservable"});
+		var MyMap = DefineMap.extend({seal: false},{"*": "stringOrObservable"});
 		var appVM = new MyMap();
 
 		canRoute.data = appVM;
 
 		canRoute._onStartComplete = function(){
-			appVM.on('action', function(ev, newVal) {
-				strictEqual(newVal, '10');
+			appVM.on("action", function(ev, newVal) {
+				strictEqual(newVal, "10");
 			});
 
-			appVM.set('action', 10);
+			appVM.set("action", 10);
 
 			// check after 30ms to see that we only have a single call
 			setTimeout(function() {
@@ -200,11 +200,11 @@ if (typeof steal !== 'undefined') {
 			iCanRoute.start();
 			iCanRoute.register("{path}");
 
-			iCanRoute.attr('path', 'foo');
+			iCanRoute.attr("path", "foo");
 			setTimeout(function() {
 				var counter = 0;
 				try {
-					equal(loc.hash, '#!foo');
+					equal(loc.hash, "#!foo");
 				} catch(e) {
 					start();
 					throw e;
@@ -217,7 +217,7 @@ if (typeof steal !== 'undefined') {
 				loc.hash = "bar";
 				setTimeout(function() {
 					try {
-						equal(loc.hash, '#bar');
+						equal(loc.hash, "#bar");
 						equal(counter, 1); //sanity check -- bindings only ran once before this change.
 					} finally {
 						start();
@@ -225,7 +225,7 @@ if (typeof steal !== 'undefined') {
 				}, 100);
 			}, 100);
 		};
-		var iframe = document.createElement('iframe');
+		var iframe = document.createElement("iframe");
 		iframe.src = __dirname+"/define-testing.html?1";
 		this.fixture.appendChild(iframe);
 	});
@@ -251,7 +251,7 @@ test("escaping periods", function () {
 
 });
 
-if (typeof require !== 'undefined') {
+if (typeof require !== "undefined") {
 
 	test("correct stringing", function () {
 		mockRoute.start();
@@ -301,7 +301,7 @@ if (typeof require !== 'undefined') {
 		canReflect.update(canRoute.data, {});
 
 		canRoute.attr({
-			type: 'page',
+			type: "page",
 			id: 10,
 			sort_by_name: true
 		});
@@ -320,15 +320,15 @@ test("on/off binding", function () {
 	canRoute.routes = {};
 	expect(1)
 
-	canRoute.on('foo', function () {
+	canRoute.on("foo", function () {
 		ok(true, "foo called");
 
-		canRoute.off('foo');
+		canRoute.off("foo");
 
-		canRoute.attr('foo', 'baz');
+		canRoute.attr("foo", "baz");
 	});
 
-	canRoute.attr('foo', 'bar');
+	canRoute.attr("foo", "bar");
 });
 
 test("two way binding canRoute.map with DefineMap instance", function(){
@@ -344,10 +344,10 @@ test("two way binding canRoute.map with DefineMap instance", function(){
 	canRoute.data = appState;
 	canRoute.start();
 
-	canRoute.serializedCompute.bind('change', function(){
+	canRoute.serializedCompute.bind("change", function(){
 
-		equal(canRoute.attr('name'), 'Brian', 'appState is bound to canRoute');
-		canRoute.serializedCompute.unbind('change');
+		equal(canRoute.attr("name"), "Brian", "appState is bound to canRoute");
+		canRoute.serializedCompute.unbind("change");
 		appState.name = undefined;
 
 		setTimeout(function(){
@@ -357,7 +357,7 @@ test("two way binding canRoute.map with DefineMap instance", function(){
 		},20);
 	});
 
-	appState.set('name', 'Brian');
+	appState.set("name", "Brian");
 });
 
 test(".url with merge=true", function(){
@@ -372,7 +372,7 @@ test(".url with merge=true", function(){
 
 	QUnit.stop();
 
-	appState.set('foo', 'bar');
+	appState.set("foo", "bar");
 
 	// TODO: expose a way to know when the url has changed.
 	setTimeout(function(){
@@ -431,8 +431,8 @@ test("triggers __url event anytime a there's a change to individual properties",
 	var appState = new AppState({});
 
 	canRoute.data = appState;
-	canRoute.register('{page}');
-	canRoute.register('{page}/{section}');
+	canRoute.register("{page}");
+	canRoute.register("{page}/{section}");
 
 	QUnit.stop();
 	canRoute.start();
@@ -440,27 +440,27 @@ test("triggers __url event anytime a there's a change to individual properties",
 	var matchedCount = 0;
 	var onMatchCall = {
 		1: function section_a() {
-			canRoute.data.section = 'a';
+			canRoute.data.section = "a";
 		},
 		2: function section_b() {
-			canRoute.data.section = 'b';
+			canRoute.data.section = "b";
 		},
 		3: function(){
 			// 1st call is going from undefined to empty string
-			equal(matchedCount, 3, 'calls __url event every time a property is changed');
+			equal(matchedCount, 3, "calls __url event every time a property is changed");
 
 			mockRoute.stop();
 			QUnit.start();
 		}
 	}
-	canRoute.on('__url', function updateMatchedCount() {
+	canRoute.on("__url", function updateMatchedCount() {
 		// any time a route property is changed, not just the matched route
 		matchedCount++;
 		onMatchCall[matchedCount]();
 	});
 
 	setTimeout(function page_two() {
-		canRoute.data.page = 'two';
+		canRoute.data.page = "two";
 	}, 50);
 
 });
@@ -478,11 +478,11 @@ QUnit.asyncTest("updating unserialized prop on bound DefineMap causes single upd
 	canRoute.data = appVM;
 	canRoute.start();
 
-	appVM.bind('action', function(ev, newVal) {
-		equal(typeof newVal, 'function');
+	appVM.bind("action", function(ev, newVal) {
+		equal(typeof newVal, "function");
 	});
 
-	appVM.set('action', function() {});
+	appVM.set("action", function() {});
 
 	// check after 30ms to see that we only have a single call
 	setTimeout(function() {

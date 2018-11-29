@@ -4,10 +4,10 @@ import route from "can-route";
 
 
 var Counter = DefineMap.extend("Counter",{
-    count: {value: 0},
-    increment() {
-        this.count++;
-    }
+	count: {value: 0},
+	increment() {
+		this.count++;
+	}
 });
 
 route.register("",{count: 0});

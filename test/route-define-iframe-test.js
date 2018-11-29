@@ -1,6 +1,6 @@
-var canRoute = require('can-route');
-var QUnit = require('steal-qunit');
-var canReflect = require('can-reflect');
+var canRoute = require("can-route");
+var QUnit = require("steal-qunit");
+var canReflect = require("can-reflect");
 
 QUnit.module("can-route with can-define/map/map in an iframe", {
 	setup: function () {
@@ -18,8 +18,8 @@ if (("onhashchange" in window)) {
 	var teardownRouteTest;
 	var setupRouteTest = function(callback){
 
-		var testarea = document.getElementById('qunit-fixture');
-		var iframe = document.createElement('iframe');
+		var testarea = document.getElementById("qunit-fixture");
+		var iframe = document.createElement("iframe");
 		stop();
 		window.routeTestReady = function(){
 			var args = canReflect.toArray(arguments);
@@ -39,20 +39,20 @@ if (("onhashchange" in window)) {
 	};
 
 
-	if (typeof steal !== 'undefined') {
+	if (typeof steal !== "undefined") {
 		test("listening to hashchange (#216, #124)", function () {
 
 			setupRouteTest(function (iframe, iCanRoute) {
 
-				ok(!iCanRoute.data.bla, 'Value not set yet');
+				ok(!iCanRoute.data.bla, "Value not set yet");
 
-				iCanRoute.bind('bla', function(){
-					equal(iCanRoute.data.get("bla"), 'blu', 'Got route change event and value is as expected');
+				iCanRoute.bind("bla", function(){
+					equal(iCanRoute.data.get("bla"), "blu", "Got route change event and value is as expected");
 					teardownRouteTest();
 				});
 
 				iCanRoute._onStartComplete = function () {
-					iframe.src = iframe.src + '#!bla=blu';
+					iframe.src = iframe.src + "#!bla=blu";
 				};
 
 				iCanRoute.start();

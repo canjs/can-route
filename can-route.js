@@ -1,12 +1,12 @@
 "use strict";
 var Bind = require("can-bind");
 var queues = require("can-queues");
-var Observation = require('can-observation');
+var Observation = require("can-observation");
 
-var namespace = require('can-namespace');
-var devLog = require('can-log/dev/dev');
-var canReflect = require('can-reflect');
-var canSymbol = require('can-symbol');
+var namespace = require("can-namespace");
+var devLog = require("can-log/dev/dev");
+var canReflect = require("can-reflect");
+var canSymbol = require("can-symbol");
 var makeCompute = require("can-simple-observable/make-compute/make-compute");
 var RouteData = require("./src/routedata");
 var stringCoercingMapDecorator = require("./src/string-coercion").stringCoercingMapDecorator;
@@ -18,8 +18,8 @@ var routeDeparam = require("./src/deparam");
 var bindingProxy = require("./src/binding-proxy");
 var Hashchange = require("can-route-hash");
 
-var isWebWorker =  require('can-globals/is-web-worker/is-web-worker');
-var isBrowserWindow =  require('can-globals/is-browser-window/is-browser-window');
+var isWebWorker =  require("can-globals/is-web-worker/is-web-worker");
+var isBrowserWindow =  require("can-globals/is-browser-window/is-browser-window");
 
 var hashchangeObservable = new Hashchange();
 bindingProxy.bindings.hashchange = hashchangeObservable;
@@ -34,8 +34,8 @@ bindingProxy.urlDataObservable.value = hashchangeObservable;
 
 function canRoute(url, defaults){
 	//!steal-remove-start
-	if(typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-		devLog.warn('Call route.register(url,defaults) instead of calling route(url, defaults)');
+	if(typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
+		devLog.warn("Call route.register(url,defaults) instead of calling route(url, defaults)");
 	}
 	//!steal-remove-end
 	registerRoute.register(url, defaults);
@@ -157,8 +157,8 @@ canReflect.assignMap(canRoute, {
 	deparam: routeDeparam,
 	map: function(data){
 		//!steal-remove-start
-		if(typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-			devLog.warn('Set route.data directly instead of calling route.map');
+		if(typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
+			devLog.warn("Set route.data directly instead of calling route.map");
 		}
 		//!steal-remove-end
 		canRoute.data = data;
@@ -231,7 +231,7 @@ canReflect.assignMap(canRoute, {
 			// For debugging: the names that will be assigned to the updateChild and
 			// updateParent functions within can-bind
 			//!steal-remove-start
-			if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+			if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
 				bindingOptions.updateChildName = "can-route.updateRouteData";
 				bindingOptions.updateParentName = "can-route.updateUrl";
 			}
@@ -278,17 +278,17 @@ var bindToCanRouteData = function(name, args) {
 	return canRoute.data[name].apply(canRoute.data, args);
 };
 
-['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off'].forEach(function(name) {
+["addEventListener","removeEventListener","bind", "unbind", "on", "off"].forEach(function(name) {
 	// exposing all internal eventQueue evt’s to canRoute
 	canRoute[name] = function(eventName, handler) {
-		if (eventName === '__url') {
+		if (eventName === "__url") {
 			return bindingProxy.call("can.onValue", handler );
 		}
 		return bindToCanRouteData(name, arguments);
 	};
 });
 
-['delegate', 'undelegate', 'removeAttr', 'compute', '_get', '___get', 'each'].forEach(function (name) {
+["delegate", "undelegate", "removeAttr", "compute", "_get", "___get", "each"].forEach(function (name) {
 	canRoute[name] = function () {
 		// `delegate` and `undelegate` require
 		// the `can/map/delegate` plugin
@@ -357,7 +357,7 @@ canRoute.attr = function(prop, value){
 		if(arguments.length > 1) {
 			canReflect.setKeyValue(canRoute.data, prop, value);
 			return canRoute.data;
-		} else if(typeof prop === 'object') {
+		} else if(typeof prop === "object") {
 			canReflect.assignDeep(canRoute.data,prop);
 			return canRoute.data;
 		} else if(arguments.length === 1){
