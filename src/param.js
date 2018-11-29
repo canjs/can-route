@@ -6,34 +6,37 @@ var register = require("./register");
 var regexps = require("./regexps");
 var bindingProxy = require("./binding-proxy");
 
+// ## can-route.param Helper Functions
+
+// ### matchesData
 // Checks if a route matches the data provided. If any route variable
 // is not present in the data, the route does not match. If all route
 // variables are present in the data, the number of matches is returned
 // to allow discerning between general and more specific routes.
-var matchesData = function (route, data) {
-	var count = 0,
-		i = 0,
-		defaults = {};
-	// look at default values, if they match ...
+function matchesData(route, data) {
+    var count = 0,
+        defaults = {};
+
+	// look at default route values, if they match ...
 	for (var name in route.defaults) {
 		if (route.defaults[name] === data[name]) {
 			// mark as matched
 			defaults[name] = 1;
 			count++;
 		}
-	}
-	for (; i < route.names.length; i++) {
+    }
+
+	for (var i = 0; i < route.names.length; i++) {
 		if (!data.hasOwnProperty(route.names[i])) {
 			return -1;
 		}
 		if (!defaults[route.names[i]]) {
 			count++;
 		}
-
 	}
 
 	return count;
-};
+}
 
 function getMatchedRoute(data, routeName) {
 	// Check if the provided data keys match the names in any routes;
