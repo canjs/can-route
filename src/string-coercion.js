@@ -2,7 +2,7 @@ var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 
 // Helper for convert any object (or value) to stringified object (or value)
-var stringify = function (obj) {
+function stringify(obj) {
 	// Object is array, plain object, Map or List
 	if (obj && typeof obj === "object") {
 		if (obj && typeof obj === "object" && ("serialize" in obj)) {
@@ -21,12 +21,12 @@ var stringify = function (obj) {
 	}
 
 	return obj;
-};
+}
 
 // everything in the backing Map is a string
 // add type coercion during Map setter to coerce all values to strings so unexpected conflicts don't happen.
 // https://github.com/canjs/canjs/issues/2206
-var stringCoercingMapDecorator = function(map) {
+function stringCoercingMapDecorator(map) {
 	var sym = canSymbol.for("can.route.stringCoercingMapDecorator");
 	if(!map.attr[sym]) {
 		var attrSuper = map.attr;
@@ -48,7 +48,7 @@ var stringCoercingMapDecorator = function(map) {
 	}
 
 	return map;
-};
+}
 
 exports.stringCoercingMapDecorator = stringCoercingMapDecorator;
 exports.stringify = stringify;
