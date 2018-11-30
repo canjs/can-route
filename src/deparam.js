@@ -5,17 +5,17 @@ var canReflect = require("can-reflect");
 var bindingProxy = require("./binding-proxy");
 var register = require("./register");
 
-var decode = function(str){
+function decode(str) {
 	try {
 		return decodeURIComponent(str);
 	} catch(ex) {
 		return unescape(str);
 	}
-};
+}
 
 // TODO: I'm not totally sure this belongs here. This might be shifted to can-route-pushstate.
-function toURLFragment(url){
-	var root =bindingProxy.call("root");
+function toURLFragment(url) {
+	var root = bindingProxy.call("root");
 	// if the root ends with `/` and the url starts with it, remove /
 	if (root.lastIndexOf("/") === root.length - 1 && url.indexOf("/") === 0) {
 		url = url.substr(1);
@@ -23,7 +23,7 @@ function toURLFragment(url){
 	return url;
 }
 
-function canRoute_getRule(url){
+function canRoute_getRule(url) {
 
 	url = toURLFragment(url);
 	// See if the url matches any routes by testing it against the `route.test` `RegExp`.

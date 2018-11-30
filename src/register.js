@@ -15,13 +15,13 @@ var RouteData = require("./routedata");
 
 
 
-var removeBackslash = function (str) {
+function removeBackslash(str) {
 	return str.replace(/\\/g, "");
-};
-var wrapQuote = function (str) {
+}
+function wrapQuote(str) {
 	return (str + "")
 		.replace(/([.?*+\^$\[\]\\(){}|\-])/g, "\\$1");
-};
+}
 
 var RouteRegistry = {
 	routes:  {},
