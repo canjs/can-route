@@ -5,16 +5,17 @@ var SimpleObservable = require("can-simple-observable");
 
 var urlDataObservable = new SimpleObservable(null);
 
-canReflect.setName(urlDataObservable,"route.urlData");
+canReflect.setName(urlDataObservable, "route.urlData");
+
 var bindingProxy = {
 	defaultBinding: null,
 	urlDataObservable: urlDataObservable,
 	bindings: {},
-	call: function(){
+	call: function() {
 		var args = canReflect.toArray(arguments),
 			prop = args.shift(),
 			binding = urlDataObservable.value;
-		if(binding === null) {
+		if (binding === null) {
 			throw new Error("there is no current binding!!!");
 		}
 		var method = binding[prop.indexOf("can.") === 0 ? canSymbol.for(prop) : prop];

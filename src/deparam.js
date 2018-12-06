@@ -5,6 +5,9 @@ var canReflect = require("can-reflect");
 var bindingProxy = require("./binding-proxy");
 var register = require("./register");
 
+// ## decode
+// Restore escaped HTML from its URI value.
+// It isn't compatable with named character references (`&copy;`, etc).
 function decode(str) {
 	try {
 		return decodeURIComponent(str);
@@ -24,7 +27,6 @@ function toURLFragment(url) {
 }
 
 function canRoute_getRule(url) {
-
 	url = toURLFragment(url);
 	// See if the url matches any routes by testing it against the `route.test` `RegExp`.
 	// By comparing the URL length the most specialized route that matches is used.
@@ -46,17 +48,16 @@ function canRoute_getRule(url) {
 function canRoute_deparam(url) {
 
 	var route = canRoute_getRule(url),
-		querySeparator =bindingProxy.call("querySeparator"),
-		paramsMatcher =bindingProxy.call("paramsMatcher");
+		querySeparator = bindingProxy.call("querySeparator"),
+		paramsMatcher = bindingProxy.call("paramsMatcher");
 
 	url = toURLFragment(url);
 
 	// If a route was matched.
 	if (route) {
-
-		var // Since `RegExp` backreferences are used in `route.test` (parens)
+		// Since `RegExp` backreferences are used in `route.test` (parens)
 		// the parts will contain the full matched string and each variable (back-referenced) value.
-		parts = url.match(route.test),
+		var parts = url.match(route.test),
 			// Start will contain the full matched string; parts contain the variable values.
 			start = parts.shift(),
 			// The remainder will be the `&amp;key=value` list at the end of the URL.
@@ -83,6 +84,5 @@ function canRoute_deparam(url) {
 }
 
 canRoute_deparam.getRule = canRoute_getRule;
-
 
 module.exports = canRoute_deparam;

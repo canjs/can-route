@@ -13,19 +13,22 @@ var RouteData = require("./routedata");
 // `RegExp` used to match route variables of the type '{name}'.
 // Any word character or a period is matched.
 
-
-
-function removeBackslash(str) {
-	return str.replace(/\\/g, "");
+// ### removeBackslash
+// removes all backslashes from a string.
+function removeBackslash(string) {
+	return string.replace(/\\/g, "");
 }
-function wrapQuote(str) {
-	return (str + "")
+
+// ### wrapQuote
+// converts input to a string
+function wrapQuote(string) {
+	return (string + "")
 		.replace(/([.?*+\^$\[\]\\(){}|\-])/g, "\\$1");
 }
 
 var RouteRegistry = {
 	routes:  {},
-	register: function registerRoute(url, defaults) {
+	register: function(url, defaults) {
 		// if route ends with a / and url starts with a /, remove the leading / of the url
 		var root = bindingProxy.call("root");
 
@@ -36,7 +39,7 @@ var RouteRegistry = {
 
 		defaults = defaults || {};
 		// Extract the variable names and replace with `RegExp` that will match
-		// an atual URL with values.
+		// an actual URL with values.
 		var names = [],
 			res,
 			test = "",
@@ -51,7 +54,7 @@ var RouteRegistry = {
 			matcher = regexps.colon;
 
 			//!steal-remove-start
-			if(process.env.NODE_ENV !== "production") {
+			if (process.env.NODE_ENV !== "production") {
 				dev.warn("update route \"" + url + "\" to \"" + url.replace(regexps.colon, function(name, key) {
 					return "{" + key + "}";
 				}) + "\"");
@@ -78,15 +81,15 @@ var RouteRegistry = {
 			.replace("\\", "");
 
 		//!steal-remove-start
-		if(process.env.NODE_ENV !== "production") {
+		if (process.env.NODE_ENV !== "production") {
 			// warn if new route uses same map properties as an existing route
 			canReflect.eachKey(RouteRegistry.routes, function(r) {
-				var existingKeys = r.names.concat(Object.keys(r.defaults)).sort();
-				var keys = names.concat(Object.keys(defaults)).sort();
-				var sameMapKeys = !diff(existingKeys, keys).length;
-				var sameDefaultValues = !diffObject(r.defaults, defaults).length;
-				//the regex removes the trailing slash
-				var matchingRoutesWithoutTrailingSlash = r.route.replace(/\/$/, "") === url.replace(/\/$/, "");
+				var existingKeys = r.names.concat(Object.keys(r.defaults)).sort(),
+					keys = names.concat(Object.keys(defaults)).sort(),
+					sameMapKeys = !diff(existingKeys, keys).length,
+					sameDefaultValues = !diffObject(r.defaults, defaults).length,
+					//the regex removes the trailing slash
+					matchingRoutesWithoutTrailingSlash = r.route.replace(/\/$/, "") === url.replace(/\/$/, "");
 
 				if (sameMapKeys && sameDefaultValues && !matchingRoutesWithoutTrailingSlash) {
 					dev.warn("two routes were registered with matching keys:\n" +
@@ -99,14 +102,14 @@ var RouteRegistry = {
 			//!steal-remove-end
 
 			// Assign to the instance props
-			if(this.data instanceof RouteData) {
+			if (this.data instanceof RouteData) {
 				var routeData = this.data;
 				canReflect.eachIndex(names, function(name) {
-					var type = "string";
-					var defaultValue = defaults[name];
-					var typeOf = typeof defaultValue;
+					var type = "string",
+						defaultValue = defaults[name],
+						typeOf = typeof defaultValue;
 
-					if(defaultValue != null) {
+					if (defaultValue != null) {
 						type = typeOf;
 					}
 
