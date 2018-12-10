@@ -14,13 +14,14 @@ var RouteData = require("./routedata");
 // Any word character or a period is matched.
 
 // ### removeBackslash
-// removes all backslashes from a string.
+// Removes all backslashes (`\`) from a string.
 function removeBackslash(string) {
 	return string.replace(/\\/g, "");
 }
 
 // ### wrapQuote
-// converts input to a string
+// Converts input to a string and readies string for regex
+// input by escaping the following special characters: `[ ] ( ) { } \ ^ $ . | ? * +`.
 function wrapQuote(string) {
 	return (string + "")
 		.replace(/([.?*+\^$\[\]\\(){}|\-])/g, "\\$1");
@@ -29,30 +30,19 @@ function wrapQuote(string) {
 var RouteRegistry = {
 	routes:  {},
 	register: function(url, defaults) {
-		// if route ends with a / and url starts with a /, remove the leading / of the url
+		// If the root ends with a forward slash (`/`)
+		// and url starts with a forward slash (`/`), remove the leading 
+		// forward slash (`/`) of the url.
 		var root = bindingProxy.call("root");
 
-		if (root.lastIndexOf("/") === root.length - 1 &&
-			url.indexOf("/") === 0) {
+		if ( root.lastIndexOf("/") === root.length - 1 && url.indexOf("/") === 0 ) {
 			url = url.substr(1);
 		}
 
-		defaults = defaults || {};
-		// Extract the variable names and replace with `RegExp` that will match
-		// an actual URL with values.
-		var names = [],
-			res,
-			test = "",
-			matcher,
-			lastIndex,
-			next,
-			querySeparator = bindingProxy.call("querySeparator"),
-			matchSlashes = bindingProxy.call("matchSlashes");
-
+		// `matcher` will be a regex
 		// fall back to legacy `:foo` RegExp if necessary
+		var matcher;
 		if (regexps.colon.test(url)) {
-			matcher = regexps.colon;
-
 			//!steal-remove-start
 			if (process.env.NODE_ENV !== "production") {
 				dev.warn("update route \"" + url + "\" to \"" + url.replace(regexps.colon, function(name, key) {
@@ -60,25 +50,37 @@ var RouteRegistry = {
 				}) + "\"");
 			}
 			//!steal-remove-end
+
+			matcher = regexps.colon;
 		} else {
 			matcher = regexps.curlies;
 		}
-		lastIndex = matcher.lastIndex = 0;
+
+		defaults = defaults || {};
+
+		// Extract the variable names and replace with `RegExp` that will match
+		// an actual URL with values.
+		var lastIndex = matcher.lastIndex = 0,
+			names = [],
+			res,
+			test = "",
+			next,
+			querySeparator = bindingProxy.call("querySeparator"),
+			matchSlashes = bindingProxy.call("matchSlashes");
 
 		// res will be something like ["{foo}","foo"]
 		while (res = matcher.exec(url)) {
 			names.push(res[1]);
 			test += removeBackslash(url.substring(lastIndex, matcher.lastIndex - res[0].length));
-			// if matchSlashes is false (the default) don't greedily match any slash in the string, assume its part of the URL
+			// If matchSlashes is false (the default) don't greedily match any slash in the string, assume its part of the URL
 			next = "\\" + (removeBackslash(url.substr(matcher.lastIndex, 1)) || querySeparator+(matchSlashes? "": "|/"));
-			// a name without a default value HAS to have a value
-			// a name that has a default value can be empty
+			// A name without a default value HAS to have a value.
+			// A name that has a default value can be empty.
 			// The `\\` is for string-escaping giving single `\` for `RegExp` escaping.
 			test += "([^" + next + "]" + (defaults[res[1]] ? "*" : "+") + ")";
 			lastIndex = matcher.lastIndex;
 		}
-		test += url.substr(lastIndex)
-			.replace("\\", "");
+		test += removeBackslash(url.substr(lastIndex));
 
 		//!steal-remove-start
 		if (process.env.NODE_ENV !== "production") {
@@ -132,8 +134,7 @@ var RouteRegistry = {
 			// Default values provided for the variables.
 			defaults: defaults,
 			// The number of parts in the URL separated by `/`.
-			length: url.split("/")
-				.length
+			length: url.split("/").length
 		};
 	}
 };

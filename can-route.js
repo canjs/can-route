@@ -106,7 +106,7 @@ function updateRouteData() {
 /**
  * @static
  */
-Object.defineProperty(canRoute,"routes",{
+Object.defineProperty(canRoute, "routes", {
 	/**
 	 * @property {Object} routes
 	 * @hide
@@ -133,7 +133,9 @@ Object.defineProperty(canRoute,"routes",{
 		return registerRoute.routes = newVal;
 	}
 });
-Object.defineProperty(canRoute,"defaultBinding",{
+
+// ## canRoute.defaultBinding
+Object.defineProperty(canRoute, "defaultBinding", {
  	get: function() {
 		return bindingProxy.defaultBinding;
 	},
@@ -145,7 +147,9 @@ Object.defineProperty(canRoute,"defaultBinding",{
 		}
 	}
 });
-Object.defineProperty(canRoute,"urlData",{
+
+// ## canRoute.urlData
+Object.defineProperty(canRoute, "urlData", {
  	get: function() {
 		return bindingProxy.urlDataObservable.value;
 	},
@@ -156,8 +160,11 @@ Object.defineProperty(canRoute,"urlData",{
 });
 
 canReflect.assignMap(canRoute, {
+	// ## canRoute.param
 	param: routeParam,
+	// ## canRoute.deparam
 	deparam: routeDeparam,
+	// ## canRoute.map
 	map: function(data) {
 		//!steal-remove-start
 		if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
@@ -167,7 +174,7 @@ canReflect.assignMap(canRoute, {
 		canRoute.data = data;
 	},
 
-
+	// ## canRoute.start
 	start: function (val) {
 		if (val !== true) {
 			canRoute._setup();
@@ -187,6 +194,7 @@ canReflect.assignMap(canRoute, {
 		}
 		return canRoute;
 	},
+	// ## canRoute.url
 	url: urlHelpers.url,
 	link: urlHelpers.link,
 	isCurrent: urlHelpers.isCurrent,

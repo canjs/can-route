@@ -5,7 +5,9 @@ var canReflect = require("can-reflect");
 var bindingProxy = require("./binding-proxy");
 var register = require("./register");
 
-// ## decode
+// ## Helper Functions
+
+// ### decode
 // Restore escaped HTML from its URI value.
 // It isn't compatable with named character references (`&copy;`, etc).
 function decode(str) {
@@ -16,16 +18,18 @@ function decode(str) {
 	}
 }
 
+// ### toURLFragment
+// If the `root` ends with `/` and the url starts with it, remove `/`.
 // TODO: I'm not totally sure this belongs here. This might be shifted to can-route-pushstate.
 function toURLFragment(url) {
 	var root = bindingProxy.call("root");
-	// if the root ends with `/` and the url starts with it, remove /
 	if (root.lastIndexOf("/") === root.length - 1 && url.indexOf("/") === 0) {
 		url = url.substr(1);
 	}
 	return url;
 }
 
+// ### canRoute_getRule
 function canRoute_getRule(url) {
 	url = toURLFragment(url);
 	// See if the url matches any routes by testing it against the `route.test` `RegExp`.
@@ -33,8 +37,8 @@ function canRoute_getRule(url) {
 	var route = {
 		length: -1
 	};
-
-	canReflect.eachKey(register.routes, function (temp, name) {
+	debugger;
+	canReflect.eachKey(register.routes, function(temp, name) {
 		if (temp.test.test(url) && temp.length > route.length) {
 			route = temp;
 		}
