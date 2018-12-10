@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>binding-proxy.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="../docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="../can-route.html">
+                  can-route.js
+                </a>
+              
+                
+                <a class="source" href="binding-proxy.html">
+                  src/binding-proxy.js
+                </a>
+              
+                
+                <a class="source" href="deparam.html">
+                  src/deparam.js
+                </a>
+              
+                
+                <a class="source" href="param.html">
+                  src/param.js
+                </a>
+              
+                
+                <a class="source" href="regexps.html">
+                  src/regexps.js
+                </a>
+              
+                
+                <a class="source" href="register.html">
+                  src/register.js
+                </a>
+              
+                
+                <a class="source" href="routedata.html">
+                  src/routedata.js
+                </a>
+              
+                
+                <a class="source" href="string-coercion.html">
+                  src/string-coercion.js
+                </a>
+              
+                
+                <a class="source" href="url-helpers.html">
+                  src/url-helpers.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>binding-proxy.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">"use strict"</span>;
+<span class="hljs-keyword">var</span> canReflect = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-reflect"</span>);
+<span class="hljs-keyword">var</span> canSymbol = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-symbol"</span>);
+<span class="hljs-keyword">var</span> SimpleObservable = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-simple-observable"</span>);
+
+<span class="hljs-keyword">var</span> urlDataObservable = <span class="hljs-keyword">new</span> SimpleObservable(<span class="hljs-literal">null</span>);
+
+canReflect.setName(urlDataObservable, <span class="hljs-string">"route.urlData"</span>);
+
+<span class="hljs-keyword">var</span> bindingProxy = {
+	<span class="hljs-attr">defaultBinding</span>: <span class="hljs-literal">null</span>,
+	<span class="hljs-attr">urlDataObservable</span>: urlDataObservable,
+	<span class="hljs-attr">bindings</span>: {},
+	<span class="hljs-attr">call</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">var</span> args = canReflect.toArray(<span class="hljs-built_in">arguments</span>),
+			prop = args.shift(),
+			binding = urlDataObservable.value;
+		<span class="hljs-keyword">if</span> (binding === <span class="hljs-literal">null</span>) {
+			<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"there is no current binding!!!"</span>);
+		}
+		<span class="hljs-keyword">var</span> method = binding[prop.indexOf(<span class="hljs-string">"can."</span>) === <span class="hljs-number">0</span> ? canSymbol.for(prop) : prop];
+		<span class="hljs-keyword">if</span> (method.apply) {
+			<span class="hljs-keyword">return</span> method.apply(binding, args);
+		} <span class="hljs-keyword">else</span> {
+			<span class="hljs-keyword">return</span> method;
+		}
+	}
+};
+<span class="hljs-built_in">module</span>.exports = bindingProxy;</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

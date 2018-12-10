@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>param.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="../docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="../can-route.html">
+                  can-route.js
+                </a>
+              
+                
+                <a class="source" href="binding-proxy.html">
+                  src/binding-proxy.js
+                </a>
+              
+                
+                <a class="source" href="deparam.html">
+                  src/deparam.js
+                </a>
+              
+                
+                <a class="source" href="param.html">
+                  src/param.js
+                </a>
+              
+                
+                <a class="source" href="regexps.html">
+                  src/regexps.js
+                </a>
+              
+                
+                <a class="source" href="register.html">
+                  src/register.js
+                </a>
+              
+                
+                <a class="source" href="routedata.html">
+                  src/routedata.js
+                </a>
+              
+                
+                <a class="source" href="string-coercion.html">
+                  src/string-coercion.js
+                </a>
+              
+                
+                <a class="source" href="url-helpers.html">
+                  src/url-helpers.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>param.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">"use strict"</span>;
+<span class="hljs-keyword">var</span> canReflect = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-reflect"</span>);
+<span class="hljs-keyword">var</span> param = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-param"</span>);
+
+<span class="hljs-keyword">var</span> register = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./register"</span>);
+<span class="hljs-keyword">var</span> regexps = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./regexps"</span>);
+<span class="hljs-keyword">var</span> bindingProxy = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./binding-proxy"</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h2 id="matchesdata">matchesData</h2>
+<p>Checks if a route matches the data provided. If any route variable
+is not present in the data, the route does not match. If all route
+variables are present in the data, the number of matches is returned
+to allow discerning between general and more specific routes.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">matchesData</span>(<span class="hljs-params">route, data</span>) </span>{
+	<span class="hljs-keyword">var</span> count = <span class="hljs-number">0</span>,
+		defaults = {};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Look at default route values, if they match increment count</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> name <span class="hljs-keyword">in</span> route.defaults) {
+		<span class="hljs-keyword">if</span> (route.defaults[name] === data[name]) {
+			defaults[name] = <span class="hljs-number">1</span>;
+			count++;
+		}
+	}
+
+	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; route.names.length; i++) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>If a route name isn’t present in data, the route doesn’t match.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">if</span> (!data.hasOwnProperty(route.names[i])) {
+			<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+		}
+		<span class="hljs-keyword">if</span> (!defaults[route.names[i]]) {
+			count++;
+		}
+	}
+
+	<span class="hljs-keyword">return</span> count;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <h2 id="getmatchedroute">getMatchedRoute</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getMatchedRoute</span>(<span class="hljs-params">data, routeName</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Check if the provided data keys match the names in any routes;
+Get the one with the most matches.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">var</span> route,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Need to have at least 1 match.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		matches = <span class="hljs-number">0</span>,
+		matchCount,
+		propCount = <span class="hljs-number">0</span>;
+
+	<span class="hljs-keyword">delete</span> data.route;
+
+	canReflect.eachKey(data, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+		propCount++;
+	});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Otherwise find route.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	canReflect.eachKey(register.routes, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">temp, name</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>best route is the first with all defaults matching</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+		matchCount = matchesData(temp, data);
+		<span class="hljs-keyword">if</span> (matchCount &gt; matches) {
+			route = temp;
+			matches = matchCount;
+		}
+		<span class="hljs-keyword">if</span> (matchCount &gt;= propCount) {
+			<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+		}
+	});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>If we have a route name in our <code>register</code> data, and it’s
+just as good as what currently matches, use that</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">if</span> (register.routes[routeName] &amp;&amp; matchesData(register.routes[routeName], data) === matches) {
+		route = register.routes[routeName];
+	}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>If this is match…</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">return</span> route;
+}
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">paramFromRoute</span>(<span class="hljs-params">route, data</span>) </span>{
+	<span class="hljs-keyword">var</span> cpy,
+		res,
+		after,
+		matcher;
+	<span class="hljs-keyword">if</span> (route) {
+
+		cpy = canReflect.assignMap({}, data);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>fall back to legacy :foo RegExp if necessary</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		matcher = regexps.colon.test(route.route) ? regexps.colon : regexps.curlies;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Create the url by replacing the var names with the provided data.
+If the default value is found an empty string is inserted.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		res = route.route.replace(matcher, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">whole, name</span>) </span>{
+			<span class="hljs-keyword">delete</span> cpy[name];
+			<span class="hljs-keyword">return</span> data[name] === route.defaults[name] ? <span class="hljs-string">""</span> : <span class="hljs-built_in">encodeURIComponent</span>(data[name]);
+		})
+		.replace(<span class="hljs-string">"\\"</span>, <span class="hljs-string">""</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Remove matching default values</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		canReflect.eachKey(route.defaults, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">val, name</span>) </span>{
+			<span class="hljs-keyword">if</span> (cpy[name] === val) {
+				<span class="hljs-keyword">delete</span> cpy[name];
+			}
+		});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>The remaining elements of data are added as
+<code>&amp;amp;</code> separated parameters to the url.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		after = param(cpy);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>if we are paraming for setting the hash
+we also want to make sure the route value is updated
+if (_setRoute) {
+   register.matched(route.route);
+}</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">return</span> res + (after ? bindingProxy.call(<span class="hljs-string">"querySeparator"</span>) + after : <span class="hljs-string">""</span>);
+	}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>If no route was found, there is no hash URL, only paramters.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">return</span> canReflect.size(data) === <span class="hljs-number">0</span> ? <span class="hljs-string">""</span> :bindingProxy.call(<span class="hljs-string">"querySeparator"</span>) + param(data);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">canRoute_param</span>(<span class="hljs-params">data, currentRouteName</span>) </span>{
+ 	<span class="hljs-keyword">return</span> paramFromRoute(getMatchedRoute(data, currentRouteName), data);
+}
+<span class="hljs-built_in">module</span>.exports = canRoute_param;
+canRoute_param.paramFromRoute = paramFromRoute;
+canRoute_param.getMatchedRoute = getMatchedRoute;</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

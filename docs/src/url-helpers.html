@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>url-helpers.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="../docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="../can-route.html">
+                  can-route.js
+                </a>
+              
+                
+                <a class="source" href="binding-proxy.html">
+                  src/binding-proxy.js
+                </a>
+              
+                
+                <a class="source" href="deparam.html">
+                  src/deparam.js
+                </a>
+              
+                
+                <a class="source" href="param.html">
+                  src/param.js
+                </a>
+              
+                
+                <a class="source" href="regexps.html">
+                  src/regexps.js
+                </a>
+              
+                
+                <a class="source" href="register.html">
+                  src/register.js
+                </a>
+              
+                
+                <a class="source" href="routedata.html">
+                  src/routedata.js
+                </a>
+              
+                
+                <a class="source" href="string-coercion.html">
+                  src/string-coercion.js
+                </a>
+              
+                
+                <a class="source" href="url-helpers.html">
+                  src/url-helpers.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>url-helpers.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">"use strict"</span>;
+<span class="hljs-keyword">var</span> bindingProxy = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./binding-proxy"</span>);
+<span class="hljs-keyword">var</span> routeDeparam = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./deparam"</span>);
+<span class="hljs-keyword">var</span> routeParam = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./param"</span>);
+<span class="hljs-keyword">var</span> canReflect = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-reflect"</span>);
+<span class="hljs-keyword">var</span> string = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-string"</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h3 id="formatattributes">formatAttributes</h3>
+<p>Creates HTML-like attributes from an object.
+It escapes hyperlink references.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">formatAttributes</span>(<span class="hljs-params">props</span>) </span>{
+	<span class="hljs-keyword">var</span> tags = [];
+	canReflect.eachKey(props, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value, name</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Converts <code>&quot;className&quot;</code> to <code>&quot;class&quot;</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">var</span> attributeName = name === <span class="hljs-string">"className"</span> ? <span class="hljs-string">"class"</span> : name,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Escapes <code>value</code> if <code>name</code> is <code>&quot;href&quot;</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			attributeValue = name === <span class="hljs-string">"href"</span> ? value : string.esc(value);
+
+		tags.push(attributeName + <span class="hljs-string">"=\""</span> + attributeValue + <span class="hljs-string">"\""</span>);
+	});
+	<span class="hljs-keyword">return</span> tags.join(<span class="hljs-string">" "</span>);
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <h3 id="matchcheck">matchCheck</h3>
+<p>It recursively compares property values in <code>matcher</code> to those in <code>source</code>.
+It returns <code>false</code> if there’s a property in <code>source</code> that’s not in <code>matcher</code>,
+or if the two values aren’t loosely equal.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">matchCheck</span>(<span class="hljs-params">source, matcher</span>) </span>{
+	<span class="hljs-comment">/*jshint eqeqeq:false*/</span>
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> property <span class="hljs-keyword">in</span> source) {
+		<span class="hljs-keyword">var</span> sourceProperty = source[property],
+			matcherProperty = matcher[property];
+
+		<span class="hljs-keyword">if</span> (sourceProperty &amp;&amp; matcherProperty &amp;&amp;
+			<span class="hljs-keyword">typeof</span> sourceProperty === <span class="hljs-string">"object"</span> &amp;&amp; <span class="hljs-keyword">typeof</span> matcher === <span class="hljs-string">"object"</span>
+		) {
+			<span class="hljs-keyword">return</span> matchCheck(sourceProperty, matcherProperty);
+		}
+
+		<span class="hljs-keyword">if</span> (sourceProperty != matcherProperty) {
+			<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+		}
+	}
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <h3 id="canroute_url">canRoute_url</h3>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">canRoute_url</span>(<span class="hljs-params">options, merge</span>) </span>{
+	<span class="hljs-keyword">if</span> (merge) {
+		<span class="hljs-keyword">var</span> baseOptions = routeDeparam( bindingProxy.call(<span class="hljs-string">"can.getValue"</span>) );
+		options = canReflect.assignMap(canReflect.assignMap({}, baseOptions), options);
+	}
+	<span class="hljs-keyword">return</span> bindingProxy.call(<span class="hljs-string">"root"</span>) + routeParam(options);
+}
+
+<span class="hljs-built_in">module</span>.exports = {
+	<span class="hljs-attr">url</span>: canRoute_url,
+
+	<span class="hljs-attr">link</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">canRoute_link</span>(<span class="hljs-params">name, options, props, merge</span>) </span>{
+		<span class="hljs-keyword">return</span> <span class="hljs-string">"&lt;a "</span> + formatAttributes(
+			canReflect.assignMap({
+				<span class="hljs-attr">href</span>: canRoute_url(options, merge)
+			}, props)) + <span class="hljs-string">"&gt;"</span> + name + <span class="hljs-string">"&lt;/a&gt;"</span>;
+	},
+
+	<span class="hljs-attr">isCurrent</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">canRoute_isCurrent</span>(<span class="hljs-params">options, subsetMatch</span>) </span>{
+		<span class="hljs-keyword">var</span> getValueSymbol = bindingProxy.call(<span class="hljs-string">"can.getValue"</span>);
+
+		<span class="hljs-keyword">if</span> (subsetMatch) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Everything in <code>options</code> shouhld be in <code>baseOptions</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			<span class="hljs-keyword">var</span> baseOptions = routeDeparam( getValueSymbol );
+			<span class="hljs-keyword">return</span> matchCheck(options, baseOptions);
+		} <span class="hljs-keyword">else</span> {
+			<span class="hljs-keyword">return</span> getValueSymbol === routeParam(options);
+		}
+	}
+};</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>can-route.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="can-route.html">
+                  can-route.js
+                </a>
+              
+                
+                <a class="source" href="src/binding-proxy.html">
+                  src/binding-proxy.js
+                </a>
+              
+                
+                <a class="source" href="src/deparam.html">
+                  src/deparam.js
+                </a>
+              
+                
+                <a class="source" href="src/param.html">
+                  src/param.js
+                </a>
+              
+                
+                <a class="source" href="src/regexps.html">
+                  src/regexps.js
+                </a>
+              
+                
+                <a class="source" href="src/register.html">
+                  src/register.js
+                </a>
+              
+                
+                <a class="source" href="src/routedata.html">
+                  src/routedata.js
+                </a>
+              
+                
+                <a class="source" href="src/string-coercion.html">
+                  src/string-coercion.js
+                </a>
+              
+                
+                <a class="source" href="src/url-helpers.html">
+                  src/url-helpers.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h1 id="can-route-js">can-route.js</h1>
+<p>Manage browser history and client state by synchronizing 
+the window.location.hash with an observable.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">
+"use strict"</span>;
+<span class="hljs-keyword">var</span> Bind = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-bind"</span>);
+<span class="hljs-keyword">var</span> queues = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-queues"</span>);
+<span class="hljs-keyword">var</span> Observation = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-observation"</span>);
+
+<span class="hljs-keyword">var</span> namespace = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-namespace"</span>);
+<span class="hljs-keyword">var</span> devLog = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-log/dev/dev"</span>);
+<span class="hljs-keyword">var</span> canReflect = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-reflect"</span>);
+<span class="hljs-keyword">var</span> canSymbol = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-symbol"</span>);
+<span class="hljs-keyword">var</span> makeCompute = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-simple-observable/make-compute/make-compute"</span>);
+<span class="hljs-keyword">var</span> RouteData = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./src/routedata"</span>);
+<span class="hljs-keyword">var</span> stringCoercingMapDecorator = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./src/string-coercion"</span>).stringCoercingMapDecorator;
+
+<span class="hljs-keyword">var</span> registerRoute = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./src/register"</span>);
+<span class="hljs-keyword">var</span> urlHelpers = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./src/url-helpers"</span>);
+<span class="hljs-keyword">var</span> routeParam = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./src/param"</span>);
+<span class="hljs-keyword">var</span> routeDeparam = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./src/deparam"</span>);
+<span class="hljs-keyword">var</span> bindingProxy = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./src/binding-proxy"</span>);
+<span class="hljs-keyword">var</span> Hashchange = <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-route-hash"</span>);
+
+<span class="hljs-keyword">var</span> isWebWorker =  <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-globals/is-web-worker/is-web-worker"</span>);
+<span class="hljs-keyword">var</span> isBrowserWindow =  <span class="hljs-built_in">require</span>(<span class="hljs-string">"can-globals/is-browser-window/is-browser-window"</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h2 id="hashchangeobservable">hashchangeObservable</h2>
+<p><code>hashchangeObservable</code> is an instance of <code>Hashchange</code>, instances of 
+<code>Hashchange</code> are two-way bound to <code>window.location.hash</code> once the
+instances have a listener.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> hashchangeObservable = <span class="hljs-keyword">new</span> Hashchange();
+bindingProxy.bindings.hashchange = hashchangeObservable;
+bindingProxy.defaultBinding = <span class="hljs-string">"hashchange"</span>;
+bindingProxy.urlDataObservable.value = hashchangeObservable;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h2 id="canroute">canRoute</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">canRoute</span>(<span class="hljs-params">url, defaults</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>!steal-remove-start</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> process !== <span class="hljs-string">"undefined"</span> &amp;&amp; process.env.NODE_ENV !== <span class="hljs-string">"production"</span>) {
+		devLog.warn(<span class="hljs-string">"Call route.register(url,defaults) instead of calling route(url, defaults)"</span>);
+	}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>!steal-remove-end</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	registerRoute.register(url, defaults);
+	<span class="hljs-keyword">return</span> canRoute;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <h2 id="helper-functions">Helper Functions</h2>
+<p>A <del>throttled</del> debounced function called multiple times will only fire once the
+timer runs down. Each call resets the timer.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> timer;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>A dummy events object used to dispatch url change events on.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> currentRuleObservable = <span class="hljs-keyword">new</span> Observation(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">canRoute_matchedRoute</span>(<span class="hljs-params"></span>) </span>{
+	<span class="hljs-keyword">var</span> url = bindingProxy.call(<span class="hljs-string">"can.getValue"</span>);
+	<span class="hljs-keyword">return</span> canRoute.rule(url);
+});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <h3 id="updateurl">updateUrl</h3>
+<p>If the <code>route.data</code> changes, update the hash.
+Using <code>.serialize()</code> retrieves the raw data contained in the <code>observable</code>.
+This function is <del>throttled</del> debounced so it only updates once even if multiple values changed.
+This might be able to use batchNum and avoid this.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">updateUrl</span>(<span class="hljs-params">serializedData</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>collect attributes that are changing</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	clearTimeout(timer);
+	timer = setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>indicate that the hash is set to look like the data</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">var</span> serialized = canReflect.serialize( canRoute.data ),
+			currentRouteName = currentRuleObservable.get(),
+			route = routeParam.getMatchedRoute(serialized, currentRouteName),
+			path = routeParam.paramFromRoute(route, serialized);
+
+		bindingProxy.call(<span class="hljs-string">"can.setValue"</span>, path);
+		<span class="hljs-keyword">var</span> onStartComplete = canRoute._onStartComplete;
+		<span class="hljs-keyword">if</span> (onStartComplete) {
+			canRoute._onStartComplete = <span class="hljs-literal">undefined</span>;
+			onStartComplete();
+		}
+	}, <span class="hljs-number">10</span>);
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <h3 id="updateroutedata">updateRouteData</h3>
+<p>Deparameterizes the portion of the hash of interest and assign the
+values to the <code>route.data</code> removing existing values no longer in the hash.
+updateRouteData is called typically by hashchange which fires asynchronously
+So it’s possible that someone started changing the data before the
+hashchange event fired.  For this reason, it will not set the route data
+if the data is changing or the hash already matches the hash that was set.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">updateRouteData</span>(<span class="hljs-params"></span>) </span>{
+	<span class="hljs-keyword">var</span> hash = bindingProxy.call(<span class="hljs-string">"can.getValue"</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>if the hash data is currently changing, or
+the hash is what we set it to anyway, do NOT change the hash</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+	queues.batch.start();
+
+	<span class="hljs-keyword">var</span> state = canRoute.deparam(hash);
+	<span class="hljs-keyword">delete</span> state.route;
+	canReflect.update(canRoute.data,state);
+	queues.batch.stop();
+
+}
+
+
+<span class="hljs-comment">/**
+ * @static
+ */</span>
+<span class="hljs-built_in">Object</span>.defineProperty(canRoute, <span class="hljs-string">"routes"</span>, {
+	<span class="hljs-comment">/**
+	 * @property {Object} routes
+	 * @hide
+	 *
+	 * A list of routes recognized by the router indixed by the url used to add it.
+	 * Each route is an object with these members:
+	 *
+	 *  - test - A regular expression that will match the route when variable values
+	 *    are present; i.e. for {page}/{type} the `RegExp` is /([\w\.]*)/([\w\.]*)/ which
+	 *    will match for any value of {page} and {type} (word chars or period).
+	 *
+	 *  - route - The original URL, same as the index for this entry in routes.
+	 *
+	 *  - names - An array of all the variable names in this route
+	 *
+	 *  - defaults - Default values provided for the variables or an empty object.
+	 *
+	 *  - length - The number of parts in the URL separated by '/'.
+	 */</span>
+ 	get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+ 		<span class="hljs-keyword">return</span> registerRoute.routes;
+ 	},
+	<span class="hljs-attr">set</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">newVal</span>) </span>{
+		<span class="hljs-keyword">return</span> registerRoute.routes = newVal;
+	}
+});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <h2 id="canroute-defaultbinding">canRoute.defaultBinding</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">Object</span>.defineProperty(canRoute, <span class="hljs-string">"defaultBinding"</span>, {
+ 	<span class="hljs-attr">get</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">return</span> bindingProxy.defaultBinding;
+	},
+	<span class="hljs-attr">set</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">newVal</span>) </span>{
+		bindingProxy.defaultBinding = newVal;
+		<span class="hljs-keyword">var</span> observable = bindingProxy.bindings[bindingProxy.defaultBinding];
+		<span class="hljs-keyword">if</span> (observable) {
+			bindingProxy.urlDataObservable.value = observable;
+		}
+	}
+});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <h2 id="canroute-urldata">canRoute.urlData</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">Object</span>.defineProperty(canRoute, <span class="hljs-string">"urlData"</span>, {
+ 	<span class="hljs-attr">get</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">return</span> bindingProxy.urlDataObservable.value;
+	},
+	<span class="hljs-attr">set</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">newVal</span>) </span>{
+		canRoute._teardown();
+		bindingProxy.urlDataObservable.value = newVal;
+	}
+});
+
+canReflect.assignMap(canRoute, {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <h2 id="canroute-param">canRoute.param</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	param: routeParam,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <h2 id="canroute-deparam">canRoute.deparam</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	deparam: routeDeparam,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <h2 id="canroute-map">canRoute.map</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	map: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>!steal-remove-start</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> process !== <span class="hljs-string">"undefined"</span> &amp;&amp; process.env.NODE_ENV !== <span class="hljs-string">"production"</span>) {
+			devLog.warn(<span class="hljs-string">"Set route.data directly instead of calling route.map"</span>);
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>!steal-remove-end</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		canRoute.data = data;
+	},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <h2 id="canroute-start">canRoute.start</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	start: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">val</span>) </span>{
+		<span class="hljs-keyword">if</span> (val !== <span class="hljs-literal">true</span>) {
+			canRoute._setup();
+			<span class="hljs-keyword">if</span> (isBrowserWindow() || isWebWorker()) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>We can’t use updateRouteData because we want to merge the route data
+into .data</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="hljs-keyword">var</span> hash = bindingProxy.call(<span class="hljs-string">"can.getValue"</span>);
+				queues.batch.start();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>get teh data</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="hljs-keyword">var</span> state = canRoute.deparam(hash);
+				<span class="hljs-keyword">delete</span> state.route;
+
+				canReflect.assign(canRoute.data,state);
+				queues.batch.stop();
+				updateUrl();
+			}
+		}
+		<span class="hljs-keyword">return</span> canRoute;
+	},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <h2 id="canroute-url">canRoute.url</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	url: urlHelpers.url,
+	<span class="hljs-attr">link</span>: urlHelpers.link,
+	<span class="hljs-attr">isCurrent</span>: urlHelpers.isCurrent,
+	<span class="hljs-attr">bindings</span>: bindingProxy.bindings,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>ready calls setup
+setup binds and listens to data changes
+bind listens to whatever you should be listening to
+data changes tries to set the path</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>we need to be able to
+easily kick off calling updateRouteData
+    teardown whatever is there
+ turn on a particular binding</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>called when the route is ready</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	_setup: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">if</span> (!canRoute._canBinding) {
+
+			<span class="hljs-keyword">var</span> bindingOptions = {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>The parent is the hashchange observable</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				parent: bindingProxy.urlDataObservable.value,
+				<span class="hljs-attr">setParent</span>: updateUrl,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>The child is route.data</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				child: canRoute.serializedObservation,
+				<span class="hljs-attr">setChild</span>: updateRouteData,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>On init, we do not want the child set to the parent’s value; this is
+handled by start() for reasons mentioned there.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				onInitDoNotUpdateChild: <span class="hljs-literal">true</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>Cycles are allowed because updateUrl is async; if another change
+happens during its setTimeout, then without cycles the change would
+be ignored :( TODO: Can this be removed if updateUrl stops using
+setTimeout in a major version?</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				cycles: <span class="hljs-number">1</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>Listen for changes in the notify queue</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				queue: <span class="hljs-string">"notify"</span>
+
+			};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>For debugging: the names that will be assigned to the updateChild and
+updateParent functions within can-bind
+!steal-remove-start</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> process !== <span class="hljs-string">"undefined"</span> &amp;&amp; process.env.NODE_ENV !== <span class="hljs-string">"production"</span>) {
+				bindingOptions.updateChildName = <span class="hljs-string">"can-route.updateRouteData"</span>;
+				bindingOptions.updateParentName = <span class="hljs-string">"can-route.updateUrl"</span>;
+			}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>!steal-remove-end</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>Create a new binding with can-bind</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			canRoute._canBinding = <span class="hljs-keyword">new</span> Bind(bindingOptions);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p>…and turn it on!</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			canRoute._canBinding.start();
+
+		}
+	},
+	<span class="hljs-attr">_teardown</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">if</span> (canRoute._canBinding) {
+			canRoute._canBinding.stop();
+			canRoute._canBinding = <span class="hljs-literal">null</span>;
+		}
+		clearTimeout(timer);
+	},
+
+	<span class="hljs-attr">stop</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">this</span>._teardown();
+		<span class="hljs-keyword">return</span> canRoute;
+	},
+
+	<span class="hljs-attr">currentRule</span>: makeCompute( currentRuleObservable ),
+	<span class="hljs-attr">register</span>: registerRoute.register,
+	<span class="hljs-attr">rule</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">url</span>) </span>{
+		<span class="hljs-keyword">var</span> rule = routeDeparam.getRule(url);
+		<span class="hljs-keyword">if</span> (rule) {
+			<span class="hljs-keyword">return</span> rule.route;
+		}
+	}
+});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p>The functions in the following list applied to <code>canRoute</code> (e.g. <code>canRoute.attr(&#39;...&#39;)</code>) will
+instead act on the <code>canRoute.data</code> observe.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">var</span> bindToCanRouteData = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">name, args</span>) </span>{
+	<span class="hljs-keyword">if</span> (!canRoute.data[name]) {
+		<span class="hljs-keyword">return</span> canRoute.data.addEventListener.apply(canRoute.data, args);
+	}
+	<span class="hljs-keyword">return</span> canRoute.data[name].apply(canRoute.data, args);
+};
+
+[<span class="hljs-string">"addEventListener"</span>,<span class="hljs-string">"removeEventListener"</span>,<span class="hljs-string">"bind"</span>, <span class="hljs-string">"unbind"</span>, <span class="hljs-string">"on"</span>, <span class="hljs-string">"off"</span>].forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>exposing all internal eventQueue evt’s to canRoute</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	canRoute[name] = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">eventName, handler</span>) </span>{
+		<span class="hljs-keyword">if</span> (eventName === <span class="hljs-string">"__url"</span>) {
+			<span class="hljs-keyword">return</span> bindingProxy.call(<span class="hljs-string">"can.onValue"</span>, handler );
+		}
+		<span class="hljs-keyword">return</span> bindToCanRouteData(name, <span class="hljs-built_in">arguments</span>);
+	};
+});
+
+[<span class="hljs-string">"delegate"</span>, <span class="hljs-string">"undelegate"</span>, <span class="hljs-string">"removeAttr"</span>, <span class="hljs-string">"compute"</span>, <span class="hljs-string">"_get"</span>, <span class="hljs-string">"___get"</span>, <span class="hljs-string">"each"</span>].forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">name</span>) </span>{
+	canRoute[name] = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p><code>delegate</code> and <code>undelegate</code> require
+the <code>can/map/delegate</code> plugin</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">return</span> bindToCanRouteData(name, <span class="hljs-built_in">arguments</span>);
+	};
+});
+
+
+<span class="hljs-keyword">var</span> routeData,
+	serializedObservation,
+	serializedCompute;
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setRouteData</span>(<span class="hljs-params">data</span>) </span>{
+	routeData = data;
+	<span class="hljs-keyword">return</span> routeData;
+}
+
+<span class="hljs-built_in">Object</span>.defineProperty(canRoute, <span class="hljs-string">"serializedObservation"</span>, {
+	<span class="hljs-attr">get</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">if</span> (!serializedObservation) {
+			serializedObservation = <span class="hljs-keyword">new</span> Observation(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">canRoute_data_serialized</span>(<span class="hljs-params"></span>) </span>{
+				<span class="hljs-keyword">return</span> canReflect.serialize( canRoute.data );
+			});
+		}
+		<span class="hljs-keyword">return</span> serializedObservation;
+	}
+});
+<span class="hljs-built_in">Object</span>.defineProperty(canRoute, <span class="hljs-string">"serializedCompute"</span>, {
+	<span class="hljs-attr">get</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">if</span> (!serializedCompute) {
+			serializedCompute = makeCompute(canRoute.serializedObservation);
+		}
+		<span class="hljs-keyword">return</span> serializedCompute;
+	}
+});
+
+<span class="hljs-keyword">var</span> viewModelSymbol = canSymbol.for(<span class="hljs-string">"can.viewModel"</span>);
+<span class="hljs-built_in">Object</span>.defineProperty(canRoute, <span class="hljs-string">"data"</span>, {
+	<span class="hljs-attr">get</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">if</span> (routeData) {
+			<span class="hljs-keyword">return</span> routeData;
+		} <span class="hljs-keyword">else</span> {
+			<span class="hljs-keyword">return</span> setRouteData(<span class="hljs-keyword">new</span> RouteData());
+		}
+	},
+	<span class="hljs-attr">set</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
+		<span class="hljs-keyword">if</span> ( canReflect.isConstructorLike(data) ) {
+			data = <span class="hljs-keyword">new</span> data();
+		}
+		<span class="hljs-keyword">if</span> (data &amp;&amp; data[viewModelSymbol] !== <span class="hljs-literal">undefined</span>) {
+			data = data[viewModelSymbol];
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <p>if it’s a map, we make it always set strings for backwards compat</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">if</span> ( <span class="hljs-string">"attr"</span> <span class="hljs-keyword">in</span> data ) {
+			setRouteData( stringCoercingMapDecorator(data) );
+		} <span class="hljs-keyword">else</span> {
+			setRouteData(data);
+		}
+	}
+});
+
+canRoute.attr = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">prop, value</span>) </span>{
+	<span class="hljs-built_in">console</span>.warn(<span class="hljs-string">"can-route: can-route.attr is deprecated. Use methods on can-route.data instead."</span>);
+	<span class="hljs-keyword">if</span> (<span class="hljs-string">"attr"</span> <span class="hljs-keyword">in</span> canRoute.data) {
+		<span class="hljs-keyword">return</span> canRoute.data.attr.apply(canRoute.data, <span class="hljs-built_in">arguments</span>);
+	} <span class="hljs-keyword">else</span> {
+		<span class="hljs-keyword">if</span> (<span class="hljs-built_in">arguments</span>.length &gt; <span class="hljs-number">1</span>) {
+			canReflect.setKeyValue(canRoute.data, prop, value);
+			<span class="hljs-keyword">return</span> canRoute.data;
+		} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> prop === <span class="hljs-string">"object"</span>) {
+			canReflect.assignDeep(canRoute.data,prop);
+			<span class="hljs-keyword">return</span> canRoute.data;
+		} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-built_in">arguments</span>.length === <span class="hljs-number">1</span>) {
+			<span class="hljs-keyword">return</span> canReflect.getKeyValue(canRoute.data, prop);
+		} <span class="hljs-keyword">else</span> {
+			<span class="hljs-keyword">return</span> canReflect.unwrap(canRoute.data);
+		}
+	}
+};
+
+
+canReflect.setKeyValue(canRoute, canSymbol.for(<span class="hljs-string">"can.isFunctionLike"</span>), <span class="hljs-literal">false</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <p>LEGACY</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>canRoute.matched = canRoute.currentRule;
+canRoute.current = canRoute.isCurrent;
+
+<span class="hljs-built_in">module</span>.exports = namespace.route = canRoute;</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
