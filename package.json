@@ -67,7 +67,7 @@
     "http-server": "^0.11.1",
     "jshint": "^2.9.1",
     "steal": "^2.0.0",
-    "steal-qunit": "^1.0.1",
+    "steal-qunit": "^2.0.0",
     "steal-tools": "^1.1.2",
     "test-saucelabs": "0.0.6",
     "testee": "^0.8.0"
