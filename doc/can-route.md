@@ -1,6 +1,6 @@
 @module {Object} can-route can-route
 @group can-route.static 0 static
-@group deprecated 1 deprecated
+@group can-route.deprecated 1 deprecated
 @download can/route
 @test can-route/test.html
 @parent can-routing
