@@ -20,7 +20,7 @@ if (("onhashchange" in window)) {
 
 		var testarea = document.getElementById('qunit-fixture');
 		var iframe = document.createElement('iframe');
-		stop();
+		var done = assert.async();
 		window.routeTestReady = function(){
 			var args = canReflect.toArray(arguments);
 			args.unshift(iframe);
@@ -32,7 +32,7 @@ if (("onhashchange" in window)) {
 			setTimeout(function(){
 				testarea.removeChild(iframe);
 				setTimeout(function(){
-					start();
+					done();
 				},10);
 			},1);
 		};
@@ -55,7 +55,7 @@ if (("onhashchange" in window)) {
 					iframe.src = iframe.src + '#!bla=blu';
 				};
 
-				iCanRoute.start();
+				iCanRoute.done();
 			});
 		});
 
@@ -68,7 +68,7 @@ if (("onhashchange" in window)) {
 					teardownRouteTest();
 				};
 
-				iCanRoute.start();
+				iCanRoute.done();
 				iCanRoute.register("{type}/{id}");
 				iCanRoute.attr({
 					type: "bar",
@@ -113,7 +113,7 @@ if (("onhashchange" in window)) {
 						}, 30);
 					}, 150);
 				};
-				iCanRoute.start();
+				iCanRoute.done();
 
 			});
 		});

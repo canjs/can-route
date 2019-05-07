@@ -20,7 +20,7 @@ var setupRouteTest = function(callback){
 
 	var testarea = document.getElementById('qunit-fixture');
 	var iframe = document.createElement('iframe');
-	stop();
+	var done = assert.async();
 	window.routeTestReady = function(iCanRoute){
 		var args = canReflect.toArray(arguments)
 		args.unshift(iframe);
@@ -32,7 +32,7 @@ var setupRouteTest = function(callback){
 		setTimeout(function(){
 			testarea.removeChild(iframe);
 			setTimeout(function(){
-				start();
+				done();
 			},10);
 		},1);
 	};
@@ -55,7 +55,7 @@ if (typeof steal !== 'undefined') {
 				iframe.src = iframe.src + '#!bla=blu';
 			};
 
-			iCanRoute.start();
+			iCanRoute.done();
 		});
 
 	});
@@ -70,7 +70,7 @@ if (typeof steal !== 'undefined') {
 			var outerChangeCalled = false;
 			setTimeout(function(){
 				if(outerChangeCalled === false) {
-					QUnit.ok(outerChangeCalled, "no outer change called");
+					assert.ok(outerChangeCalled, "no outer change called");
 					teardownRouteTest();
 				}
 			},60000);
@@ -93,7 +93,7 @@ if (typeof steal !== 'undefined') {
 						tearDown = true;
 						teardownRouteTest();
 					} else {
-						QUnit.equal(prop, "foo", "removed foo");
+						assert.equal(prop, "foo", "removed foo");
 					}
 				});
 
@@ -102,8 +102,8 @@ if (typeof steal !== 'undefined') {
 				// failed.
 				setTimeout(function(){
 					if(tearDown === false) {
-						QUnit.ok(changeFired, "changed was fired");
-						QUnit.ok(false, "no personId change");
+						assert.ok(changeFired, "changed was fired");
+						assert.ok(false, "no personId change");
 						teardownRouteTest();
 					}
 				},60000);
@@ -120,7 +120,7 @@ if (typeof steal !== 'undefined') {
 				iframe.contentWindow.location.hash = '#!foo=bar';
 			};
 
-			iCanRoute.start();
+			iCanRoute.done();
 		});
 	});
 
@@ -146,7 +146,7 @@ if (typeof steal !== 'undefined') {
 			};
 
 			loc.hash = "#!cat/5";
-			iCanRoute.start();
+			iCanRoute.done();
 		});
 	});
 
@@ -159,7 +159,7 @@ if (typeof steal !== 'undefined') {
 				teardownRouteTest();
 			};
 
-			iCanRoute.start();
+			iCanRoute.done();
 			iCanRoute.register("{type}/{id}");
 			iCanRoute.attr({
 				type: "bar",
@@ -172,7 +172,7 @@ if (typeof steal !== 'undefined') {
 
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
-			iCanRoute.start()
+			iCanRoute.done()
 			iCanRoute.register("active");
 			iCanRoute.register("");
 
@@ -196,7 +196,7 @@ if (typeof steal !== 'undefined') {
 			var appVM =  new win.CanMap();
 
 			route.data = appVM;
-			route.start();
+			route.done();
 
 			appVM.bind('action', function(ev, newVal) {
 				strictEqual(newVal, '10');
@@ -212,10 +212,10 @@ if (typeof steal !== 'undefined') {
 	});
 
 	test("hash doesn't update to itself with a !", function() {
-		stop();
+		var done = assert.async();
 		window.routeTestReady = function (iCanRoute, loc) {
 
-			iCanRoute.start();
+			iCanRoute.done();
 			iCanRoute.register("{path}");
 
 			iCanRoute.attr('path', 'foo');
@@ -224,7 +224,7 @@ if (typeof steal !== 'undefined') {
 				try {
 					equal(loc.hash, '#!foo');
 				} catch(e) {
-					start();
+					done();
 					throw e;
 				}
 
@@ -238,7 +238,7 @@ if (typeof steal !== 'undefined') {
 						equal(loc.hash, '#bar');
 						equal(counter, 1); //sanity check -- bindings only ran once before this change.
 					} finally {
-						start();
+						done();
 					}
 				}, 100);
 			}, 100);

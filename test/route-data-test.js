@@ -24,12 +24,12 @@ test("can-route.data can be set to an element with a viewModel", function(){
     canRoute.data = element;
 
 
-    QUnit.equal(canRoute.data, vm, "works");
+    assert.equal(canRoute.data, vm, "works");
 });
 
 
 QUnit.asyncTest("Default map registers properties", function(){
-	mockRoute.start();
+	mockRoute.done();
 
 	canRoute.register("{type}/{id}");
 
@@ -38,16 +38,16 @@ QUnit.asyncTest("Default map registers properties", function(){
 		equal(after, "cat/5", "same URL");
 		equal(canRoute.data.type, "cat", "conflicts should be won by the URL");
 		equal(canRoute.data.id, "5", "conflicts should be won by the URL");
-		QUnit.start();
-		mockRoute.stop();
+		done();
+		mockRoute.var done = assert.async();
 	};
 
 	mockRoute.hash.value = "#!cat/5";
-	canRoute.start();
+	canRoute.done();
 });
 
 QUnit.asyncTest("Property defaults influence the Type", function(){
-	mockRoute.start();
+	mockRoute.done();
 
 	canRoute.register("{type}/{id}/{more}", { type: "dog", "id": 14, more: null });
 
@@ -57,10 +57,10 @@ QUnit.asyncTest("Property defaults influence the Type", function(){
 		equal(canRoute.data.type, "cat", "conflicts should be won by the URL");
 		deepEqual(canRoute.data.id, 7, "conflicts should be won by the URL");
 		deepEqual(canRoute.data.more, "stuff", "null defaults are converted");
-		QUnit.start();
-		mockRoute.stop();
+		done();
+		mockRoute.var done = assert.async();
 	};
 
 	mockRoute.hash.value = "#!cat/7/stuff";
-	canRoute.start();
+	canRoute.done();
 });

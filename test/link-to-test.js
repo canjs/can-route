@@ -2,7 +2,7 @@ var canRoute = require('can-route');
 var QUnit = require('steal-qunit');
 
 QUnit.module("can-route .linkTo",{
-    setup: function(){
+    beforeEach: function(assert){
         canRoute.routes = {};
     }
 });

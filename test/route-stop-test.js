@@ -7,35 +7,35 @@ require('can-observation');
 
 QUnit.module("can-route.stop", {
 	setup: function () {
-		mock.stop();
+		mock.var done = assert.async();
 		canRoute.defaultBinding = "mock";
 		this.fixture = document.getElementById("qunit-fixture");
 	}
 });
 
-test("Calling route.stop() tears down bindings", function(){
-	QUnit.stop();
-	mock.start();
+test("Calling route.var done = assert.async() tears down bindings", function(){
+	var done = assert.async();
+	mock.done();
 
 	canRoute.routes = {};
 	canRoute.register("{page}");
-	canRoute.start();
+	canRoute.done();
 
 	canRoute.data.set("page", "home");
 
 	var hash = mock.hash;
 	setTimeout(function(){
-		QUnit.equal(hash.get(), "home", "set to home");
+		assert.equal(hash.get(), "home", "set to home");
 
-		canRoute.stop();
+		canRoute.var done = assert.async();
 		canRoute.data = new SimpleMap({page: "home"});
-		canRoute.start();
+		canRoute.done();
 
 		canRoute.data.set("page", "cart");
 
 		setTimeout(function(){
-			QUnit.equal(hash.get(), "cart", "now it is the cart");
-			QUnit.start();
+			assert.equal(hash.get(), "cart", "now it is the cart");
+			done();
 		}, 30);
 	}, 30);
 });

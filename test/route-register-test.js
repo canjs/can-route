@@ -3,7 +3,7 @@ var QUnit = require('steal-qunit');
 var testHelpers = require('can-test-helpers');
 
 QUnit.module("can-route .register", {
-	setup: function(){
+	beforeEach: function(assert){
 		canRoute.routes = {};
 	}
 });
