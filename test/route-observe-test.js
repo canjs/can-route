@@ -5,32 +5,32 @@ var mockRoute = require("./mock-route-binding");
 var canReflect = require("can-reflect");
 
 QUnit.module("can-route observe",{
-    setup: function(){
+    beforeEach: function(assert) {
         canRoute.routes = {};
     }
 });
 
-QUnit.test("two way binding canRoute.map with a can-observe instance", function(){
+QUnit.test("two way binding canRoute.map with a can-observe instance", function(assert) {
 
-	expect(3);
-	stop();
-	mockRoute.start();
+	assert.expect(3);
+	var done = assert.async();
+	mockRoute.done();
 
 	var AppState = observe.Object.extend("AppState",{},{});
 	var appState = new AppState();
 
 	canRoute.data = appState;
-	canRoute.start();
+	canRoute.done();
 
     canReflect.onValue( mockRoute.hash, function handler1(newVal){
-        QUnit.equal(newVal, "#&name=Brian", "updated hash");
+        assert.equal(newVal, "#&name=Brian", "updated hash");
         canReflect.offValue( mockRoute.hash, handler1);
-        QUnit.equal(canRoute.data.name, 'Brian', 'appState is bound to canRoute');
+        assert.equal(canRoute.data.name, 'Brian', 'appState is bound to canRoute');
 
         canReflect.onValue( mockRoute.hash, function handler2(newVal){
-        	equal( newVal, "#");
-            mockRoute.stop();
-            start();
+        	assert.equal( newVal, "#");
+            mockRoute.var done = assert.async();
+            done();
         });
 
         delete appState.name;

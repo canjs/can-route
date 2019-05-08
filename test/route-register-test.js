@@ -3,7 +3,7 @@ var QUnit = require('steal-qunit');
 var testHelpers = require('can-test-helpers');
 
 QUnit.module("can-route .register", {
-	setup: function(){
+	beforeEach: function(assert) {
 		canRoute.routes = {};
 	}
 });
@@ -14,7 +14,7 @@ testHelpers.dev.devOnlyTest("should warn when two routes have same map propertie
 	canRoute.register("{page}/{subpage}");
 	canRoute.register("foo/{page}/{subpage}");
 
-	equal(teardown(), 1);
+	assert.equal(teardown(), 1);
 });
 
 testHelpers.dev.devOnlyTest("should warn when two routes have same map properties - including defaults", function () {
@@ -23,7 +23,7 @@ testHelpers.dev.devOnlyTest("should warn when two routes have same map propertie
 	canRoute.register("foo/{page}/{subpage}");
 	canRoute.register("{page}/{subpage}");
 
-	equal(teardown(), 1);
+	assert.equal(teardown(), 1);
 });
 
 testHelpers.dev.devOnlyTest("should not warn when two routes have same map properties - but different defaults(#36)", function () {
@@ -32,7 +32,7 @@ testHelpers.dev.devOnlyTest("should not warn when two routes have same map prope
 	canRoute.register("login", { "page": "auth", "subpage": "login" });
 	canRoute.register("signup", { "page": "auth", "subpage": "signup" });
 
-	equal(teardown(), 0);
+	assert.equal(teardown(), 0);
 });
 
 testHelpers.dev.devOnlyTest("should not be display warning for matching keys when the routes do not match (#99)", function () {
@@ -55,5 +55,5 @@ testHelpers.dev.devOnlyTest("should not be display warning for matching keys whe
 	canRoute.register("login3", { "page":"auth3" });
 	canRoute.register("login3", { "page":"auth3" });
 
-	equal(teardown(), 1);
+	assert.equal(teardown(), 1);
 });
