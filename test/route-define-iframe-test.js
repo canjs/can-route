@@ -16,8 +16,7 @@ if (("onhashchange" in window)) {
 
 
 	var teardownRouteTest;
-	var setupRouteTest = function(callback){
-
+	var setupRouteTest = function(callback, assert){
 		var testarea = document.getElementById('qunit-fixture');
 		var iframe = document.createElement('iframe');
 		var done = assert.async();
@@ -56,7 +55,7 @@ if (("onhashchange" in window)) {
 				};
 
 				iCanRoute.start();
-			});
+			}, assert);
 		});
 
 		QUnit.test("updating the hash", function(assert) {
@@ -75,7 +74,7 @@ if (("onhashchange" in window)) {
 					id: "\/"
 				});
 
-			});
+			}, assert);
 		});
 
 		QUnit.test("unsticky routes", function(assert) {
@@ -115,7 +114,7 @@ if (("onhashchange" in window)) {
 				};
 				iCanRoute.start();
 
-			});
+			}, assert);
 		});
 
 	}

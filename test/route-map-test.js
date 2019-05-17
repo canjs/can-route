@@ -16,7 +16,7 @@ QUnit.module("can/route with can-map", {
 if (("onhashchange" in window)) {
 
 var teardownRouteTest;
-var setupRouteTest = function(callback){
+var setupRouteTest = function(callback, assert){
 
 	var testarea = document.getElementById('qunit-fixture');
 	var iframe = document.createElement('iframe');
@@ -56,7 +56,7 @@ if (typeof steal !== 'undefined') {
 			};
 
 			iCanRoute.start();
-		});
+		}, assert);
 
 	});
 
@@ -121,7 +121,7 @@ if (typeof steal !== 'undefined') {
 			};
 
 			iCanRoute.start();
-		});
+		}, assert);
 	});
 
 	QUnit.test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(assert) {
@@ -147,7 +147,7 @@ if (typeof steal !== 'undefined') {
 
 			loc.hash = "#!cat/5";
 			iCanRoute.start();
-		});
+		}, assert);
 	});
 
 	QUnit.test("updating the hash", function(assert) {
@@ -165,7 +165,7 @@ if (typeof steal !== 'undefined') {
 				type: "bar",
 				id: "\/"
 			});
-		});
+		}, assert);
 	});
 
 	QUnit.test("sticky enough routes", function(assert) {
@@ -186,7 +186,7 @@ if (typeof steal !== 'undefined') {
 				teardownRouteTest();
 
 			}, 30);
-		});
+		}, assert);
 	});
 
 	QUnit.test("updating bound SimpleMap causes single update with a coerced string value", function(assert) {
@@ -208,7 +208,7 @@ if (typeof steal !== 'undefined') {
 			setTimeout(function() {
 				teardownRouteTest();
 			}, 5);
-		});
+		}, assert);
 	});
 
 	QUnit.test("hash doesn't update to itself with a !", function(assert) {
@@ -340,7 +340,7 @@ if (typeof require === 'undefined') {
 			});
 
 			teardownRouteTest();
-		});
+		}, assert);
 	});
 
 }
@@ -369,7 +369,7 @@ QUnit.test("Calling attr with an object should not stringify object (#197)", fun
 		assert.equal(app.attr('foo'), false, 'route data - .attr({"foo": ...}) works');
 
 		teardownRouteTest();
-	});
+	}, assert);
 });
 
 
