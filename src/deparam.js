@@ -37,7 +37,6 @@ function canRoute_getRule(url) {
 	var route = {
 		length: -1
 	};
-	debugger;
 	canReflect.eachKey(register.routes, function(temp, name) {
 		if (temp.test.test(url) && temp.length > route.length) {
 			route = temp;
