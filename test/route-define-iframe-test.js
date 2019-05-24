@@ -3,7 +3,7 @@ var QUnit = require('steal-qunit');
 var canReflect = require('can-reflect');
 
 QUnit.module("can-route with can-define/map/map in an iframe", {
-	setup: function () {
+	beforeEach: function(assert) {
 		canRoute._teardown();
 		canRoute.urlData = canRoute.bindings.hashchange;
 		//canRoute.defaultBinding = "hashchange";
@@ -16,11 +16,10 @@ if (("onhashchange" in window)) {
 
 
 	var teardownRouteTest;
-	var setupRouteTest = function(callback){
-
+	var setupRouteTest = function(callback, assert){
 		var testarea = document.getElementById('qunit-fixture');
 		var iframe = document.createElement('iframe');
-		stop();
+		var done = assert.async();
 		window.routeTestReady = function(){
 			var args = canReflect.toArray(arguments);
 			args.unshift(iframe);
@@ -32,7 +31,7 @@ if (("onhashchange" in window)) {
 			setTimeout(function(){
 				testarea.removeChild(iframe);
 				setTimeout(function(){
-					start();
+					done();
 				},10);
 			},1);
 		};
@@ -40,14 +39,14 @@ if (("onhashchange" in window)) {
 
 
 	if (typeof steal !== 'undefined') {
-		test("listening to hashchange (#216, #124)", function () {
+		QUnit.test("listening to hashchange (#216, #124)", function(assert) {
 
 			setupRouteTest(function (iframe, iCanRoute) {
 
-				ok(!iCanRoute.data.bla, 'Value not set yet');
+				assert.ok(!iCanRoute.data.bla, 'Value not set yet');
 
 				iCanRoute.bind('bla', function(){
-					equal(iCanRoute.data.get("bla"), 'blu', 'Got route change event and value is as expected');
+					assert.equal(iCanRoute.data.get("bla"), 'blu', 'Got route change event and value is as expected');
 					teardownRouteTest();
 				});
 
@@ -56,14 +55,14 @@ if (("onhashchange" in window)) {
 				};
 
 				iCanRoute.start();
-			});
+			}, assert);
 		});
 
-		test("updating the hash", function () {
+		QUnit.test("updating the hash", function(assert) {
 			setupRouteTest(function (iframe, iCanRoute, loc) {
 				iCanRoute._onStartComplete = function () {
 					var after = loc.href.substr(loc.href.indexOf("#"));
-					equal(after, "#!bar/" + encodeURIComponent("\/"));
+					assert.equal(after, "#!bar/" + encodeURIComponent("\/"));
 
 					teardownRouteTest();
 				};
@@ -75,10 +74,10 @@ if (("onhashchange" in window)) {
 					id: "\/"
 				});
 
-			});
+			}, assert);
 		});
 
-		test("unsticky routes", function () {
+		QUnit.test("unsticky routes", function(assert) {
 			setupRouteTest(function (iframe, iCanRoute, loc) {
 
 				iCanRoute.register("{type}");
@@ -92,7 +91,7 @@ if (("onhashchange" in window)) {
 
 					setTimeout(function () {
 						var after = loc.href.substr(loc.href.indexOf("#"));
-						equal(after, "#!bar");
+						assert.equal(after, "#!bar");
 						iCanRoute.attr({
 							type: "bar",
 							id: "\/"
@@ -105,7 +104,7 @@ if (("onhashchange" in window)) {
 							var isMatch = after === "#!bar/" + encodeURIComponent("\/");
 							var isWaitingTooLong = new Date() - time > 5000;
 							if (isMatch || isWaitingTooLong) {
-								equal(after, "#!bar/" + encodeURIComponent("\/"), "should go to type/id "+ (new Date() - time));
+								assert.equal(after, "#!bar/" + encodeURIComponent("\/"), "should go to type/id "+ (new Date() - time));
 								teardownRouteTest();
 							} else {
 								setTimeout(innerTimer, 30);
@@ -115,7 +114,7 @@ if (("onhashchange" in window)) {
 				};
 				iCanRoute.start();
 
-			});
+			}, assert);
 		});
 
 	}
