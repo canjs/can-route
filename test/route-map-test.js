@@ -6,7 +6,7 @@ var canReflect = require('can-reflect');
 
 
 QUnit.module("can/route with can-map", {
-	beforeEach: function(assert) {
+	setup: function () {
 		canRoute._teardown();
 		canRoute.defaultBinding = "hashchange";
 		this.fixture = document.getElementById("qunit-fixture");
@@ -16,11 +16,11 @@ QUnit.module("can/route with can-map", {
 if (("onhashchange" in window)) {
 
 var teardownRouteTest;
-var setupRouteTest = function(callback, assert){
+var setupRouteTest = function(callback){
 
 	var testarea = document.getElementById('qunit-fixture');
 	var iframe = document.createElement('iframe');
-	var done = assert.async();
+	stop();
 	window.routeTestReady = function(iCanRoute){
 		var args = canReflect.toArray(arguments)
 		args.unshift(iframe);
@@ -32,7 +32,7 @@ var setupRouteTest = function(callback, assert){
 		setTimeout(function(){
 			testarea.removeChild(iframe);
 			setTimeout(function(){
-				done();
+				start();
 			},10);
 		},1);
 	};
@@ -40,14 +40,14 @@ var setupRouteTest = function(callback, assert){
 
 
 if (typeof steal !== 'undefined') {
-	QUnit.test("listening to hashchange (#216, #124)", function(assert) {
+	test("listening to hashchange (#216, #124)", function () {
 
 		setupRouteTest(function (iframe, iCanRoute) {
 
-			assert.ok(!iCanRoute.attr('bla'), 'Value not set yet');
+			ok(!iCanRoute.attr('bla'), 'Value not set yet');
 
 			iCanRoute.bind('change', function () {
-				assert.equal(iCanRoute.attr('bla'), 'blu', 'Got route change event and value is as expected');
+				equal(iCanRoute.attr('bla'), 'blu', 'Got route change event and value is as expected');
 				teardownRouteTest();
 			});
 
@@ -56,12 +56,12 @@ if (typeof steal !== 'undefined') {
 			};
 
 			iCanRoute.start();
-		}, assert);
+		});
 
 	});
 
 
-	QUnit.test("removing things from the hash", function(assert) {
+	test("removing things from the hash", function () {
 
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 			// CanJS's build was failing on this test.
@@ -70,14 +70,14 @@ if (typeof steal !== 'undefined') {
 			var outerChangeCalled = false;
 			setTimeout(function(){
 				if(outerChangeCalled === false) {
-					assert.ok(outerChangeCalled, "no outer change called");
+					QUnit.ok(outerChangeCalled, "no outer change called");
 					teardownRouteTest();
 				}
 			},60000);
 
 			iCanRoute.bind('change', function change1() {
 				outerChangeCalled = true;
-				assert.equal(iCanRoute.attr('foo'), 'bar', 'expected value');
+				equal(iCanRoute.attr('foo'), 'bar', 'expected value');
 				iCanRoute.unbind('change');
 
 				var changeFired = false,
@@ -85,15 +85,15 @@ if (typeof steal !== 'undefined') {
 
 				iCanRoute.bind('change', function change2(ev, prop){
 					changeFired = true;
-					assert.equal(iCanRoute.attr('personId'), '3', 'personId');
-					assert.equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
+					equal(iCanRoute.attr('personId'), '3', 'personId');
+					equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
 					iCanRoute.unbind('change');
 
 					if (prop === 'personId') {
 						tearDown = true;
 						teardownRouteTest();
 					} else {
-						assert.equal(prop, "foo", "removed foo");
+						QUnit.equal(prop, "foo", "removed foo");
 					}
 				});
 
@@ -102,8 +102,8 @@ if (typeof steal !== 'undefined') {
 				// failed.
 				setTimeout(function(){
 					if(tearDown === false) {
-						assert.ok(changeFired, "changed was fired");
-						assert.ok(false, "no personId change");
+						QUnit.ok(changeFired, "changed was fired");
+						QUnit.ok(false, "no personId change");
 						teardownRouteTest();
 					}
 				},60000);
@@ -121,10 +121,10 @@ if (typeof steal !== 'undefined') {
 			};
 
 			iCanRoute.start();
-		}, assert);
+		});
 	});
 
-	QUnit.test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(assert) {
+	test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(){
 		setupRouteTest(function (iframe, iCanRoute, loc, win) {
 
 			iCanRoute.register("{type}/{id}");
@@ -135,11 +135,11 @@ if (typeof steal !== 'undefined') {
 
 			iCanRoute._onStartComplete = function () {
 				var after = loc.href.substr(loc.href.indexOf("#"));
-				assert.equal(after, "#!cat/5&section=home", "same URL");
-				assert.equal(appState.attr("type"), "cat", "hash populates the appState");
-				assert.equal(appState.attr("id"), "5", "hash populates the appState");
-				assert.equal(appState.attr("section"), "home", "appState keeps its properties");
-				assert.ok(iCanRoute.data === appState, "canRoute.data is the same as appState");
+				equal(after, "#!cat/5&section=home", "same URL");
+				equal(appState.attr("type"), "cat", "hash populates the appState");
+				equal(appState.attr("id"), "5", "hash populates the appState");
+				equal(appState.attr("section"), "home", "appState keeps its properties");
+				ok(iCanRoute.data === appState, "canRoute.data is the same as appState");
 
 
 				teardownRouteTest();
@@ -147,14 +147,14 @@ if (typeof steal !== 'undefined') {
 
 			loc.hash = "#!cat/5";
 			iCanRoute.start();
-		}, assert);
+		});
 	});
 
-	QUnit.test("updating the hash", function(assert) {
+	test("updating the hash", function () {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 			iCanRoute._onStartComplete = function () {
 				var after = loc.href.substr(loc.href.indexOf("#"));
-				assert.equal(after, "#!bar/" + encodeURIComponent("\/"));
+				equal(after, "#!bar/" + encodeURIComponent("\/"));
 
 				teardownRouteTest();
 			};
@@ -165,10 +165,10 @@ if (typeof steal !== 'undefined') {
 				type: "bar",
 				id: "\/"
 			});
-		}, assert);
+		});
 	});
 
-	QUnit.test("sticky enough routes", function(assert) {
+	test("sticky enough routes", function () {
 
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
@@ -181,16 +181,16 @@ if (typeof steal !== 'undefined') {
 			setTimeout(function () {
 
 				var after = loc.href.substr(loc.href.indexOf("#"));
-				assert.equal(after, "#!active");
+				equal(after, "#!active");
 
 				teardownRouteTest();
 
 			}, 30);
-		}, assert);
+		});
 	});
 
-	QUnit.test("updating bound SimpleMap causes single update with a coerced string value", function(assert) {
-		assert.expect(1);
+	test("updating bound SimpleMap causes single update with a coerced string value", function() {
+		expect(1);
 
 		setupRouteTest(function (iframe, route, loc, win) {
 			var appVM =  new win.CanMap();
@@ -199,7 +199,7 @@ if (typeof steal !== 'undefined') {
 			route.start();
 
 			appVM.bind('action', function(ev, newVal) {
-				assert.strictEqual(newVal, '10');
+				strictEqual(newVal, '10');
 			});
 
 			appVM.attr('action', 10);
@@ -208,11 +208,11 @@ if (typeof steal !== 'undefined') {
 			setTimeout(function() {
 				teardownRouteTest();
 			}, 5);
-		}, assert);
+		});
 	});
 
-	QUnit.test("hash doesn't update to itself with a !", function(assert) {
-		var done = assert.async();
+	test("hash doesn't update to itself with a !", function() {
+		stop();
 		window.routeTestReady = function (iCanRoute, loc) {
 
 			iCanRoute.start();
@@ -222,9 +222,9 @@ if (typeof steal !== 'undefined') {
 			setTimeout(function() {
 				var counter = 0;
 				try {
-					assert.equal(loc.hash, '#!foo');
+					equal(loc.hash, '#!foo');
 				} catch(e) {
-					done();
+					start();
 					throw e;
 				}
 
@@ -235,10 +235,10 @@ if (typeof steal !== 'undefined') {
 				loc.hash = "bar";
 				setTimeout(function() {
 					try {
-						assert.equal(loc.hash, '#bar');
-						assert.equal(counter, 1); //sanity check -- bindings only ran once before this change.
+						equal(loc.hash, '#bar');
+						equal(counter, 1); //sanity check -- bindings only ran once before this change.
 					} finally {
-						done();
+						start();
 					}
 				}, 100);
 			}, 100);
@@ -251,7 +251,7 @@ if (typeof steal !== 'undefined') {
 
 }
 
-QUnit.test("escaping periods", function(assert) {
+test("escaping periods", function () {
 
 	canRoute.routes = {};
 	canRoute.register("{page}\\.html", {
@@ -259,11 +259,11 @@ QUnit.test("escaping periods", function(assert) {
 	});
 
 	var obj = canRoute.deparam("can.Control.html");
-	assert.deepEqual(obj, {
+	deepEqual(obj, {
 		page: "can.Control"
 	});
 
-	assert.equal(canRoute.param({
+	equal(canRoute.param({
 		page: "can.Control"
 	}), "can.Control.html");
 
@@ -271,12 +271,12 @@ QUnit.test("escaping periods", function(assert) {
 
 if (typeof require === 'undefined') {
 
-	QUnit.test("correct stringing", function(assert) {
+	test("correct stringing", function () {
 		setupRouteTest(function(iframe, route) {
 			route.routes = {};
 
 			route.attr('number', 1);
-			assert.propEqual(route.attr(), {
+			propEqual(route.attr(), {
 				'number': "1"
 			});
 
@@ -284,21 +284,21 @@ if (typeof require === 'undefined') {
 				bool: true
 			}, true);
 
-			assert.propEqual(route.attr(), {
+			propEqual(route.attr(), {
 				'bool': "true"
 			});
 
 			route.attr({
 				string: "hello"
 			}, true);
-			assert.propEqual(route.attr(), {
+			propEqual(route.attr(), {
 				'string': "hello"
 			});
 
 			route.attr({
 				array: [1, true, "hello"]
 			}, true);
-			assert.propEqual(route.attr(), {
+			propEqual(route.attr(), {
 				'array': ["1", "true", "hello"]
 			});
 
@@ -313,7 +313,7 @@ if (typeof require === 'undefined') {
 				}
 			}, true);
 
-			assert.propEqual(route.attr(), {
+			propEqual(route.attr(), {
 				number: "1",
 				bool: "true",
 				string: "hello",
@@ -333,43 +333,43 @@ if (typeof require === 'undefined') {
 				sort_by_name: true
 			}, true);
 
-			assert.propEqual(route.attr(), {
+			propEqual(route.attr(), {
 				type: "page",
 				id: "10",
 				sort_by_name: "true"
 			});
 
 			teardownRouteTest();
-		}, assert);
+		});
 	});
 
 }
 
-QUnit.test("Calling attr with an object should not stringify object (#197)", function(assert) {
+test("Calling attr with an object should not stringify object (#197)", function () {
 	setupRouteTest(function (iframe, iCanRoute, loc, win) {
 		var app = new win.CanMap({});
 		app.define = { foo: { serialize: false } };
 
 		app.attr('foo', true);
-		assert.equal(app.attr('foo'), true, 'not route data - .attr("foo", ...) works');
+		equal(app.attr('foo'), true, 'not route data - .attr("foo", ...) works');
 
 		app.attr({
 			foo: false
 		});
-		assert.equal(app.attr('foo'), false, 'not route data - .attr({"foo": ...}) works');
+		equal(app.attr('foo'), false, 'not route data - .attr({"foo": ...}) works');
 
 		iCanRoute.data = app;
 
 		app.attr('foo', true);
-		assert.equal(app.attr('foo'), true, 'route data - .attr("foo", ...) works');
+		equal(app.attr('foo'), true, 'route data - .attr("foo", ...) works');
 
 		app.attr({
 			foo: false
 		});
-		assert.equal(app.attr('foo'), false, 'route data - .attr({"foo": ...}) works');
+		equal(app.attr('foo'), false, 'route data - .attr({"foo": ...}) works');
 
 		teardownRouteTest();
-	}, assert);
+	});
 });
 
 

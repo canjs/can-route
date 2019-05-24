@@ -16,13 +16,13 @@ function getMsg(routes, input, method, output) {
 }
 
 QUnit.module("can-route .param and .deparam",{
-	beforeEach: function(assert) {
+	setup: function(){
 		canRoute.defaultBinding = "hashchange";
 		canRoute.routes = {};
 	}
 });
 
-QUnit.test("param / deparam / rule", function(assert) {
+test("param / deparam / rule", function () {
 	var testCases = [
 		{
 			routes: [],
@@ -539,14 +539,14 @@ QUnit.test("param / deparam / rule", function(assert) {
 			var actual = canRoute[method].apply(canRoute, input);
 
 			if ("output" in assertion) {
-				assert.deepEqual(actual, assertion.output,
+				QUnit.deepEqual(actual, assertion.output,
 					getMsg(testCase.routes, assertion.input, " --" + assertion.method + "-->", assertion.output)
 				);
 			}
 
 			if (assertion.symmetric) {
 				var reverseMethod = method.indexOf("de") === 0 ? method.slice(2) : "de" + method;
-				assert.deepEqual(canRoute[reverseMethod].call(canRoute, actual), assertion.input,
+				QUnit.deepEqual(canRoute[reverseMethod].call(canRoute, actual), assertion.input,
 					getMsg(testCase.routes, assertion.input, " <---> ", actual)
 				);
 			}
