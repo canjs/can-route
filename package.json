@@ -1,6 +1,6 @@
 {
   "name": "can-route",
-  "version": "4.4.6",
+  "version": "4.4.7",
   "description": "Observable front-end application routing for CanJS.",
   "homepage": "https://canjs.com/doc/can-route.html",
   "license": "MIT",
@@ -63,14 +63,13 @@
     "can-stache-key": "^1.0.0",
     "can-test-helpers": "^1.1.2",
     "detect-cyclic-packages": "^1.1.0",
-    "docco": "^0.8.0",
-    "done-serve": "^2.0.0",
+    "done-serve": "^3.0.0",
     "http-server": "^0.11.1",
     "jshint": "^2.9.1",
     "steal": "^2.0.0",
     "steal-qunit": "^1.0.1",
     "steal-tools": "^1.1.2",
     "test-saucelabs": "0.0.6",
-    "testee": "^0.8.0"
+    "testee": "^0.9.0"
   }
 }
