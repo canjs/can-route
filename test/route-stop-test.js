@@ -6,15 +6,15 @@ var mock = require("./mock-route-binding");
 require('can-observation');
 
 QUnit.module("can-route.stop", {
-	beforeEach: function(assert) {
+	setup: function () {
 		mock.stop();
 		canRoute.defaultBinding = "mock";
 		this.fixture = document.getElementById("qunit-fixture");
 	}
 });
 
-QUnit.test("Calling route.stop() tears down bindings", function(assert) {
-	var done = assert.async();
+test("Calling route.stop() tears down bindings", function(){
+	QUnit.stop();
 	mock.start();
 
 	canRoute.routes = {};
@@ -25,7 +25,7 @@ QUnit.test("Calling route.stop() tears down bindings", function(assert) {
 
 	var hash = mock.hash;
 	setTimeout(function(){
-		assert.equal(hash.get(), "home", "set to home");
+		QUnit.equal(hash.get(), "home", "set to home");
 
 		canRoute.stop();
 		canRoute.data = new SimpleMap({page: "home"});
@@ -34,8 +34,8 @@ QUnit.test("Calling route.stop() tears down bindings", function(assert) {
 		canRoute.data.set("page", "cart");
 
 		setTimeout(function(){
-			assert.equal(hash.get(), "cart", "now it is the cart");
-			done();
+			QUnit.equal(hash.get(), "cart", "now it is the cart");
+			QUnit.start();
 		}, 30);
 	}, 30);
 });

@@ -7,7 +7,7 @@ var mockRoute = require("./mock-route-binding");
 require('can-observation');
 
 QUnit.module("can-route.data", {
-	beforeEach: function(assert) {
+	setup: function () {
 		canRoute._teardown();
 		canRoute.defaultBinding = "hashchange";
 		this.fixture = document.getElementById("qunit-fixture");
@@ -15,7 +15,7 @@ QUnit.module("can-route.data", {
 });
 
 
-QUnit.test("can-route.data can be set to an element with a viewModel", function(assert) {
+test("can-route.data can be set to an element with a viewModel", function(){
     var element = document.createElement("div");
 
     var vm = new SimpleMap();
@@ -24,45 +24,43 @@ QUnit.test("can-route.data can be set to an element with a viewModel", function(
     canRoute.data = element;
 
 
-    assert.equal(canRoute.data, vm, "works");
+    QUnit.equal(canRoute.data, vm, "works");
 });
 
 
-QUnit.test("Default map registers properties", function(assert) {
-    var ready = assert.async();
-    mockRoute.start();
+QUnit.asyncTest("Default map registers properties", function(){
+	mockRoute.start();
 
-    canRoute.register("{type}/{id}");
+	canRoute.register("{type}/{id}");
 
-    canRoute._onStartComplete = function () {
+	canRoute._onStartComplete = function () {
 		var after = mockRoute.hash.get();
-		assert.equal(after, "cat/5", "same URL");
-		assert.equal(canRoute.data.type, "cat", "conflicts should be won by the URL");
-		assert.equal(canRoute.data.id, "5", "conflicts should be won by the URL");
-		ready();
+		equal(after, "cat/5", "same URL");
+		equal(canRoute.data.type, "cat", "conflicts should be won by the URL");
+		equal(canRoute.data.id, "5", "conflicts should be won by the URL");
+		QUnit.start();
 		mockRoute.stop();
 	};
 
-    mockRoute.hash.value = "#!cat/5";
-    canRoute.start();
+	mockRoute.hash.value = "#!cat/5";
+	canRoute.start();
 });
 
-QUnit.test("Property defaults influence the Type", function(assert) {
-    var ready = assert.async();
-    mockRoute.start();
+QUnit.asyncTest("Property defaults influence the Type", function(){
+	mockRoute.start();
 
-    canRoute.register("{type}/{id}/{more}", { type: "dog", "id": 14, more: null });
+	canRoute.register("{type}/{id}/{more}", { type: "dog", "id": 14, more: null });
 
-    canRoute._onStartComplete = function () {
+	canRoute._onStartComplete = function () {
 		var after = mockRoute.hash.get();
-		assert.equal(after, "cat/7/stuff", "same URL");
-		assert.equal(canRoute.data.type, "cat", "conflicts should be won by the URL");
-		assert.deepEqual(canRoute.data.id, 7, "conflicts should be won by the URL");
-		assert.deepEqual(canRoute.data.more, "stuff", "null defaults are converted");
-		ready();
+		equal(after, "cat/7/stuff", "same URL");
+		equal(canRoute.data.type, "cat", "conflicts should be won by the URL");
+		deepEqual(canRoute.data.id, 7, "conflicts should be won by the URL");
+		deepEqual(canRoute.data.more, "stuff", "null defaults are converted");
+		QUnit.start();
 		mockRoute.stop();
 	};
 
-    mockRoute.hash.value = "#!cat/7/stuff";
-    canRoute.start();
+	mockRoute.hash.value = "#!cat/7/stuff";
+	canRoute.start();
 });

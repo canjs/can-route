@@ -3,39 +3,39 @@ var QUnit = require('steal-qunit');
 var testHelpers = require('can-test-helpers');
 
 QUnit.module("can-route .register", {
-	beforeEach: function(assert) {
+	setup: function(){
 		canRoute.routes = {};
 	}
 });
 
-testHelpers.dev.devOnlyTest("should warn when two routes have same map properties", function (assert) {
+testHelpers.dev.devOnlyTest("should warn when two routes have same map properties", function () {
 	var teardown = testHelpers.dev.willWarn(/two routes were registered with matching keys/);
 
 	canRoute.register("{page}/{subpage}");
 	canRoute.register("foo/{page}/{subpage}");
 
-	assert.equal(teardown(), 1);
+	equal(teardown(), 1);
 });
 
-testHelpers.dev.devOnlyTest("should warn when two routes have same map properties - including defaults", function (assert) {
+testHelpers.dev.devOnlyTest("should warn when two routes have same map properties - including defaults", function () {
 	var teardown = testHelpers.dev.willWarn(/two routes were registered with matching keys/);
 
 	canRoute.register("foo/{page}/{subpage}");
 	canRoute.register("{page}/{subpage}");
 
-	assert.equal(teardown(), 1);
+	equal(teardown(), 1);
 });
 
-testHelpers.dev.devOnlyTest("should not warn when two routes have same map properties - but different defaults(#36)", function (assert) {
+testHelpers.dev.devOnlyTest("should not warn when two routes have same map properties - but different defaults(#36)", function () {
 	var teardown = testHelpers.dev.willWarn(/two routes were registered with matching keys/);
 
 	canRoute.register("login", { "page": "auth", "subpage": "login" });
 	canRoute.register("signup", { "page": "auth", "subpage": "signup" });
 
-	assert.equal(teardown(), 0);
+	equal(teardown(), 0);
 });
 
-testHelpers.dev.devOnlyTest("should not be display warning for matching keys when the routes do not match (#99)", function (assert) {
+testHelpers.dev.devOnlyTest("should not be display warning for matching keys when the routes do not match (#99)", function () {
 	var expectedWarningText = 'two routes were registered with matching keys:\n' +
 		'\t(1) route.register("login", {"page":"auth"})\n' +
 		'\t(2) route.register("signup", {"page":"auth"})\n' +
@@ -55,5 +55,5 @@ testHelpers.dev.devOnlyTest("should not be display warning for matching keys whe
 	canRoute.register("login3", { "page":"auth3" });
 	canRoute.register("login3", { "page":"auth3" });
 
-	assert.equal(teardown(), 1);
+	equal(teardown(), 1);
 });
