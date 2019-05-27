@@ -6,19 +6,19 @@ var RouteMock = require("can-route-mock");
 var oldDefault;
 
 module.exports = {
-	start: function(){
+	start: function() {
 		// discard old hash
 		this.hash = new RouteMock();
 		oldDefault = canRoute.urlData;
-        canRoute.urlData = this.hash;
+		canRoute.urlData = this.hash;
 
 		this.hash.value = "";
 		canRoute.data = new RouteData();
 		//canRoute._setup();
 	},
-	stop: function(){
+	stop: function() {
 		canRoute._teardown();
-        canRoute.urlData = oldDefault;
+		canRoute.urlData = oldDefault;
 
 		this.hash = new RouteMock();
 		canRoute.data = new RouteData();

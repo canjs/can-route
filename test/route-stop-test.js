@@ -1,9 +1,9 @@
-var canRoute = require('can-route');
-var QUnit = require('steal-qunit');
+var canRoute = require("can-route");
+var QUnit = require("steal-qunit");
 var SimpleMap = require("can-simple-map");
 var mock = require("./mock-route-binding");
 
-require('can-observation');
+require("can-observation");
 
 QUnit.module("can-route.stop", {
 	setup: function () {

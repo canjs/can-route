@@ -1,8 +1,8 @@
 /* jshint asi:true */
 /* jshint -W079 */
-var canRoute = require('can-route');
-var QUnit = require('steal-qunit');
-var canReflect = require('can-reflect');
+var canRoute = require("can-route");
+var QUnit = require("steal-qunit");
+var canReflect = require("can-reflect");
 
 
 QUnit.module("can/route with can-map", {
@@ -18,8 +18,8 @@ if (("onhashchange" in window)) {
 var teardownRouteTest;
 var setupRouteTest = function(callback){
 
-	var testarea = document.getElementById('qunit-fixture');
-	var iframe = document.createElement('iframe');
+	var testarea = document.getElementById("qunit-fixture");
+	var iframe = document.createElement("iframe");
 	stop();
 	window.routeTestReady = function(iCanRoute){
 		var args = canReflect.toArray(arguments)
@@ -39,20 +39,20 @@ var setupRouteTest = function(callback){
 };
 
 
-if (typeof steal !== 'undefined') {
+if (typeof steal !== "undefined") {
 	test("listening to hashchange (#216, #124)", function () {
 
 		setupRouteTest(function (iframe, iCanRoute) {
 
-			ok(!iCanRoute.attr('bla'), 'Value not set yet');
+			ok(!iCanRoute.attr("bla"), "Value not set yet");
 
-			iCanRoute.bind('change', function () {
-				equal(iCanRoute.attr('bla'), 'blu', 'Got route change event and value is as expected');
+			iCanRoute.bind("change", function () {
+				equal(iCanRoute.attr("bla"), "blu", "Got route change event and value is as expected");
 				teardownRouteTest();
 			});
 
 			iCanRoute._onStartComplete = function () {
-				iframe.src = iframe.src + '#!bla=blu';
+				iframe.src = iframe.src + "#!bla=blu";
 			};
 
 			iCanRoute.start();
@@ -75,21 +75,21 @@ if (typeof steal !== 'undefined') {
 				}
 			},60000);
 
-			iCanRoute.bind('change', function change1() {
+			iCanRoute.bind("change", function change1() {
 				outerChangeCalled = true;
-				equal(iCanRoute.attr('foo'), 'bar', 'expected value');
-				iCanRoute.unbind('change');
+				equal(iCanRoute.attr("foo"), "bar", "expected value");
+				iCanRoute.unbind("change");
 
 				var changeFired = false,
 					tearDown = false;
 
-				iCanRoute.bind('change', function change2(ev, prop){
+				iCanRoute.bind("change", function change2(ev, prop){
 					changeFired = true;
-					equal(iCanRoute.attr('personId'), '3', 'personId');
-					equal(iCanRoute.attr('foo'), undefined, 'unexpected value');
-					iCanRoute.unbind('change');
+					equal(iCanRoute.attr("personId"), "3", "personId");
+					equal(iCanRoute.attr("foo"), undefined, "unexpected value");
+					iCanRoute.unbind("change");
 
-					if (prop === 'personId') {
+					if (prop === "personId") {
 						tearDown = true;
 						teardownRouteTest();
 					} else {
@@ -110,14 +110,14 @@ if (typeof steal !== 'undefined') {
 
 				// Then remove those old props and add new ones
 				setTimeout(function () {
-					iframe.contentWindow.location.hash = '#!personId=3';
+					iframe.contentWindow.location.hash = "#!personId=3";
 				}, 150);
 
 			});
 
 			// Update the hash to have some properties and values
 			iCanRoute._onStartComplete = function () {
-				iframe.contentWindow.location.hash = '#!foo=bar';
+				iframe.contentWindow.location.hash = "#!foo=bar";
 			};
 
 			iCanRoute.start();
@@ -129,7 +129,7 @@ if (typeof steal !== 'undefined') {
 
 			iCanRoute.register("{type}/{id}");
 			var AppState = win.CanMap.extend();
-			var appState = new AppState({section: 'home'});
+			var appState = new AppState({section: "home"});
 
 			iCanRoute.data = appState;
 
@@ -198,11 +198,11 @@ if (typeof steal !== 'undefined') {
 			route.data = appVM;
 			route.start();
 
-			appVM.bind('action', function(ev, newVal) {
-				strictEqual(newVal, '10');
+			appVM.bind("action", function(ev, newVal) {
+				strictEqual(newVal, "10");
 			});
 
-			appVM.attr('action', 10);
+			appVM.attr("action", 10);
 
 			// check after 30ms to see that we only have a single call
 			setTimeout(function() {
@@ -218,11 +218,11 @@ if (typeof steal !== 'undefined') {
 			iCanRoute.start();
 			iCanRoute.register("{path}");
 
-			iCanRoute.attr('path', 'foo');
+			iCanRoute.attr("path", "foo");
 			setTimeout(function() {
 				var counter = 0;
 				try {
-					equal(loc.hash, '#!foo');
+					equal(loc.hash, "#!foo");
 				} catch(e) {
 					start();
 					throw e;
@@ -235,7 +235,7 @@ if (typeof steal !== 'undefined') {
 				loc.hash = "bar";
 				setTimeout(function() {
 					try {
-						equal(loc.hash, '#bar');
+						equal(loc.hash, "#bar");
 						equal(counter, 1); //sanity check -- bindings only ran once before this change.
 					} finally {
 						start();
@@ -243,7 +243,7 @@ if (typeof steal !== 'undefined') {
 				}, 100);
 			}, 100);
 		};
-		var iframe = document.createElement('iframe');
+		var iframe = document.createElement("iframe");
 		iframe.src = __dirname+"/testing.html?1";
 		this.fixture.appendChild(iframe);
 	});
@@ -269,15 +269,15 @@ test("escaping periods", function () {
 
 });
 
-if (typeof require === 'undefined') {
+if (typeof require === "undefined") {
 
 	test("correct stringing", function () {
 		setupRouteTest(function(iframe, route) {
 			route.routes = {};
 
-			route.attr('number', 1);
+			route.attr("number", 1);
 			propEqual(route.attr(), {
-				'number': "1"
+				"number": "1"
 			});
 
 			route.attr({
@@ -285,21 +285,21 @@ if (typeof require === 'undefined') {
 			}, true);
 
 			propEqual(route.attr(), {
-				'bool': "true"
+				"bool": "true"
 			});
 
 			route.attr({
 				string: "hello"
 			}, true);
 			propEqual(route.attr(), {
-				'string': "hello"
+				"string": "hello"
 			});
 
 			route.attr({
 				array: [1, true, "hello"]
 			}, true);
 			propEqual(route.attr(), {
-				'array': ["1", "true", "hello"]
+				"array": ["1", "true", "hello"]
 			});
 
 			route.attr({
@@ -328,7 +328,7 @@ if (typeof require === 'undefined') {
 			route.register("{type}/{id}");
 
 			route.attr({
-				type: 'page',
+				type: "page",
 				id: 10,
 				sort_by_name: true
 			}, true);
@@ -350,23 +350,23 @@ test("Calling attr with an object should not stringify object (#197)", function 
 		var app = new win.CanMap({});
 		app.define = { foo: { serialize: false } };
 
-		app.attr('foo', true);
-		equal(app.attr('foo'), true, 'not route data - .attr("foo", ...) works');
+		app.attr("foo", true);
+		equal(app.attr("foo"), true, "not route data - .attr(\"foo\", ...) works");
 
 		app.attr({
 			foo: false
 		});
-		equal(app.attr('foo'), false, 'not route data - .attr({"foo": ...}) works');
+		equal(app.attr("foo"), false, "not route data - .attr({\"foo\": ...}) works");
 
 		iCanRoute.data = app;
 
-		app.attr('foo', true);
-		equal(app.attr('foo'), true, 'route data - .attr("foo", ...) works');
+		app.attr("foo", true);
+		equal(app.attr("foo"), true, "route data - .attr(\"foo\", ...) works");
 
 		app.attr({
 			foo: false
 		});
-		equal(app.attr('foo'), false, 'route data - .attr({"foo": ...}) works');
+		equal(app.attr("foo"), false, "route data - .attr({\"foo\": ...}) works");
 
 		teardownRouteTest();
 	});

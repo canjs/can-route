@@ -1,6 +1,6 @@
-var canRoute = require('can-route');
-var QUnit = require('steal-qunit');
-var testHelpers = require('can-test-helpers');
+var canRoute = require("can-route");
+var QUnit = require("steal-qunit");
+var testHelpers = require("can-test-helpers");
 
 QUnit.module("can-route .register", {
 	setup: function(){
@@ -36,10 +36,10 @@ testHelpers.dev.devOnlyTest("should not warn when two routes have same map prope
 });
 
 testHelpers.dev.devOnlyTest("should not be display warning for matching keys when the routes do not match (#99)", function () {
-	var expectedWarningText = 'two routes were registered with matching keys:\n' +
-		'\t(1) route.register("login", {"page":"auth"})\n' +
-		'\t(2) route.register("signup", {"page":"auth"})\n' +
-		'(1) will always be chosen since it was registered first';
+	var expectedWarningText = "two routes were registered with matching keys:\n" +
+		"\t(1) route.register(\"login\", {\"page\":\"auth\"})\n" +
+		"\t(2) route.register(\"signup\", {\"page\":\"auth\"})\n" +
+		"(1) will always be chosen since it was registered first";
 
 	var teardown = testHelpers.dev.willWarn(expectedWarningText);
 

@@ -1,5 +1,5 @@
-var canRoute = require('can-route');
-var QUnit = require('steal-qunit');
+var canRoute = require("can-route");
+var QUnit = require("steal-qunit");
 
 function getMsg(routes, input, method, output) {
 	var msg = "[ ";
@@ -31,7 +31,7 @@ test("param / deparam / rule", function () {
 					// deparam of url with non-generated hash (manual override)
 					method: "deparam",
 					input:"page=foo&bar=baz&where=there",
-					output: { page: 'foo', bar: 'baz', where: 'there' }
+					output: { page: "foo", bar: "baz", where: "there" }
 				},
 				{
 					method: "param",
@@ -167,7 +167,7 @@ test("param / deparam / rule", function () {
 		// deparam of invalid url
 		{
 			routes: [
-				[ "pages/{page}/{section}/{subsection}", { page: 'default1', section: 'default2', subsection: 'default3' } ]
+				[ "pages/{page}/{section}/{subsection}", { page: "default1", section: "default2", subsection: "default3" } ]
 			],
 			assertions: [
 				{
@@ -180,7 +180,7 @@ test("param / deparam / rule", function () {
 					// A valid path with invalid parameters should return the path data but ignore the parameters
 					method: "deparam",
 					input: "pages/val1/val2/val3&invalid-parameters",
-					output: { page: 'val1', section: 'val2', subsection: 'val3' }
+					output: { page: "val1", section: "val2", subsection: "val3" }
 				},
 				{
 					// A valid path with invalid parameters should return the correct rule
