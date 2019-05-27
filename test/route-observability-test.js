@@ -4,16 +4,16 @@ var mockRoute = require("./mock-route-binding");
 var DefineMap = require("can-define/map/");
 
 QUnit.module("can-route observablility",{
-	setup: function(){
+	beforeEach: function(assert) {
 		canRoute.routes = {};
 	}
 });
 
-QUnit.test("on/off binding", function () {
+QUnit.test("on/off binding", function(assert) {
 	canRoute.routes = {};
-	expect(1);
+	assert.expect(1);
 	canRoute.on("foo", function () {
-		ok(true, "foo called");
+		assert.ok(true, "foo called");
 
 		canRoute.off("foo");
 
@@ -25,10 +25,10 @@ QUnit.test("on/off binding", function () {
 
 //var queues = require("can-queues");
 //queues.log("flush");
-test("currentRule() compute", function() {
+QUnit.test("currentRule() compute", function(assert) {
 
 	mockRoute.start();
-	QUnit.stop();
+	var done = assert.async();
 
 	var AppState = DefineMap.extend({
 		seal: false
@@ -43,14 +43,14 @@ test("currentRule() compute", function() {
 	canRoute.register("{type}/{subtype}");
 	canRoute.start();
 
-	equal(appState.route, undefined, "should not set route on appState");
-	equal(canRoute.currentRule(), "{type}", "should set route.currentRule property");
+	assert.equal(appState.route, undefined, "should not set route on appState");
+	assert.equal(canRoute.currentRule(), "{type}", "should set route.currentRule property");
 	appState.subtype = "bar";
 	var check = function(){
 		if(canRoute.currentRule() === "{type}/{subtype}") {
-			QUnit.ok(true, "moved to right route");
+			assert.ok(true, "moved to right route");
 			mockRoute.stop();
-			start();
+			done();
 		} else {
 			setTimeout(check, 20);
 		}

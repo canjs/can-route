@@ -6,7 +6,7 @@ var canReflect = require("can-reflect");
 
 
 QUnit.module("can/route with can-map", {
-	setup: function () {
+	beforeEach: function(assert) {
 		canRoute._teardown();
 		canRoute.defaultBinding = "hashchange";
 		this.fixture = document.getElementById("qunit-fixture");
@@ -20,7 +20,7 @@ var setupRouteTest = function(callback){
 
 	var testarea = document.getElementById("qunit-fixture");
 	var iframe = document.createElement("iframe");
-	stop();
+	var done = assert.async();
 	window.routeTestReady = function(iCanRoute){
 		var args = canReflect.toArray(arguments)
 		args.unshift(iframe);
@@ -32,7 +32,7 @@ var setupRouteTest = function(callback){
 		setTimeout(function(){
 			testarea.removeChild(iframe);
 			setTimeout(function(){
-				start();
+				done();
 			},10);
 		},1);
 	};
@@ -40,14 +40,14 @@ var setupRouteTest = function(callback){
 
 
 if (typeof steal !== "undefined") {
-	test("listening to hashchange (#216, #124)", function () {
+	QUnit.test("listening to hashchange (#216, #124)", function(assert) {
 
 		setupRouteTest(function (iframe, iCanRoute) {
 
-			ok(!iCanRoute.attr("bla"), "Value not set yet");
+			assert.ok(!iCanRoute.attr("bla"), "Value not set yet");
 
 			iCanRoute.bind("change", function () {
-				equal(iCanRoute.attr("bla"), "blu", "Got route change event and value is as expected");
+				assert.equal(iCanRoute.attr("bla"), "blu", "Got route change event and value is as expected");
 				teardownRouteTest();
 			});
 
@@ -61,7 +61,7 @@ if (typeof steal !== "undefined") {
 	});
 
 
-	test("removing things from the hash", function () {
+	QUnit.test("removing things from the hash", function(assert) {
 
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 			// CanJS's build was failing on this test.
@@ -70,14 +70,14 @@ if (typeof steal !== "undefined") {
 			var outerChangeCalled = false;
 			setTimeout(function(){
 				if(outerChangeCalled === false) {
-					QUnit.ok(outerChangeCalled, "no outer change called");
+					assert.ok(outerChangeCalled, "no outer change called");
 					teardownRouteTest();
 				}
 			},60000);
 
 			iCanRoute.bind("change", function change1() {
 				outerChangeCalled = true;
-				equal(iCanRoute.attr("foo"), "bar", "expected value");
+				assert.equal(iCanRoute.attr("foo"), "bar", "expected value");
 				iCanRoute.unbind("change");
 
 				var changeFired = false,
@@ -85,15 +85,15 @@ if (typeof steal !== "undefined") {
 
 				iCanRoute.bind("change", function change2(ev, prop){
 					changeFired = true;
-					equal(iCanRoute.attr("personId"), "3", "personId");
-					equal(iCanRoute.attr("foo"), undefined, "unexpected value");
+					assert.equal(iCanRoute.attr("personId"), "3", "personId");
+					assert.equal(iCanRoute.attr("foo"), undefined, "unexpected value");
 					iCanRoute.unbind("change");
 
 					if (prop === "personId") {
 						tearDown = true;
 						teardownRouteTest();
 					} else {
-						QUnit.equal(prop, "foo", "removed foo");
+						assert.equal(prop, "foo", "removed foo");
 					}
 				});
 
@@ -102,8 +102,8 @@ if (typeof steal !== "undefined") {
 				// failed.
 				setTimeout(function(){
 					if(tearDown === false) {
-						QUnit.ok(changeFired, "changed was fired");
-						QUnit.ok(false, "no personId change");
+						assert.ok(changeFired, "changed was fired");
+						assert.ok(false, "no personId change");
 						teardownRouteTest();
 					}
 				},60000);
@@ -124,7 +124,7 @@ if (typeof steal !== "undefined") {
 		});
 	});
 
-	test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(){
+	QUnit.test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(assert) {
 		setupRouteTest(function (iframe, iCanRoute, loc, win) {
 
 			iCanRoute.register("{type}/{id}");
@@ -135,11 +135,11 @@ if (typeof steal !== "undefined") {
 
 			iCanRoute._onStartComplete = function () {
 				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!cat/5&section=home", "same URL");
-				equal(appState.attr("type"), "cat", "hash populates the appState");
-				equal(appState.attr("id"), "5", "hash populates the appState");
-				equal(appState.attr("section"), "home", "appState keeps its properties");
-				ok(iCanRoute.data === appState, "canRoute.data is the same as appState");
+				assert.equal(after, "#!cat/5&section=home", "same URL");
+				assert.equal(appState.attr("type"), "cat", "hash populates the appState");
+				assert.equal(appState.attr("id"), "5", "hash populates the appState");
+				assert.equal(appState.attr("section"), "home", "appState keeps its properties");
+				assert.ok(iCanRoute.data === appState, "canRoute.data is the same as appState");
 
 
 				teardownRouteTest();
@@ -150,11 +150,11 @@ if (typeof steal !== "undefined") {
 		});
 	});
 
-	test("updating the hash", function () {
+	QUnit.test("updating the hash", function(assert) {
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 			iCanRoute._onStartComplete = function () {
 				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!bar/" + encodeURIComponent("\/"));
+				assert.equal(after, "#!bar/" + encodeURIComponent("\/"));
 
 				teardownRouteTest();
 			};
@@ -168,7 +168,7 @@ if (typeof steal !== "undefined") {
 		});
 	});
 
-	test("sticky enough routes", function () {
+	QUnit.test("sticky enough routes", function(assert) {
 
 		setupRouteTest(function (iframe, iCanRoute, loc) {
 
@@ -181,7 +181,7 @@ if (typeof steal !== "undefined") {
 			setTimeout(function () {
 
 				var after = loc.href.substr(loc.href.indexOf("#"));
-				equal(after, "#!active");
+				assert.equal(after, "#!active");
 
 				teardownRouteTest();
 
@@ -189,8 +189,8 @@ if (typeof steal !== "undefined") {
 		});
 	});
 
-	test("updating bound SimpleMap causes single update with a coerced string value", function() {
-		expect(1);
+	QUnit.test("updating bound SimpleMap causes single update with a coerced string value", function(assert) {
+		assert.expect(1);
 
 		setupRouteTest(function (iframe, route, loc, win) {
 			var appVM =  new win.CanMap();
@@ -199,7 +199,7 @@ if (typeof steal !== "undefined") {
 			route.start();
 
 			appVM.bind("action", function(ev, newVal) {
-				strictEqual(newVal, "10");
+				assert.strictEqual(newVal, "10");
 			});
 
 			appVM.attr("action", 10);
@@ -211,8 +211,8 @@ if (typeof steal !== "undefined") {
 		});
 	});
 
-	test("hash doesn't update to itself with a !", function() {
-		stop();
+	QUnit.test("hash doesn't update to itself with a !", function(assert) {
+		var done = assert.async();
 		window.routeTestReady = function (iCanRoute, loc) {
 
 			iCanRoute.start();
@@ -222,9 +222,9 @@ if (typeof steal !== "undefined") {
 			setTimeout(function() {
 				var counter = 0;
 				try {
-					equal(loc.hash, "#!foo");
+					assert.equal(loc.hash, "#!foo");
 				} catch(e) {
-					start();
+					done();
 					throw e;
 				}
 
@@ -235,10 +235,10 @@ if (typeof steal !== "undefined") {
 				loc.hash = "bar";
 				setTimeout(function() {
 					try {
-						equal(loc.hash, "#bar");
-						equal(counter, 1); //sanity check -- bindings only ran once before this change.
+						assert.equal(loc.hash, "#bar");
+						assert.equal(counter, 1); //sanity check -- bindings only ran once before this change.
 					} finally {
-						start();
+						done();
 					}
 				}, 100);
 			}, 100);
@@ -251,7 +251,7 @@ if (typeof steal !== "undefined") {
 
 }
 
-test("escaping periods", function () {
+QUnit.test("escaping periods", function(assert) {
 
 	canRoute.routes = {};
 	canRoute.register("{page}\\.html", {
@@ -259,11 +259,11 @@ test("escaping periods", function () {
 	});
 
 	var obj = canRoute.deparam("can.Control.html");
-	deepEqual(obj, {
+	assert.deepEqual(obj, {
 		page: "can.Control"
 	});
 
-	equal(canRoute.param({
+	assert.equal(canRoute.param({
 		page: "can.Control"
 	}), "can.Control.html");
 
@@ -271,12 +271,12 @@ test("escaping periods", function () {
 
 if (typeof require === "undefined") {
 
-	test("correct stringing", function () {
+	QUnit.test("correct stringing", function(assert) {
 		setupRouteTest(function(iframe, route) {
 			route.routes = {};
 
 			route.attr("number", 1);
-			propEqual(route.attr(), {
+			assert.propEqual(route.attr(), {
 				"number": "1"
 			});
 
@@ -284,21 +284,21 @@ if (typeof require === "undefined") {
 				bool: true
 			}, true);
 
-			propEqual(route.attr(), {
+			assert.propEqual(route.attr(), {
 				"bool": "true"
 			});
 
 			route.attr({
 				string: "hello"
 			}, true);
-			propEqual(route.attr(), {
+			assert.propEqual(route.attr(), {
 				"string": "hello"
 			});
 
 			route.attr({
 				array: [1, true, "hello"]
 			}, true);
-			propEqual(route.attr(), {
+			assert.propEqual(route.attr(), {
 				"array": ["1", "true", "hello"]
 			});
 
@@ -313,7 +313,7 @@ if (typeof require === "undefined") {
 				}
 			}, true);
 
-			propEqual(route.attr(), {
+			assert.propEqual(route.attr(), {
 				number: "1",
 				bool: "true",
 				string: "hello",
@@ -333,7 +333,7 @@ if (typeof require === "undefined") {
 				sort_by_name: true
 			}, true);
 
-			propEqual(route.attr(), {
+			assert.propEqual(route.attr(), {
 				type: "page",
 				id: "10",
 				sort_by_name: "true"
@@ -345,28 +345,28 @@ if (typeof require === "undefined") {
 
 }
 
-test("Calling attr with an object should not stringify object (#197)", function () {
+QUnit.test("Calling attr with an object should not stringify object (#197)", function(assert) {
 	setupRouteTest(function (iframe, iCanRoute, loc, win) {
 		var app = new win.CanMap({});
 		app.define = { foo: { serialize: false } };
 
 		app.attr("foo", true);
-		equal(app.attr("foo"), true, "not route data - .attr(\"foo\", ...) works");
+		assert.equal(app.attr("foo"), true, "not route data - .attr(\"foo\", ...) works");
 
 		app.attr({
 			foo: false
 		});
-		equal(app.attr("foo"), false, "not route data - .attr({\"foo\": ...}) works");
+		assert.equal(app.attr("foo"), false, "not route data - .attr({\"foo\": ...}) works");
 
 		iCanRoute.data = app;
 
 		app.attr("foo", true);
-		equal(app.attr("foo"), true, "route data - .attr(\"foo\", ...) works");
+		assert.equal(app.attr("foo"), true, "route data - .attr(\"foo\", ...) works");
 
 		app.attr({
 			foo: false
 		});
-		equal(app.attr("foo"), false, "route data - .attr({\"foo\": ...}) works");
+		assert.equal(app.attr("foo"), false, "route data - .attr({\"foo\": ...}) works");
 
 		teardownRouteTest();
 	});
