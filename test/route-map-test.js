@@ -16,7 +16,7 @@ QUnit.module("can/route with can-map", {
 if (("onhashchange" in window)) {
 
 var teardownRouteTest;
-var setupRouteTest = function(callback){
+var setupRouteTest = function(assert, callback){
 
 	var testarea = document.getElementById("qunit-fixture");
 	var iframe = document.createElement("iframe");
@@ -42,7 +42,7 @@ var setupRouteTest = function(callback){
 if (typeof steal !== "undefined") {
 	QUnit.test("listening to hashchange (#216, #124)", function(assert) {
 
-		setupRouteTest(function (iframe, iCanRoute) {
+		setupRouteTest(assert, function (iframe, iCanRoute) {
 
 			assert.ok(!iCanRoute.attr("bla"), "Value not set yet");
 
@@ -63,7 +63,7 @@ if (typeof steal !== "undefined") {
 
 	QUnit.test("removing things from the hash", function(assert) {
 
-		setupRouteTest(function (iframe, iCanRoute, loc) {
+		setupRouteTest(assert, function (iframe, iCanRoute, loc) {
 			// CanJS's build was failing on this test.
 			// This code is to make sure we can more information on why the build
 			// failed.
@@ -125,7 +125,7 @@ if (typeof steal !== "undefined") {
 	});
 
 	QUnit.test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(assert) {
-		setupRouteTest(function (iframe, iCanRoute, loc, win) {
+		setupRouteTest(assert, function (iframe, iCanRoute, loc, win) {
 
 			iCanRoute.register("{type}/{id}");
 			var AppState = win.CanMap.extend();
@@ -151,7 +151,7 @@ if (typeof steal !== "undefined") {
 	});
 
 	QUnit.test("updating the hash", function(assert) {
-		setupRouteTest(function (iframe, iCanRoute, loc) {
+		setupRouteTest(assert, function (iframe, iCanRoute, loc) {
 			iCanRoute._onStartComplete = function () {
 				var after = loc.href.substr(loc.href.indexOf("#"));
 				assert.equal(after, "#!bar/" + encodeURIComponent("\/"));
@@ -170,7 +170,7 @@ if (typeof steal !== "undefined") {
 
 	QUnit.test("sticky enough routes", function(assert) {
 
-		setupRouteTest(function (iframe, iCanRoute, loc) {
+		setupRouteTest(assert, function (iframe, iCanRoute, loc) {
 
 			iCanRoute.start()
 			iCanRoute.register("active");
@@ -192,7 +192,7 @@ if (typeof steal !== "undefined") {
 	QUnit.test("updating bound SimpleMap causes single update with a coerced string value", function(assert) {
 		assert.expect(1);
 
-		setupRouteTest(function (iframe, route, loc, win) {
+		setupRouteTest(assert, function (iframe, route, loc, win) {
 			var appVM =  new win.CanMap();
 
 			route.data = appVM;
@@ -272,7 +272,7 @@ QUnit.test("escaping periods", function(assert) {
 if (typeof require === "undefined") {
 
 	QUnit.test("correct stringing", function(assert) {
-		setupRouteTest(function(iframe, route) {
+		setupRouteTest(assert, function(iframe, route) {
 			route.routes = {};
 
 			route.attr("number", 1);
@@ -346,7 +346,7 @@ if (typeof require === "undefined") {
 }
 
 QUnit.test("Calling attr with an object should not stringify object (#197)", function(assert) {
-	setupRouteTest(function (iframe, iCanRoute, loc, win) {
+	setupRouteTest(assert, function (iframe, iCanRoute, loc, win) {
 		var app = new win.CanMap({});
 		app.define = { foo: { serialize: false } };
 
