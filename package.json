@@ -56,7 +56,7 @@
     "can-symbol": "^1.0.0"
   },
   "devDependencies": {
-    "can-map": "^4.0.0",
+    "can-map": "^4.3.8",
     "can-observe": "^2.0.0",
     "can-route-mock": "<2.0.0",
     "can-simple-map": "^4.0.0",
