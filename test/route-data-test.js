@@ -1,6 +1,7 @@
 var canRoute = require("can-route");
 var QUnit = require("steal-qunit");
 var SimpleMap = require("can-simple-map");
+var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var mockRoute = require("./mock-route-binding");
 
@@ -64,5 +65,40 @@ QUnit.test("Property defaults influence the Type", function(assert) {
 	};
 
     mockRoute.hash.value = "#!cat/7/stuff";
+    canRoute.start();
+});
+QUnit.test("Default map registers defaults as properties", function(assert) {
+		var ready = assert.async();
+		mockRoute.start();
+
+		canRoute.register("{page}", { page: "home", path: undefined, prop: 13 });
+
+		canRoute._onStartComplete = function () {
+			assert.equal(canRoute.data.path, undefined);
+			assert.equal(canRoute.data.prop, 13);
+
+			var howMany = 2;
+			var onDone = function(){
+				howMany--;
+				if(howMany === 0) {
+					ready();
+					mockRoute.stop();
+				}
+			};
+			canReflect.onKeyValue(canRoute.data, "path", function onPath() {
+				canReflect.offKeyValue(canRoute.data, "path", onPath);
+				assert.equal(canRoute.data.path, "one");
+				onDone();
+			});
+			canReflect.onKeyValue(canRoute.data, "prop", function onProp() {
+				canReflect.offKeyValue(canRoute.data, "prop", onProp);
+				assert.deepEqual(canRoute.data.prop, 16);
+				onDone();
+			});
+
+			mockRoute.hash.value = "#!home&path=one&prop=16";
+		};
+
+		mockRoute.hash.value = "#!";
     canRoute.start();
 });

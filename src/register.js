@@ -31,7 +31,7 @@ var RouteRegistry = {
 	routes:  {},
 	register: function(url, defaults) {
 		// If the root ends with a forward slash (`/`)
-		// and url starts with a forward slash (`/`), remove the leading 
+		// and url starts with a forward slash (`/`), remove the leading
 		// forward slash (`/`) of the url.
 		var root = bindingProxy.call("root");
 
@@ -106,7 +106,7 @@ var RouteRegistry = {
 			// Assign to the instance props
 			if (this.data instanceof RouteData) {
 				var routeData = this.data;
-				canReflect.eachIndex(names, function(name) {
+				var definePropertyWithDefault = function(name) {
 					var type = "string",
 						defaultValue = defaults[name],
 						typeOf = typeof defaultValue;
@@ -118,7 +118,12 @@ var RouteRegistry = {
 					canReflect.defineInstanceKey(routeData.constructor, name, {
 						type: type
 					});
+				};
+				canReflect.eachIndex(names, definePropertyWithDefault);
+				canReflect.eachKey(defaults, function(value, key){
+					definePropertyWithDefault(key);
 				});
+
 			}
 
 		// Add route in a form that can be easily figured out.
