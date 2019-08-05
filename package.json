@@ -45,7 +45,7 @@
     "can-key-tree": "<2.0.0",
     "can-log": "<2.0.0",
     "can-namespace": "1.0.0",
-    "can-observation": "^4.0.0",
+    "can-observation": "^4.2.0",
     "can-observation-recorder": "<2.0.0",
     "can-param": "^1.0.1",
     "can-queues": "<2.0.0",
