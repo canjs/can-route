@@ -7,10 +7,32 @@
 <p>This is a dummy page to use<br/> for testing route goodness</p>
 
 <!-- For the main CanJS test suite -->
+<script>
+	steal = {
+		paths: {
+			'can-route/src/routedata': 'src/routedata-definemap.js'
+		}
+	};
+</script>
 <script type="text/javascript" src="../../../node_modules/steal/steal-with-promises.js" main="@empty"></script>
 
 <!-- For this repo’s test suite -->
+<script>
+	steal = {
+		paths: {
+			'can-route/src/routedata': 'src/routedata-definemap.js'
+		}
+	};
+</script>
 <script type="text/javascript" src="../node_modules/steal/steal-with-promises.js" main="@empty"></script>
+
+<script>
+steal.config({
+	map: {
+		'src/routedata.js': 'src/routedata-definemap.js'
+	}
+});
+</script>
 
 <script>
 	steal.done().then(function() {
@@ -28,6 +50,9 @@
 				window.DefineMap = modules[3];
 				window.queues = modules[4];
 				window.canReflect = modules[5];
+
+				route.data = new window.DefineMap({});
+
 				/*
 				// delay start to find tests that may fail in CI
 				var origStart = route.start;

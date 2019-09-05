@@ -73,7 +73,7 @@ can-route keeps the state of the hash in-sync with the [can-route.data] containe
 
 ## data
 
-Underlying `can-route` is an observable map: [can-route.data can-route.data]. Depending on what type of map your application uses this could be a [can-define/map/map], an [can-observe.Object] or maybe even a [can-simple-map].
+Underlying `can-route` is an observable map: [can-route.data can-route.data]. Depending on what type of map your application uses, this could be a [can-observable-object], a [can-define/map/map], an [can-observe.Object], or maybe even a [can-simple-map].
 
 `can-route` is an observable. Once initialized using [can-route.start `route.start()`], it is going to change, you can respond to those changes. The following example has the my-app component's `routeData` property return `route.data`. It responds to changes in routing in `componentToShow`.
 
@@ -171,7 +171,7 @@ route.data.page = "settings";
 
 ### Updating can-route
 
-When using a [can-define/map/map DefineMap] to back can-route, create changes in the route data by modifying it directly:
+When using an [can-observable-object ObservableObject] to back can-route, create changes in the route data by modifying it directly:
 
 ```js
 route.data.page = "images";
@@ -331,7 +331,9 @@ easy:
 <a href="{{ routeUrl(type='videos') }}">Videos</a>
 ```
 
-As long as `route.data` is a [can-define/map/map] [can-define/map/map.prototype.assign route.data.assign( { } )] can be used to overwrite, but not delete properties and [can-define/map/map.prototype.update route.data.update( { } )] can be used to overwrite AND delete properties.
+If `route.data` is an [can-observable-object ObservableObject], then `route.data.assign( { } )` can be used to overwrite (but not delete) properties and `route.data.update( { } )` can be used to overwrite AND delete properties.
+
+If `route.data` is a [can-define/map/map], then [can-define/map/map.prototype.assign route.data.assign( { } )] can be used to overwrite (but not delete) properties and [can-define/map/map.prototype.update route.data.update( { } )] can be used to overwrite AND delete properties.
 
 ## Finding the matched route
 

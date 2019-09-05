@@ -1,8 +1,21 @@
-var DefineMap = require("can-define/map/map");
+var canSymbol = require("can-symbol");
+var ObservableObject = require("can-observable-object");
 var stringify = require("./string-coercion").stringify;
 
-module.exports = DefineMap.extend("RouteData", { seal: false }, {
-	"*": {
-		type: stringify
+var Stringify = {};
+Stringify[canSymbol.for("can.new")] = function(value) {
+	return stringify(value);
+};
+Stringify[canSymbol.for("can.isMember")] = function(value) {
+	return typeof value === "string";
+};
+
+class RouteData extends ObservableObject {
+	static get propertyDefaults() {
+		return {
+			type: Stringify
+		};
 	}
-});
+}
+
+module.exports = RouteData;

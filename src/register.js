@@ -3,6 +3,7 @@
 var canReflect = require("can-reflect");
 
 var dev = require("can-log/dev/dev");
+var type = require("can-type");
 
 var bindingProxy = require("./binding-proxy");
 var regexps = require("./regexps");
@@ -107,16 +108,11 @@ var RouteRegistry = {
 			if (this.data instanceof RouteData) {
 				var routeData = this.data;
 				var definePropertyWithDefault = function(name) {
-					var type = "string",
-						defaultValue = defaults[name],
-						typeOf = typeof defaultValue;
-
-					if (defaultValue != null) {
-						type = typeOf;
-					}
+					var defaultValue = defaults[name];
+					var propertyType = defaultValue != null ? type.maybeConvert(defaultValue.constructor) : type.maybeConvert(String);
 
 					canReflect.defineInstanceKey(routeData.constructor, name, {
-						type: type
+						type: propertyType
 					});
 				};
 				canReflect.eachIndex(names, definePropertyWithDefault);

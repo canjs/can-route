@@ -10,6 +10,7 @@ var Observation = require("can-observation");
 var queues = require("can-queues");
 window.queues = queues;
 var mockRoute = require("./mock-route-binding");
+var stringify = require("../src/string-coercion").stringify;
 
 require("can-observation");
 
@@ -32,12 +33,11 @@ if (typeof steal !== "undefined") {
 		var done = assert.async();
 		mockRoute.start();
 
-
-		canRoute.register("{type}/{id}");
 		var AppState = DefineMap.extend({seal: false},{});
 		var appState = new AppState({type: "dog", id: "4"});
-
 		canRoute.data = appState;
+
+		canRoute.register("{type}/{id}");
 
 		canRoute._onStartComplete = function () {
 			var after = mockRoute.hash.get();
@@ -56,11 +56,11 @@ if (typeof steal !== "undefined") {
 		var done = assert.async();
 		mockRoute.start();
 
-		canRoute.register("{type}/{id}");
 		var AppState = DefineMap.extend({seal: false},{});
 		var appState = new AppState({section: "home"});
-
 		canRoute.data = appState;
+
+		canRoute.register("{type}/{id}");
 
 		canRoute._onStartComplete = function () {
 			assert.equal(mockRoute.hash.value, "cat/5&section=home", "same URL");
@@ -68,7 +68,7 @@ if (typeof steal !== "undefined") {
 			assert.equal(appState.get("id"), "5", "hash populates the appState");
 			assert.equal(appState.get("section"), "home", "appState keeps its properties");
 			assert.ok(canRoute.data === appState, "canRoute.data is the same as appState");
-	
+
 			mockRoute.stop();
 			done();
 		};
@@ -82,6 +82,7 @@ if (typeof steal !== "undefined") {
 		var done = assert.async();
 
 		mockRoute.start();
+		canRoute.data = new DefineMap();
 		canRoute.register("active");
 		canRoute.register("");
 
@@ -103,7 +104,8 @@ if (typeof steal !== "undefined") {
         mockRoute.start();
 
 
-        canRoute.start();
+				canRoute.data = new DefineMap();
+				canRoute.start();
         var isOnTestPage = new Observation(function isCurrent(){
 			return canRoute.isCurrent({page: "test"});
 		});
@@ -124,7 +126,8 @@ if (typeof steal !== "undefined") {
 	QUnit.test("can.compute.read should not call canRoute (#1154)", function(assert) {
         var ready = assert.async();
         mockRoute.start();
-        canRoute.attr("page","test");
+				canRoute.data = new DefineMap();
+				canRoute.attr("page","test");
         canRoute.start();
 
         var val = stacheKey.read({route: canRoute},stacheKey.reads("route")).value;
@@ -168,7 +171,9 @@ if (typeof steal !== "undefined") {
 			ready();
 		};
 
-        canRoute.start();
+
+			canRoute.data = new DefineMap();
+			canRoute.start();
     });
 
 	QUnit.test("updating bound DefineMap causes single update with a coerced string value", function(assert) {
@@ -238,6 +243,7 @@ if (typeof steal !== "undefined") {
 }
 
 QUnit.test("escaping periods", function(assert) {
+	canRoute.data = new DefineMap({});
 
 	canRoute.routes = {};
 	canRoute.register("{page}\\.html", {
@@ -260,6 +266,12 @@ if (typeof require !== "undefined") {
 	QUnit.test("correct stringing", function(assert) {
 		mockRoute.start();
 
+		var RouteData = DefineMap.extend("RouteData", { seal: false }, {
+			"*": {
+				type: stringify
+			}
+		});
+		canRoute.data = new RouteData({});
 		canRoute.routes = {};
 
 		canRoute.attr({
@@ -321,6 +333,7 @@ if (typeof require !== "undefined") {
 }
 
 QUnit.test("on/off binding", function(assert) {
+	canRoute.data = new DefineMap();
 	canRoute.routes = {};
 	assert.expect(1)
 
@@ -396,6 +409,7 @@ QUnit.test(".url with merge=true", function(assert) {
 }
 
 QUnit.test("param with whitespace in interpolated string (#45)", function(assert) {
+	canRoute.data = new DefineMap({});
 	canRoute.routes = {};
 	canRoute.register("{ page }", {
 		page: "index"
@@ -441,6 +455,10 @@ QUnit.test("triggers __url event anytime a there's a change to individual proper
 	var done = assert.async();
 	canRoute.start();
 
+	var timeoutID = setTimeout(function page_two() {
+		canRoute.data.page = "two";
+	}, 50);
+
 	var matchedCount = 0;
 	var onMatchCall = {
 		1: function section_a() {
@@ -454,6 +472,7 @@ QUnit.test("triggers __url event anytime a there's a change to individual proper
 			assert.equal(matchedCount, 3, "calls __url event every time a property is changed");
 
 			mockRoute.stop();
+			clearTimeout(timeoutID);
 			done();
 		}
 	}
@@ -462,10 +481,6 @@ QUnit.test("triggers __url event anytime a there's a change to individual proper
 		matchedCount++;
 		onMatchCall[matchedCount]();
 	});
-
-	setTimeout(function page_two() {
-		canRoute.data.page = "two";
-	}, 50);
 
 });
 
