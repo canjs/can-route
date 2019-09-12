@@ -5,7 +5,7 @@ var QUnit = require("steal-qunit");
 var canReflect = require("can-reflect");
 
 
-QUnit.module("can/route with can-map", {
+QUnit.module("can-route with can-map", {
 	beforeEach: function(assert) {
 		canRoute._teardown();
 		canRoute.defaultBinding = "hashchange";

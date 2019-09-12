@@ -14,7 +14,7 @@ var stringify = require("../src/string-coercion").stringify;
 
 require("can-observation");
 
-QUnit.module("can/route with can-define/map/map", {
+QUnit.module("can-route with can-define/map/map", {
 	beforeEach: function(assert) {
 		canRoute.routes = {};
 		canRoute._teardown();

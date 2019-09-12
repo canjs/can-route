@@ -15,7 +15,7 @@ var RouteData = require("../src/routedata");
 
 require("can-observation");
 
-QUnit.module("can/route with can-observable-object", {
+QUnit.module("can-route with can-observable-object", {
 	beforeEach: function(assert) {
 		canRoute.routes = {};
 		canRoute._teardown();
