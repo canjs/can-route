@@ -10,7 +10,7 @@
 <script>
 	steal = {
 		paths: {
-			'node_modules/can-route/src/routedata': 'src/routedata-definemap.js'
+			"can-route*src/routedata": "src/routedata-definemap.js"
 		}
 	};
 </script>
@@ -18,9 +18,9 @@
 
 <!-- For this repo’s test suite -->
 <script>
-	steal = steal.config ? steal : {
+	steal = {
 		paths: {
-			'can-route/src/routedata': 'src/routedata-definemap.js'
+			"can-route*src/routedata": "src/routedata-definemap.js"
 		}
 	};
 </script>
