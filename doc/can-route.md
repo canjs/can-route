@@ -82,33 +82,38 @@ Underlying `can-route` is an observable map: [can-route.data can-route.data]. De
 <mock-url>
 
 <script type="module">
-import {DefineMap, Component, route} from "can";
+import {ObservableObject, StacheElement, route} from "can";
 import "//unpkg.com/mock-url@^5";
 
-const PageHome = Component.extend({
-  tag: "page-home",
-  view: `<h1>Home page</h1>
-  <a href="{{ routeUrl(page='other') }}">
-    Go to another page
-  </a>`,
-  ViewModel: {},
-});
+class PageHome extends StacheElement {
+	static view = `
+		<h1>Home page</h1>
+		<a href="{{ routeUrl(page='other') }}">
+			Go to another page
+		</a>
+	`;
+}
 
-const PageOther = Component.extend({
-  tag: "page-other",
-  view: `<h1>Other page</h1>
-    <a href="{{ routeUrl(page='home') }}">
-      Go home
-    </a>`,
-  ViewModel: {},
-});
+customElements.define("page-home", PageHome);
 
-Component.extend({
-  tag: "my-app",
-  ViewModel: {
+class PageOther extends StacheElement {
+	static view = `
+		<h1>Other page</h1>
+		<a href="{{ routeUrl(page='home') }}">
+			Go home
+		</a>
+	`;
+}
+
+customElements.define("page-other", PageOther);
+
+class MyApp extends StacheElement {
+	static view = `{{componentToShow}}`;
+
+	static props = {
     routeData: {
-      default() {
-        route.data = new DefineMap();
+      get default() {
+        route.data = new ObservableObject();
         route.register("{page}", { page: "home" });
         route.start();
         return route.data;
@@ -121,21 +126,25 @@ Component.extend({
         case "other":
           return new PageOther();
       }
-    },
-    page: "string"
-  },
-  view: `{{componentToShow}}`
-});
+    }
+  };
+}
+
+customElements.define("my-app", MyApp);
 </script>
 ```
 @codepen
 
-`route.data` defaults to [can-define/map/map], but `route.data` can be set to any observable. The following uses [can-observe]:
+`route.data` defaults to [can-observable-object], but `route.data` can be set to any observable. The following uses [can-define-map]:
 
 ```js
-import {DefineMap, route, observe} from "can/everything";
+import {DefineMap, route} from "can/everything";
 
-route.data = new observe();
+const RouteData = DefineMap.extend("RouteData", {
+	page: "string"
+});
+
+route.data = new RouteData();
 route.register( "{page}", { page: "home" } );
 route.start();
 console.log( route.data.page ) //-> "home"
@@ -152,9 +161,9 @@ You can listen to changes in the url by listening on the underlying route data. 
 your route data and rule might have a page property:
 
 ```js
-import {DefineMap, route} from "can";
+import {ObservableObject, route} from "can";
 
-route.data = new DefineMap();
+route.data = new ObservableObject();
 route.register( "{page}", {page: "recipes"} );
 route.start();
 
@@ -195,9 +204,9 @@ You will see this result in the URL and `location.hash`.
 <mock-url></mock-url>
 <script type="module">
 import "//unpkg.com/mock-url@^5.0.0";
-import {DefineMap, route} from "can";
+import {ObservableObject, route} from "can";
 
-route.data = new DefineMap( {type: "image/bar"} ); // location.hash -> #!&type=image%2Fbar
+route.data = new ObservableObject( {type: "image/bar"} ); // location.hash -> #!&type=image%2Fbar
 route.start();
 </script>
 ```

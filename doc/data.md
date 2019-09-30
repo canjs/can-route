@@ -10,10 +10,10 @@ properties will update the hash and vice-versa. `route.data` defaults to a [can-
   ```html
   <mock-url></mock-url>
   <script type="module">
-  import {DefineMap, route} from "can";
+  import {ObservableObject, route} from "can";
   import "//unpkg.com/mock-url@^5.0.0/mock-url.mjs";
 
-  route.data = new DefineMap( {page: ""} );
+  route.data = new ObservableObject( {page: ""} );
   route.register( "{page}" );
   route.start();
 
@@ -49,7 +49,7 @@ For in-depth examples see the the [guides/routing Routing] guide.
 `route.data` defaults to [can-observable-object], but `route.data` can be set to any observable. The following uses [can-define/map/map]:
 
 ```js
-import { DefineMap, route } from "can";
+import { DefineMap, route } from "can/everything";
 
 route.data = new DefineMap();
 route.register( "{page}", { page: "home" } );

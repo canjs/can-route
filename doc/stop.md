@@ -38,7 +38,7 @@
 If you need to disconnect an observable from the URL, call stop.
 To reconnect, call [can-route.start] again.
 
-In the example shows a possible use reason for stopping can-route. 
+In the example shows a possible use reason for stopping can-route.
 When the user logs out the page doesn't change, though the hash still updates.
 Notice the `logout`/`login` functions start and stop route. When logged out you can't change the page,
 even though the hash still updates.
@@ -47,45 +47,50 @@ even though the hash still updates.
 <mock-url></mock-url>
 <my-app></my-app>
 <script type="module">
-import {DefineMap, route, Component } from "can";
+import {StacheElement, route } from "can/everything";
 import "//unpkg.com/mock-url@^5";
 
-Component.extend({
-  tag: "my-app",
-  view: `<a href="{{ routeUrl(page="dashboard") }}">dashboard</a>
-    <a href="{{ routeUrl(page="admin") }}">admin</a><br />
-    {{# if (showLogin) }}
-      <button on:click="login()">login</button>
-    {{ else }}
-      <button on:click="logout()">logout</button>
-    {{/ if }}
-    <h1>{{componentToShow}}</h1>
-    `,
-  ViewModel: {
+class MyApp extends StacheElement {
+	static view = `
+		<a href="{{ routeUrl(page="dashboard") }}">dashboard</a>
+		<a href="{{ routeUrl(page="admin") }}">admin</a><br />
+		{{# if (showLogin) }}
+			<button on:click="login()">login</button>
+		{{ else }}
+			<button on:click="logout()">logout</button>
+		{{/ if }}
+		<h1>{{componentToShow}}</h1>
+	`;
+
+	static props = {
     routeData: {
-      default() {
+      get default() {
         route.register("{page}");
         route.data.page = "admin";
         route.start();
         return route.data;
       }
     },
-    logout() {
-      route.data.page = "login";
-      route.stop();
-    },
-    login() {
-      route.start();
-      route.data.page = "admin";
-    },
     get componentToShow() {
       return this.routeData.page;
     },
     get showLogin() {
       return this.routeData.page === "login";
-    } 
+    }
+  };
+
+  logout() {
+  	route.data.page = "login";
+  	route.stop();
   }
-});
+  
+  login() {
+  	route.start();
+  	route.data.page = "admin";
+  }
+}
+
+customElements.define("my-app", MyApp);
 </script>
 ```
 @codepen
