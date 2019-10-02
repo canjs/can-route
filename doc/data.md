@@ -5,15 +5,15 @@ An observable key-value object used to cross bind to the url observable [can-rou
 
 @type {Object} If `route.data` is set to a [can-reflect]ed observable object of
 key-value pairs, once [can-route.start] is called, changes in `route.data`'s
-properties will update the hash and vice-versa. `route.data` defaults to a [can-define/map/map].
+properties will update the hash and vice-versa. `route.data` defaults to a [can-observable-object].
 
   ```html
   <mock-url></mock-url>
   <script type="module">
-  import {DefineMap, route} from "can";
+  import {ObservableObject, route} from "can";
   import "//unpkg.com/mock-url@^5.0.0/mock-url.mjs";
 
-  route.data = new DefineMap( {page: ""} );
+  route.data = new ObservableObject( {page: ""} );
   route.register( "{page}" );
   route.start();
 
@@ -46,12 +46,12 @@ For in-depth examples see the the [guides/routing Routing] guide.
 
 ## Use
 
-`route.data` defaults to [can-define/map/map], but `route.data` can be set to any observable. The following uses [can-observe]:
+`route.data` defaults to [can-observable-object], but `route.data` can be set to any observable. The following uses [can-define/map/map]:
 
 ```js
-import {DefineMap, route, observe} from "can/everything";
+import { DefineMap, route } from "can/everything";
 
-route.data = new observe();
+route.data = new DefineMap();
 route.register( "{page}", { page: "home" } );
 route.start();
 console.log( route.data.page ) //-> "home"

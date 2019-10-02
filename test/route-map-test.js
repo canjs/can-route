@@ -5,7 +5,7 @@ var QUnit = require("steal-qunit");
 var canReflect = require("can-reflect");
 
 
-QUnit.module("can/route with can-map", {
+QUnit.module("can-route with can-map", {
 	beforeEach: function(assert) {
 		canRoute._teardown();
 		canRoute.defaultBinding = "hashchange";
@@ -127,11 +127,11 @@ if (typeof steal !== "undefined") {
 	QUnit.test("canRoute.map: route is initialized from URL first, then URL params are added from canRoute.data", function(assert) {
 		setupRouteTest(assert, function (iframe, iCanRoute, loc, win) {
 
-			iCanRoute.register("{type}/{id}");
 			var AppState = win.CanMap.extend();
 			var appState = new AppState({section: "home"});
-
 			iCanRoute.data = appState;
+
+			iCanRoute.register("{type}/{id}");
 
 			iCanRoute._onStartComplete = function () {
 				var after = loc.href.substr(loc.href.indexOf("#"));

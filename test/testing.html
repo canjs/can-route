@@ -13,6 +13,17 @@
 <script type="text/javascript" src="../node_modules/steal/steal-with-promises.js" main="@empty"></script>
 
 <script>
+	steal.config({
+		paths: {
+			"can-route*src/routedata":
+				(System.src === "../../../node_modules/steal/steal-with-promises.js"
+					? "node_modules/can-route/"
+					: "") + "src/routedata-definemap.js"
+		}
+	});
+</script>
+
+<script>
 	steal.done().then(function() {
 		Promise.all([
 				System.import("can-route"),

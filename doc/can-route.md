@@ -73,7 +73,7 @@ can-route keeps the state of the hash in-sync with the [can-route.data] containe
 
 ## data
 
-Underlying `can-route` is an observable map: [can-route.data can-route.data]. Depending on what type of map your application uses this could be a [can-define/map/map], an [can-observe.Object] or maybe even a [can-simple-map].
+Underlying `can-route` is an observable map: [can-route.data can-route.data]. Depending on what type of map your application uses, this could be a [can-observable-object], a [can-define/map/map], an [can-observe.Object], or maybe even a [can-simple-map].
 
 `can-route` is an observable. Once initialized using [can-route.start `route.start()`], it is going to change, you can respond to those changes. The following example has the my-app component's `routeData` property return `route.data`. It responds to changes in routing in `componentToShow`.
 
@@ -82,33 +82,38 @@ Underlying `can-route` is an observable map: [can-route.data can-route.data]. De
 <mock-url>
 
 <script type="module">
-import {DefineMap, Component, route} from "can";
+import {ObservableObject, StacheElement, route} from "can";
 import "//unpkg.com/mock-url@^5";
 
-const PageHome = Component.extend({
-  tag: "page-home",
-  view: `<h1>Home page</h1>
-  <a href="{{ routeUrl(page='other') }}">
-    Go to another page
-  </a>`,
-  ViewModel: {},
-});
+class PageHome extends StacheElement {
+	static view = `
+		<h1>Home page</h1>
+		<a href="{{ routeUrl(page='other') }}">
+			Go to another page
+		</a>
+	`;
+}
 
-const PageOther = Component.extend({
-  tag: "page-other",
-  view: `<h1>Other page</h1>
-    <a href="{{ routeUrl(page='home') }}">
-      Go home
-    </a>`,
-  ViewModel: {},
-});
+customElements.define("page-home", PageHome);
 
-Component.extend({
-  tag: "my-app",
-  ViewModel: {
+class PageOther extends StacheElement {
+	static view = `
+		<h1>Other page</h1>
+		<a href="{{ routeUrl(page='home') }}">
+			Go home
+		</a>
+	`;
+}
+
+customElements.define("page-other", PageOther);
+
+class MyApp extends StacheElement {
+	static view = `{{componentToShow}}`;
+
+	static props = {
     routeData: {
-      default() {
-        route.data = new DefineMap();
+      get default() {
+        route.data = new ObservableObject();
         route.register("{page}", { page: "home" });
         route.start();
         return route.data;
@@ -121,21 +126,25 @@ Component.extend({
         case "other":
           return new PageOther();
       }
-    },
-    page: "string"
-  },
-  view: `{{componentToShow}}`
-});
+    }
+  };
+}
+
+customElements.define("my-app", MyApp);
 </script>
 ```
 @codepen
 
-`route.data` defaults to [can-define/map/map], but `route.data` can be set to any observable. The following uses [can-observe]:
+`route.data` defaults to [can-observable-object], but `route.data` can be set to any observable. The following uses [can-define-map]:
 
 ```js
-import {DefineMap, route, observe} from "can/everything";
+import {DefineMap, route} from "can/everything";
 
-route.data = new observe();
+const RouteData = DefineMap.extend("RouteData", {
+	page: "string"
+});
+
+route.data = new RouteData();
 route.register( "{page}", { page: "home" } );
 route.start();
 console.log( route.data.page ) //-> "home"
@@ -152,9 +161,9 @@ You can listen to changes in the url by listening on the underlying route data. 
 your route data and rule might have a page property:
 
 ```js
-import {DefineMap, route} from "can";
+import {ObservableObject, route} from "can";
 
-route.data = new DefineMap();
+route.data = new ObservableObject();
 route.register( "{page}", {page: "recipes"} );
 route.start();
 
@@ -171,7 +180,7 @@ route.data.page = "settings";
 
 ### Updating can-route
 
-When using a [can-define/map/map DefineMap] to back can-route, create changes in the route data by modifying it directly:
+When using an [can-observable-object ObservableObject] to back can-route, create changes in the route data by modifying it directly:
 
 ```js
 route.data.page = "images";
@@ -195,9 +204,9 @@ You will see this result in the URL and `location.hash`.
 <mock-url></mock-url>
 <script type="module">
 import "//unpkg.com/mock-url@^5.0.0";
-import {DefineMap, route} from "can";
+import {ObservableObject, route} from "can";
 
-route.data = new DefineMap( {type: "image/bar"} ); // location.hash -> #!&type=image%2Fbar
+route.data = new ObservableObject( {type: "image/bar"} ); // location.hash -> #!&type=image%2Fbar
 route.start();
 </script>
 ```
@@ -331,7 +340,9 @@ easy:
 <a href="{{ routeUrl(type='videos') }}">Videos</a>
 ```
 
-As long as `route.data` is a [can-define/map/map] [can-define/map/map.prototype.assign route.data.assign( { } )] can be used to overwrite, but not delete properties and [can-define/map/map.prototype.update route.data.update( { } )] can be used to overwrite AND delete properties.
+If `route.data` is an [can-observable-object ObservableObject], then `route.data.assign( { } )` can be used to overwrite (but not delete) properties and `route.data.update( { } )` can be used to overwrite AND delete properties.
+
+If `route.data` is a [can-define/map/map], then [can-define/map/map.prototype.assign route.data.assign( { } )] can be used to overwrite (but not delete) properties and [can-define/map/map.prototype.update route.data.update( { } )] can be used to overwrite AND delete properties.
 
 ## Finding the matched route
 

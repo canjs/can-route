@@ -13,6 +13,17 @@
 <script type="text/javascript" src="../node_modules/steal/steal-with-promises.js" main="@empty"></script>
 
 <script>
+	steal.config({
+		paths: {
+			"can-route*src/routedata":
+				(System.src === "../../../node_modules/steal/steal-with-promises.js"
+					? "node_modules/can-route/"
+					: "") + "src/routedata-definemap.js"
+		}
+	});
+</script>
+
+<script>
 	steal.done().then(function() {
 		Promise.all([
 				System.import("can-route"),
@@ -28,6 +39,9 @@
 				window.DefineMap = modules[3];
 				window.queues = modules[4];
 				window.canReflect = modules[5];
+
+				route.data = new window.DefineMap({});
+
 				/*
 				// delay start to find tests that may fail in CI
 				var origStart = route.start;
