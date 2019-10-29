@@ -4,6 +4,8 @@ var SimpleMap = require("can-simple-map");
 var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var mockRoute = require("./mock-route-binding");
+var RouteData = require("../src/routedata");
+var testHelpers = require("can-test-helpers");
 
 require("can-observation");
 
@@ -101,4 +103,13 @@ QUnit.test("Default map registers defaults as properties", function(assert) {
 
 		mockRoute.hash.value = "#!";
     canRoute.start();
+});
+
+testHelpers.dev.devOnlyTest("should warn when .data is set after .register() is called", function (assert) {
+	var teardown = testHelpers.dev.willWarn(/Set can-route.data before/);
+
+	canRoute.register("{page}/{subpage}");
+	canRoute.data = new RouteData();
+
+	assert.equal(teardown(), 1);
 });
