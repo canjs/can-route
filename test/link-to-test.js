@@ -1,19 +1,19 @@
-var canRoute = require('can-route');
-var QUnit = require('steal-qunit');
+var canRoute = require("can-route");
+var QUnit = require("steal-qunit");
 
 QUnit.module("can-route .linkTo",{
-    setup: function(){
-        canRoute.routes = {};
-    }
+	beforeEach: function(assert) {
+		canRoute.routes = {};
+	}
 });
 
 
-QUnit.test("linkTo", function () {
+QUnit.test("linkTo", function(assert) {
 	canRoute.routes = {};
 	canRoute.register("{foo}");
 	var res = canRoute.link("Hello", {
 		foo: "bar",
-		baz: 'foo'
+		baz: "foo"
 	});
-	equal(res, '<a href="#!bar&baz=foo">Hello</a>');
+	assert.equal(res, "<a href=\"#!bar&baz=foo\">Hello</a>");
 });

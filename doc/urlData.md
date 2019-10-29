@@ -4,19 +4,17 @@
 Specifies an observable value that represents the URL. Useful for changing
 what URL [can-route route] is cross-bound to.
 
-@type {ValueObservable} `urlData` is an observable value that represents the part of the URL cross
-  bound to the [can-route.data] state object.  It can be set to other observable urls like [can-route-pushstate]
-  or [can-route-mock]. It defaults to [can-route-hash].
+@type {ValueObservable} `urlData` is an observable value that represents the part of the URL cross bound to the [can-route.data] state object.  It can be set to other observable urls like [can-route-pushstate] or [can-route-mock]. It defaults to [can-route-hash].
 
   The following shows setting `urlData` to another observable.
 
   ```js
-  import {route, RouteMock, DefineMap} from "can";
+  import {route, RouteMock} from "can/everything";
 
   // route.data will update routeMock and be updated by changes in
   // routeMock.
-  var routeMock = route.urlData = new RouteMock();
-  var routeData = route.data = new DefineMap({},false);
+  const routeMock = route.urlData = new RouteMock();
+  const routeData = route.data;
 
   // begin binding
   route.start()
@@ -24,7 +22,7 @@ what URL [can-route route] is cross-bound to.
   // simulate setting the URL
   routeMock.value = "foo=bar";
 
-  routeData.foo //-> "bar";
+  console.log( routeData.foo ); //-> "bar";
   ```
   @codepen
 
@@ -35,7 +33,6 @@ what URL [can-route route] is cross-bound to.
 > WARNING: The following is non-normative and may change in a
 > future release.  Please let us know if you are trying to create your own
 > observable and we will work with you to stabilize the API.
-
 
 Besides implementing the standard `ValueObservable` symbols:
 

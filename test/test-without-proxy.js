@@ -3,8 +3,6 @@ require("./link-to-test");
 require("./url-test");
 require("./route-data-test");
 require("./route-observability-test");
-require("./route-observable-test");
-require("./route-observe-test");
 require("./route-define-test");
 require("./route-map-test");
 require("./route-register-test");

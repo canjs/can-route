@@ -3,18 +3,26 @@
 @description A compute representing the currently matched routing rule route.
 
 @signature `route.currentRule()`
-@return {String} The currently matched [can-route.register registered] routing rule.
+  Use `route.currentRule()` to find the current route rule.
 
-@body
+  ```js
+  import {route} from "can";
 
-## Use
+  route.register( "{type}" );
+  route.register( "{type}/{subtype}" );
+  route.start();
 
-Use `route.currentRule()` to find the current route rule.
+  route.data.type = "foo";
+  setTimeout(() => {
+    console.log( route.currentRule() ); //-> "{type}"
+    
+    route.data.subtype = "bar";
+  }, 100);
 
-```js
-route.register( "{type}", { type: "foo" } );
-route.register( "{type}/{subtype}" );
-route.currentRule(); // "{type}"
-route.data.subtype = "foo";
-route.currentRule(); // "{type}/{subtype}"
-```
+  setTimeout(() => {
+    console.log( route.currentRule() ); //-> "{type}/{subtype}"
+  }, 200);
+  ```
+  @codepen
+
+  @return {String} The currently matched [can-route.register registered] routing rule.

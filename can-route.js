@@ -1,15 +1,19 @@
+// # can-route.js
+// Manage browser history and client state by synchronizing 
+// the window.location.hash with an observable.
+
 "use strict";
-/*jshint -W079 */
 var Bind = require("can-bind");
 var queues = require("can-queues");
-var Observation = require('can-observation');
+var Observation = require("can-observation");
 
-var namespace = require('can-namespace');
-var devLog = require('can-log/dev/dev');
-var canReflect = require('can-reflect');
-var canSymbol = require('can-symbol');
+var namespace = require("can-namespace");
+var devLog = require("can-log/dev/dev");
+var canReflect = require("can-reflect");
+var canSymbol = require("can-symbol");
 var makeCompute = require("can-simple-observable/make-compute/make-compute");
-var SimpleMap = require("can-simple-map");
+var RouteData = require("./src/routedata");
+var stringCoercingMapDecorator = require("./src/string-coercion").stringCoercingMapDecorator;
 
 var registerRoute = require("./src/register");
 var urlHelpers = require("./src/url-helpers");
@@ -18,24 +22,24 @@ var routeDeparam = require("./src/deparam");
 var bindingProxy = require("./src/binding-proxy");
 var Hashchange = require("can-route-hash");
 
-var isWebWorker =  require('can-globals/is-web-worker/is-web-worker');
-var isBrowserWindow =  require('can-globals/is-browser-window/is-browser-window');
+var isWebWorker =  require("can-globals/is-web-worker/is-web-worker");
+var isBrowserWindow =  require("can-globals/is-browser-window/is-browser-window");
 
+// ## hashchangeObservable
+// `hashchangeObservable` is an instance of `Hashchange`, instances of 
+// `Hashchange` are two-way bound to `window.location.hash` once the
+// instances have a listener.
 var hashchangeObservable = new Hashchange();
 bindingProxy.bindings.hashchange = hashchangeObservable;
 bindingProxy.defaultBinding = "hashchange";
 bindingProxy.urlDataObservable.value = hashchangeObservable;
 
 
-// ## route.js
-// `can-route`
-// _Helps manage browser history (and client state) by synchronizing the
-// `window.location.hash` with a `Map`._
-
-function canRoute(url, defaults){
+// ## canRoute
+function canRoute(url, defaults) {
 	//!steal-remove-start
-	if(process.env.NODE_ENV !== 'production') {
-		devLog.warn('Call route.register(url,defaults) instead of calling route(url, defaults)');
+	if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
+		devLog.warn("Call route.register(url,defaults) instead of calling route(url, defaults)");
 	}
 	//!steal-remove-end
 	registerRoute.register(url, defaults);
@@ -43,19 +47,17 @@ function canRoute(url, defaults){
 }
 
 
-// Helper methods used for matching routes.
-
-
+// ## Helper Functions
 // A ~~throttled~~ debounced function called multiple times will only fire once the
 // timer runs down. Each call resets the timer.
 var timer;
 // A dummy events object used to dispatch url change events on.
-var currentRuleObservable = new Observation(function canRoute_matchedRoute(){
+var currentRuleObservable = new Observation(function canRoute_matchedRoute() {
 	var url = bindingProxy.call("can.getValue");
 	return canRoute.rule(url);
 });
 
-
+// ### updateUrl
 // If the `route.data` changes, update the hash.
 // Using `.serialize()` retrieves the raw data contained in the `observable`.
 // This function is ~~throttled~~ debounced so it only updates once even if multiple values changed.
@@ -71,9 +73,15 @@ function updateUrl(serializedData) {
 			path = routeParam.paramFromRoute(route, serialized);
 
 		bindingProxy.call("can.setValue", path);
+		var onStartComplete = canRoute._onStartComplete;
+		if (onStartComplete) {
+			canRoute._onStartComplete = undefined;
+			onStartComplete();
+		}
 	}, 10);
 }
 
+// ### updateRouteData
 // Deparameterizes the portion of the hash of interest and assign the
 // values to the `route.data` removing existing values no longer in the hash.
 // updateRouteData is called typically by hashchange which fires asynchronously
@@ -98,7 +106,7 @@ function updateRouteData() {
 /**
  * @static
  */
-Object.defineProperty(canRoute,"routes",{
+Object.defineProperty(canRoute, "routes", {
 	/**
 	 * @property {Object} routes
 	 * @hide
@@ -125,45 +133,52 @@ Object.defineProperty(canRoute,"routes",{
 		return registerRoute.routes = newVal;
 	}
 });
-Object.defineProperty(canRoute,"defaultBinding",{
- 	get: function(){
+
+// ## canRoute.defaultBinding
+Object.defineProperty(canRoute, "defaultBinding", {
+ 	get: function() {
 		return bindingProxy.defaultBinding;
 	},
-	set: function(newVal){
+	set: function(newVal) {
 		bindingProxy.defaultBinding = newVal;
 		var observable = bindingProxy.bindings[bindingProxy.defaultBinding];
-		if(observable) {
+		if (observable) {
 			bindingProxy.urlDataObservable.value = observable;
 		}
 	}
 });
-Object.defineProperty(canRoute,"urlData",{
- 	get: function(){
+
+// ## canRoute.urlData
+Object.defineProperty(canRoute, "urlData", {
+ 	get: function() {
 		return bindingProxy.urlDataObservable.value;
 	},
-	set: function(newVal){
+	set: function(newVal) {
 		canRoute._teardown();
 		bindingProxy.urlDataObservable.value = newVal;
 	}
 });
 
 canReflect.assignMap(canRoute, {
+	// ## canRoute.param
 	param: routeParam,
+	// ## canRoute.deparam
 	deparam: routeDeparam,
-	map: function(data){
+	// ## canRoute.map
+	map: function(data) {
 		//!steal-remove-start
-		if(process.env.NODE_ENV !== 'production') {
-			devLog.warn('Set route.data directly instead of calling route.map');
+		if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
+			devLog.warn("Set route.data directly instead of calling route.map");
 		}
 		//!steal-remove-end
 		canRoute.data = data;
 	},
 
-
+	// ## canRoute.start
 	start: function (val) {
 		if (val !== true) {
 			canRoute._setup();
-			if(isBrowserWindow() || isWebWorker()) {
+			if (isBrowserWindow() || isWebWorker()) {
 				// We can't use updateRouteData because we want to merge the route data
 				// into .data
 				var hash = bindingProxy.call("can.getValue");
@@ -179,6 +194,7 @@ canReflect.assignMap(canRoute, {
 		}
 		return canRoute;
 	},
+	// ## canRoute.url
 	url: urlHelpers.url,
 	link: urlHelpers.link,
 	isCurrent: urlHelpers.isCurrent,
@@ -226,7 +242,7 @@ canReflect.assignMap(canRoute, {
 			// For debugging: the names that will be assigned to the updateChild and
 			// updateParent functions within can-bind
 			//!steal-remove-start
-			if (process.env.NODE_ENV !== 'production') {
+			if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
 				bindingOptions.updateChildName = "can-route.updateRouteData";
 				bindingOptions.updateParentName = "can-route.updateUrl";
 			}
@@ -255,9 +271,9 @@ canReflect.assignMap(canRoute, {
 
 	currentRule: makeCompute( currentRuleObservable ),
 	register: registerRoute.register,
-	rule: function(url){
+	rule: function(url) {
 		var rule = routeDeparam.getRule(url);
-		if(rule) {
+		if (rule) {
 			return rule.route;
 		}
 	}
@@ -266,24 +282,24 @@ canReflect.assignMap(canRoute, {
 // The functions in the following list applied to `canRoute` (e.g. `canRoute.attr('...')`) will
 // instead act on the `canRoute.data` observe.
 
-var bindToCanRouteData = function(name, args) {
+var bindToCanRouteData = function (name, args) {
 	if (!canRoute.data[name]) {
 		return canRoute.data.addEventListener.apply(canRoute.data, args);
 	}
 	return canRoute.data[name].apply(canRoute.data, args);
 };
 
-['addEventListener','removeEventListener','bind', 'unbind', 'on', 'off'].forEach(function(name) {
+["addEventListener","removeEventListener","bind", "unbind", "on", "off"].forEach(function(name) {
 	// exposing all internal eventQueue evt’s to canRoute
 	canRoute[name] = function(eventName, handler) {
-		if (eventName === '__url') {
+		if (eventName === "__url") {
 			return bindingProxy.call("can.onValue", handler );
 		}
 		return bindToCanRouteData(name, arguments);
 	};
 });
 
-['delegate', 'undelegate', 'removeAttr', 'compute', '_get', '___get', 'each'].forEach(function (name) {
+["delegate", "undelegate", "removeAttr", "compute", "_get", "___get", "each"].forEach(function (name) {
 	canRoute[name] = function () {
 		// `delegate` and `undelegate` require
 		// the `can/map/delegate` plugin
@@ -292,97 +308,52 @@ var bindToCanRouteData = function(name, args) {
 });
 
 
-var routeData;
-var setRouteData = function(data){
+var routeData,
+	serializedObservation,
+	serializedCompute;
+
+function setRouteData(data) {
 	routeData = data;
 	return routeData;
-};
-var serializedObservation;
-var serializedCompute;
+}
 
-Object.defineProperty(canRoute,"serializedObservation", {
-	get: function(){
-		if(!serializedObservation) {
-			serializedObservation = new Observation(function canRoute_data_serialized(){
+Object.defineProperty(canRoute, "serializedObservation", {
+	get: function() {
+		if (!serializedObservation) {
+			serializedObservation = new Observation(function canRoute_data_serialized() {
 				return canReflect.serialize( canRoute.data );
 			});
 		}
 		return serializedObservation;
 	}
 });
-Object.defineProperty(canRoute,"serializedCompute", {
-	get: function(){
-		if(!serializedCompute) {
+Object.defineProperty(canRoute, "serializedCompute", {
+	get: function() {
+		if (!serializedCompute) {
 			serializedCompute = makeCompute(canRoute.serializedObservation);
 		}
 		return serializedCompute;
 	}
 });
-// Helper for convert any object (or value) to stringified object (or value)
-var stringify = function (obj) {
-	// Object is array, plain object, Map or List
-	if (obj && typeof obj === "object") {
-		if (obj && typeof obj === "object" && ("serialize" in obj)) {
-			obj = obj.serialize();
-		} else {
-			// Get array from array-like or shallow-copy object
-			obj = typeof obj.slice === "function" ? obj.slice() : canReflect.assign({}, obj);
-		}
-		// Convert each object property or array item into stringified new
-		canReflect.eachKey(obj, function (val, prop) {
-			obj[prop] = stringify(val);
-		});
-		// Object supports toString function
-	} else if (obj !== undefined && obj !== null && (typeof obj.toString === "function" )) {
-		obj = obj.toString();
-	}
-
-	return obj;
-};
-// everything in the backing Map is a string
-// add type coercion during Map setter to coerce all values to strings so unexpected conflicts don't happen.
-// https://github.com/canjs/canjs/issues/2206
-var stringCoercingMapDecorator = function(map) {
-	var sym = canSymbol.for("can.route.stringCoercingMapDecorator");
-	if(!map.attr[sym]) {
-		var attrSuper = map.attr;
-
-		map.attr = function(prop, val) {
-			var serializable = this.define === undefined || this.define[prop] === undefined || !!this.define[prop].serialize,
-				args;
-
-			if (serializable) { // if setting non-str non-num attr
-				args = stringify(Array.apply(null, arguments));
-			} else {
-				args = arguments;
-			}
-
-			return attrSuper.apply(this, args);
-		};
-		canReflect.setKeyValue(map.attr, sym, true);
-	}
-
-	return map;
-};
 
 var viewModelSymbol = canSymbol.for("can.viewModel");
-Object.defineProperty(canRoute,"data", {
-	get: function(){
-		if(routeData) {
+Object.defineProperty(canRoute, "data", {
+	get: function() {
+		if (routeData) {
 			return routeData;
 		} else {
-			return setRouteData( stringCoercingMapDecorator( new SimpleMap() ) );
+			return setRouteData(new RouteData());
 		}
 	},
 	set: function(data) {
-		if( canReflect.isConstructorLike(data) ){
+		if ( canReflect.isConstructorLike(data) ) {
 			data = new data();
 		}
-		if(data && data[viewModelSymbol] !== undefined) {
+		if (data && data[viewModelSymbol] !== undefined) {
 			data = data[viewModelSymbol];
 		}
 		// if it’s a map, we make it always set strings for backwards compat
-		if( "attr" in data ) {
+		if ( "attr" in data ) {
 			setRouteData( stringCoercingMapDecorator(data) );
 		} else {
 			setRouteData(data);
@@ -390,18 +361,18 @@ Object.defineProperty(canRoute,"data", {
 	}
 });
 
-canRoute.attr = function(prop, value){
+canRoute.attr = function(prop, value) {
 	console.warn("can-route: can-route.attr is deprecated. Use methods on can-route.data instead.");
-	if("attr" in canRoute.data) {
+	if ("attr" in canRoute.data) {
 		return canRoute.data.attr.apply(canRoute.data, arguments);
 	} else {
-		if(arguments.length > 1) {
+		if (arguments.length > 1) {
 			canReflect.setKeyValue(canRoute.data, prop, value);
 			return canRoute.data;
-		} else if(typeof prop === 'object') {
+		} else if (typeof prop === "object") {
 			canReflect.assignDeep(canRoute.data,prop);
 			return canRoute.data;
-		} else if(arguments.length === 1){
+		} else if (arguments.length === 1) {
 			return canReflect.getKeyValue(canRoute.data, prop);
 		} else {
 			return canReflect.unwrap(canRoute.data);
