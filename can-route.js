@@ -1,5 +1,5 @@
 // # can-route.js
-// Manage browser history and client state by synchronizing 
+// Manage browser history and client state by synchronizing
 // the window.location.hash with an observable.
 
 "use strict";
@@ -26,7 +26,7 @@ var isWebWorker =  require("can-globals/is-web-worker/is-web-worker");
 var isBrowserWindow =  require("can-globals/is-browser-window/is-browser-window");
 
 // ## hashchangeObservable
-// `hashchangeObservable` is an instance of `Hashchange`, instances of 
+// `hashchangeObservable` is an instance of `Hashchange`, instances of
 // `Hashchange` are two-way bound to `window.location.hash` once the
 // instances have a listener.
 var hashchangeObservable = new Hashchange();
@@ -346,6 +346,13 @@ Object.defineProperty(canRoute, "data", {
 		}
 	},
 	set: function(data) {
+		//!steal-remove-start
+		if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
+			if (Object.keys(registerRoute.routes).length > 0) {
+				devLog.warn("can-route: Setting can-route.data after calling can-route.register() may result in unexpected behavior. Set can-route.data before calling can-route.register().");
+			}
+		}
+		//!steal-remove-end
 		if ( canReflect.isConstructorLike(data) ) {
 			data = new data();
 		}
