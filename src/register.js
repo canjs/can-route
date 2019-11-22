@@ -3,14 +3,13 @@
 var canReflect = require("can-reflect");
 
 var dev = require("can-log/dev/dev");
-var type = require("can-type");
 
 var bindingProxy = require("./binding-proxy");
 var regexps = require("./regexps");
 
 var diff = require("can-diff/list/list");
 var diffObject = require("can-diff/map/map");
-var RouteData = require("./routedata");
+
 // `RegExp` used to match route variables of the type '{name}'.
 // Any word character or a period is matched.
 
