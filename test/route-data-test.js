@@ -113,3 +113,13 @@ testHelpers.dev.devOnlyTest("should warn when .data is set after .register() is 
 
 	assert.equal(teardown(), 1);
 });
+
+testHelpers.dev.devOnlyTest("should not warn when .data is set after .register() is called", function (assert) {
+	var teardown = testHelpers.dev.willWarn(/Set can-route.data before/);
+	canRoute.register("{page}/{subpage}");
+	canRoute.data = new RouteData();
+
+	canRoute.start();
+	
+	assert.equal(teardown(), 0);
+});
