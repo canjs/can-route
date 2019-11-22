@@ -101,25 +101,7 @@ var RouteRegistry = {
 				}
 			});
 		}
-			//!steal-remove-end
-
-			// Assign to the instance props
-			// if (this.data instanceof RouteData) {
-			// 	var routeData = this.data;
-			// 	var definePropertyWithDefault = function(name) {
-			// 		var defaultValue = defaults[name];
-			// 		var propertyType = defaultValue != null ? type.maybeConvert(defaultValue.constructor) : type.maybeConvert(String);
-
-			// 		canReflect.defineInstanceKey(routeData.constructor, name, {
-			// 			type: propertyType
-			// 		});
-			// 	};
-			// 	canReflect.eachIndex(names, definePropertyWithDefault);
-			// 	canReflect.eachKey(defaults, function(value, key){
-			// 		definePropertyWithDefault(key);
-			// 	});
-
-			// }
+		//!steal-remove-end
 
 		// Add route in a form that can be easily figured out.
 		return RouteRegistry.routes[url] = {
