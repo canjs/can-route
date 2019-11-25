@@ -340,6 +340,7 @@ if ("onhashchange" in window) {
 
 			canRoute.routes = {};
 			canRoute.register("{type}/{id}");
+			canRoute.start();
 
 			canReflect.update(canRoute.data, {});
 
