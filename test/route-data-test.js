@@ -5,7 +5,6 @@ var canReflect = require("can-reflect");
 var canSymbol = require("can-symbol");
 var mockRoute = require("./mock-route-binding");
 var RouteData = require("../src/routedata");
-var testHelpers = require("can-test-helpers");
 
 require("can-observation");
 
@@ -105,11 +104,37 @@ QUnit.test("Default map registers defaults as properties", function(assert) {
     canRoute.start();
 });
 
-testHelpers.dev.devOnlyTest("should warn when .data is set after .register() is called", function (assert) {
-	var teardown = testHelpers.dev.willWarn(/Set can-route.data before/);
+QUnit.test("route.register should not read route.data, register first", function (assert) {
+	var done = assert.async();
+	mockRoute.start();
 
 	canRoute.register("{page}/{subpage}");
 	canRoute.data = new RouteData();
 
-	assert.equal(teardown(), 1);
+	canRoute._onStartComplete = function () {
+		assert.ok('page' in canRoute.data);
+		assert.ok('subpage' in canRoute.data);
+		done();
+		mockRoute.stop();
+	};
+
+	canRoute.start();
+});
+
+QUnit.test("route.register should not read route.data 2, start first", function (assert) {
+	var done = assert.async();
+	mockRoute.start();
+
+	canRoute.data = new RouteData();
+	canRoute.register("{page}/{subpage}");
+
+	canRoute._onStartComplete = function () {
+		assert.ok('page' in canRoute.data);
+		assert.ok('subpage' in canRoute.data);
+		done();
+		mockRoute.stop();
+	};
+
+	
+	canRoute.start();
 });

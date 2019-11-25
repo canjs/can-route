@@ -6,6 +6,7 @@
 var Bind = require("can-bind");
 var queues = require("can-queues");
 var Observation = require("can-observation");
+var type = require("can-type");
 
 var namespace = require("can-namespace");
 var devLog = require("can-log/dev/dev");
@@ -176,6 +177,27 @@ canReflect.assignMap(canRoute, {
 
 	// ## canRoute.start
 	start: function (val) {
+		if (canRoute.data instanceof RouteData) {
+			var routeData = canRoute.data;
+			var definePropertyWithDefault = function(defaults, name) {
+				var defaultValue = defaults[name];
+				var propertyType = defaultValue != null ? type.maybeConvert(defaultValue.constructor) : type.maybeConvert(String);
+				canReflect.defineInstanceKey(routeData.constructor, name, {
+					type: propertyType
+				});
+			};
+
+			canReflect.eachKey(canRoute.routes, function(route) {
+				canReflect.eachIndex(route.names, function (name) {
+					definePropertyWithDefault(route.defaults, name);
+				});
+
+				canReflect.eachKey(route.defaults, function(value, key) {
+					definePropertyWithDefault(route.defaults, key);
+				});
+			});
+		}
+
 		if (val !== true) {
 			canRoute._setup();
 			if (isBrowserWindow() || isWebWorker()) {
@@ -192,6 +214,7 @@ canReflect.assignMap(canRoute, {
 				updateUrl();
 			}
 		}
+		
 		return canRoute;
 	},
 	// ## canRoute.url
@@ -346,13 +369,6 @@ Object.defineProperty(canRoute, "data", {
 		}
 	},
 	set: function(data) {
-		//!steal-remove-start
-		if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
-			if (Object.keys(registerRoute.routes).length > 0) {
-				devLog.warn("can-route: Setting can-route.data after calling can-route.register() may result in unexpected behavior. Set can-route.data before calling can-route.register().");
-			}
-		}
-		//!steal-remove-end
 		if ( canReflect.isConstructorLike(data) ) {
 			data = new data();
 		}
