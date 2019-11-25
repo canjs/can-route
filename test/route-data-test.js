@@ -120,3 +120,21 @@ QUnit.test("route.register should not read route.data, register first", function
 
 	canRoute.start();
 });
+
+QUnit.test("route.register should not read route.data 2, start first", function (assert) {
+	var done = assert.async();
+	mockRoute.start();
+
+	canRoute.data = new RouteData();
+	canRoute.register("{page}/{subpage}");
+
+	canRoute._onStartComplete = function () {
+		assert.ok('page' in canRoute.data);
+		assert.ok('subpage' in canRoute.data);
+		done();
+		mockRoute.stop();
+	};
+
+	
+	canRoute.start();
+});
