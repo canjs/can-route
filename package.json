@@ -39,7 +39,7 @@
     "can-deparam": "^1.0.1",
     "can-diff": "^1.0.4",
     "can-dom-events": "^1.1.0",
-    "can-event-queue": "^1.0.0",
+    "can-event-queue": "1.1.7",
     "can-globals": "^1.0.0",
     "can-key-tree": "^1.0.0",
     "can-log": "^1.0.0",
