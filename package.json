@@ -66,7 +66,7 @@
     "can-test-helpers": "^1.1.2",
     "detect-cyclic-packages": "^1.1.0",
     "done-serve": "^3.0.0",
-    "http-server": "^0.11.1",
+    "http-server": "^0.12.2",
     "jshint": "^2.9.1",
     "steal": "^2.0.0",
     "steal-qunit": "^2.0.0",
