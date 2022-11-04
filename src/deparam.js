@@ -26,6 +26,12 @@ function toURLFragment(url) {
 	if (root.lastIndexOf("/") === root.length - 1 && url.indexOf("/") === 0) {
 		url = url.substr(1);
 	}
+
+	// Remove any trialing `/` to allow for pushstate to be deparamed properly
+	if (url.lastIndexOf("/") === url.length - 1) {
+		url = url.slice(0, -1);
+	}
+	
 	return url;
 }
 
