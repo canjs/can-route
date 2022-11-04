@@ -326,6 +326,17 @@ QUnit.test("param / deparam / rule", function(assert) {
 					input: { page: "foo", section: "bar" },
 					output: "foo/bar"
 				},
+				{
+					method: "deparam",
+					input: "foo/bar",
+					output: { page: "foo", section: "bar" }
+				},
+				// handles trailing slash (`/`) in url
+				{
+					method: "deparam",
+					input: "foo/bar/",
+					output: { page: "foo", section: "bar" }
+				},
 				// handles falsey values
 				// handles ""
 				{
@@ -336,7 +347,7 @@ QUnit.test("param / deparam / rule", function(assert) {
 				{
 					method: "deparam",
 					input: "home/",
-					output: {}
+					output: { page: "home" }
 				},
 				{
 					method: "rule",

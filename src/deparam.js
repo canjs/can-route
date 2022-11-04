@@ -26,11 +26,6 @@ function toURLFragment(url) {
 	if (root.lastIndexOf("/") === root.length - 1 && url.indexOf("/") === 0) {
 		url = url.substr(1);
 	}
-
-	// Remove any trialing `/` to allow for pushstate to be deparamed properly
-	if (url.lastIndexOf("/") === url.length - 1) {
-		url = url.slice(0, -1);
-	}
 	
 	return url;
 }
@@ -55,7 +50,11 @@ function canRoute_getRule(url) {
 }
 
 function canRoute_deparam(url) {
-
+	// Remove any trialing `/` to allow for pushstate to be deparamed properly
+	if (url.length > 1 && url.lastIndexOf("/") === url.length - 1) {
+		url = url.slice(0, -1);
+	}
+	
 	var route = canRoute_getRule(url),
 		querySeparator = bindingProxy.call("querySeparator"),
 		paramsMatcher = bindingProxy.call("paramsMatcher");
